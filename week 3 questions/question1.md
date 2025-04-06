@@ -1,0 +1,2 @@
+Exam Question 1: Discriminative vs. Generative Models
+Explain the difference between discriminative and generative models in machine learning. In your answer, describe how each type handles classification tasks—especially in scenarios with out-of-distribution samples—and provide examples of algorithms that fall under each category. Discuss the advantages and limitations of both approaches.
