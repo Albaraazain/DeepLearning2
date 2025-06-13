@@ -1,0 +1,1304 @@
+
+Transcript
+0:09
+okay um good morning again so let's start
+0:15
+uh by looking at um the previous lecture in the previous lecture we
+0:22
+talked about um some other well-known widely used and sen architectures um rest next
+0:31
+is a popular example in rest next we
+0:37
+extend the res connection in restn net
+0:42
+by adding multiple pathways so on um a single layer in a sense we have multiple
+0:49
+functions acting simultaneously um in addition to the identity transfer
+0:59
+so we mentioned that rest nex is really powerful however it introduces many
+1:05
+parameters um but if you want a strong backbone you can give it a shot
+1:13
+denset uses resolute connections as well we have residual connections from a
+1:19
+layer to alling layers so we have dense residual connections in a sense
+1:28
+um then we talked about um the efforts for improving the performance running
+1:34
+time speed and memory consumption requirements of CNN's people
+1:41
+are working on converting the weights to binary converting the data to binary and
+1:48
+with those we can obtain significant improvements in memory um and running
+1:54
+time speed however we have some reduction loss in terms of performance
+2:00
+but there are efforts to uh reduce that gap as
+2:07
+well um then we start to talk about sequence modeling problems in sequence
+2:12
+modeling problems we have a sequence we either try to classify that sequence we try to map that to other sequence or
+2:19
+given some input we want to generate a sequence um and in many cases processing
+2:27
+sequential information uh will require somehow
+2:33
+storing and taking into account the history or context
+2:40
+uh of what we have seen in the sequence so far by using that we can try to
+2:48
+process the current input either at the current time point or at the current
+2:54
+position um a very um suitable architecture for that is uh recurrent
+3:02
+neural networks in recurrent neural networks what we try to do is we have this recurrent connection which allows
+3:10
+the previous content the hidden representations from the previous time step or previous position to be
+3:17
+propagated to the processing of the next time step or the next position
+3:23
+so this allows us to have a memory component and in that memory we can
+3:29
+carry we can represent and can store useful information that summarizes the
+3:34
+sequence we have seen so far um so this
+3:41
+memory capacity allows us to represent actually any
+3:48
+uh during computable problem solution um in in a recurrent neuron
+3:55
+network however this recurrent connection uh is challenging for us
+4:01
+because when we back propagate how do we back propagate to that recurrent so we
+4:06
+need to address that and um we address that by unfolding the u current
+4:14
+connection for a number of um time steps so if you consider
+4:20
+um so let's say these are weights from input to hidden layer these are the
+4:27
+weights from input to output layer and these have weights um hidden to hidden
+4:34
+layer right so what we can do is if
+4:40
+you look at the processing how processing is performed across different
+4:45
+time points we have inputed time zero we by processing this through this
+4:54
+linear layer with parameters xh we obtain hidden state then using HW we
+5:02
+obtain the output and given the next input at time one
+5:09
+we obtain the hidden representation but while obtaining the hidden representation we use this um weight as
+5:19
+well then given the hidden representation we can estimates the output so this way by step by step um
+5:29
+unfolding the recurrent connection actually we can simulate the dynamics of the recurrent
+5:36
+connection we mentioned that in part this yeah
+5:53
+how does that the gradients of the go back to
+6:08
+they do not exist anymore they do so when we are unfolding the
+6:15
+unfolded thing is actually let's say we have unfolded the network for let's say
+6:22
+100 time steps Right so we have
+6:33
+Yes so if you consider let's say we we are
+6:40
+unfolding the network for 100 time steps if you look at the unfolded uh network
+6:47
+it is actually 100 layer feed forward network
+6:53
+right so you have 100 layer feed network you just you might you might have 100
+7:01
+predictions in the intermediate layers but it is a 100 layer pit for network
+7:06
+you can use back propagation can calculate the gradients and you can update the weights
+7:14
+so just be sure since we have trained model and then we are shipping it yes do
+7:20
+we really send 100 pairs for the processing of 100 or just No when we are
+7:26
+when we are unfolding the unfolded version effectively has is a 100 layer neuronet network but what we
+7:33
+store are these weights actually three three weights if you just store
+7:40
+these three weights as your network right wxh
+7:47
+wy three weight matrices are sufficient for shifting but when you do inference you
+7:55
+need to unfold for 100 time steps or whatever the sequence length
+8:01
+is that uh yes the non recurrent connections
+8:09
+exist for the last in reality they do not exist when
+8:15
+we ship this so do we just discard their gradients no we will we will now today we will
+8:23
+look at back propagation maybe then it will be more clear so we will back propagate through the unfolded
+8:30
+network unfolded network mimics the dynamics of the return connection
+8:36
+using chain rule we will calculate the gradients and we will back
+8:41
+so some yes
+8:50
+um and here we mentioned that um so in our problem we will work with
+8:57
+sequences sequences have different lengths right we can have um let's say
+9:03
+if you are working with sentences we can have sentences having 10 words or sentences having 100 words right so what
+9:11
+we do in general to make training um faster
+9:18
+right we want to store our samples in matrices right and matrices
+9:24
+if you want if you want to store samples or sequences in matrices we need to ensure that they have the same
+9:31
+length what we do is we zero pad shorter sequences so that every sequence has the
+9:39
+same number of elements the same number of words and this way we can store all our
+9:47
+whole training set as a matrix we can get a matrix of batch of samples then we
+9:53
+can um train the recurrent
+9:58
+architecture however during inference we are not specific to sequence length so
+10:05
+we just have three matrices using the three matrices we can unfold the network
+10:11
+for any number of time steps we can work with five sequences with five words
+10:16
+sequences with 20 words it doesn't matter um however the sequence for which the
+10:23
+network was trained the sequence length network was trained for it's um it has
+10:32
+an implication so it's um recurrent neur networks we will discuss this later on
+10:37
+fails to generalize to longer sequences
+10:43
+so this is this is one of the fundamental problems of RNNs so today we will look at vector
+10:50
+propagation through time we call that vectoration through time but it is
+10:55
+actually plain straightforward application of chain
+11:01
+rule we will talk about the issues in um training and in using RNNs
+11:09
+um a very promising alternative to RNN that addresses the issues of RNN is long
+11:16
+short-term memory networks with that after having covered LSTM and it is
+11:24
+variations we will look at language modeling as an example task right uh it
+11:31
+is it is a we have sequences of words um we have really a lot of data to train
+11:39
+RNN's or LSTMs or um such sequence modeling tasks so
+11:47
+language modeling is a really good um example problem for us um and next week
+11:54
+we will look at other examples to illustrate better understand how RNNs or
+12:00
+LSTMs can be used after RNN ends with language modeling we will switch
+12:08
+to uh self attention and transformers so next week we will switch to more modern
+12:15
+networks architectures approaches with transformers we will switch to large
+12:22
+language models and we are slowly um coming to the end of the term and we
+12:30
+will look at um more more recent approaches
+12:36
+and architecture any
+12:43
+questions okay so how can we back propagate through
+12:48
+um an RN so first let's write down the
+12:54
+feed forward um pass through the network so that we can take that as a basis and
+12:59
+we can back propagate through the network so we have our input so let's
+13:06
+start at time one so X X X1 can be a word it can be a
+13:16
+character it can be part of an image etc so we will look at different examples different applications where X can X
+13:24
+will represent different entities but in any case we need a
+13:29
+vector right x is a vector one-dimensional vector
+13:38
+so we multiply x u with a matrix we have a linear layer
+13:48
+right we with that we try to obtain um the hidden representation at time one
+13:56
+but while calculating the hidden
+14:02
+representation we need to use the previous hidden representation as a previous hidden
+14:08
+state so we need to use H0 so our network starts working at time
+14:20
+one there is no input before right but we still need
+14:27
+some 8 zero value some initial hidden state so later on we will discuss
+14:37
+alternatives for setting h0 one option is we can set it to a constant value we
+14:44
+can initialize it with some random numbers or we can make it a learnable
+14:50
+variable h0 it can be a learnable
+14:56
+variable here x1 is a vector h1 H0 they
+15:02
+are also vectors so in a sense this is the dimensionality
+15:08
+of the hidden state um and depending on how complex the problem is we can
+15:14
+increase the state size hidden dimensionality or we can reduce
+15:22
+that so we can write down what we uh do
+15:29
+for calculating h1 so this is equal
+15:37
+to in general we use hyperbolic tangent we multiply
+15:43
+uh the input vectors with the uh u with the matrix of
+15:52
+parameters so we have a linear layer we add to
+15:58
+that the information coming from the previous hidden
+16:03
+state we can have a bias here for the sake of simplicity I won't write it down
+16:10
+but either we write it down explicitly or it is implemented as part of these
+16:16
+weight matrices so in a sense we have two linear layers
+16:23
+one from X to the hidden state another one from the previous hidden state to
+16:30
+the hidden state so we add them up we combine them and we pass them through
+16:36
+hyperbolic tangent a squashing activation function
+16:45
+so then we have another linear layer unless we have we can have additional
+16:52
+hidden layers as well so we can have as many hidden layers as you want but for
+16:58
+the sake of simplicity I will just use one hidden layer
+17:11
+yes um let me unfold for a few number of
+17:16
+time steps and it will maybe become more
+17:22
+clear we have our prediction for the first time step we use again a linear layer
+17:32
+mapping the hidden state to the output here this is HH right so our prediction
+17:40
+our output is depending on whether we have a classification problem or a regression
+17:47
+problem uh the nonlinearity we want to use might be different but at least we
+17:53
+have u a linear layer right if you have
+17:59
+a classification problem we can use for example soft max to map those to
+18:08
+probabilities then we have our prediction at time one we have ground
+18:15
+truth so depending on the uh problem we are trying to solve we can
+18:21
+either use losses for classification problems or losses for regression problems if you have a classification
+18:28
+problem then for this time step we can use for
+18:34
+example cross center loss that compares the ground truth with our
+18:40
+prediction right this is just for the first time
+18:46
+step then we have the next time step next
+18:54
+input again we are doing the same thing we are passing our input through this
+19:00
+linear layer the same weights we used for the first time
+19:06
+step we need to calculate the hidden state while calculating the hidden state
+19:11
+we use the previous hidden state as well right and given the hidden state
+19:20
+um at time two we have a linear layer mapping the hidden state to the output
+19:27
+at time two so we calculate the same
+19:34
+things for the next time step for the next input
+19:39
+right we can repeat this as many times as we want but at any time
+19:48
+step if we generalize at any time step we have our
+19:55
+input we pass that through the linear layer we obtain the
+20:02
+hidden state right of course considering the uh
+20:08
+previous hidden state as well ht minus one and we pass that through a linear
+20:17
+layer and we obtain the prediction at time
+20:22
+t and we unfold this for let's say
+20:28
+uh capital t many
+20:40
+times so the processing at time t can be
+20:45
+written in a general form like this so the hidden state at time t is equal to
+20:52
+hyperbolic tangent which multiplies where here we
+20:58
+have a linear layer processing the input then we have a hidden two hidden
+21:05
+linear layer processing the previous
+21:17
+uh processing the previous uh hidden state right and the output our
+21:24
+prediction is salt mark applied on um hidden to output
+21:36
+ht and we have our loss for this time
+21:43
+point which is cross entropy um between the correct value and our
+21:56
+prediction is this clear is forward pass through
+22:04
+RNN okay so coming back to the question so we know that sequestion activation
+22:12
+functions have uh issues right saturation issue and as a result of that
+22:18
+we have vanishing gradient problem so why are we using that here why are using
+22:23
+that here
+22:30
+there's no other way otherwise it will just be a combination of we could use
+22:44
+I guess
+22:49
+the horizontal
+22:54
+sorry I guess I guess the amplitude gets too high
+23:00
+okay
+23:06
+why do you b need to bounce that
+23:13
+[Music]
+23:19
+okay
+23:25
+yeah um so h here across time represents
+23:33
+um state state of um what we are
+23:38
+observing right so that state representation should
+23:45
+um should be consistent i mean it should be it should follow it should be bound
+23:50
+it should be between certain limits
+23:55
+and the the meaning that representation should stay unified across
+24:03
+time right so that from that state representation we can predict the
+24:10
+outputs that are meaningful that are similar to each other just at a
+24:16
+different time step so using hyperbolic tangent ensures
+24:21
+that the values are bounded and across time uh what we are looking at is
+24:29
+actually comparable so encoding some concept just changing
+24:35
+across time we can use reu but
+24:41
+with we review is unbounded right so
+24:46
+across time steps the val we cannot control how the
+24:52
+values change maybe we can use additional tricks etc to make sure that
+24:57
+it stays within bounds but it requires additional tricks so this is the vanilla version of
+25:06
+RNN there are extensions that try to use convolution instead of linear layers that try to use
+25:14
+uh nonsqu um activation functions but in the
+25:19
+vanilla version we are using squashing calculation
+25:25
+functions so as a result of this if you consider that we unfold this 100 time
+25:33
+steps right 100 time steps we have a 100 layer feed forward
+25:41
+network it is a huge network right and we have squashing activation
+25:48
+function all the way we have a significant issue with the
+25:56
+gradients it is very difficult to train an RNN for long
+26:04
+sequences so this is feed forward pass let's look at how we can back propagate
+26:10
+can perform back with
+26:17
+us so these are same things written in a better form um okay
+26:24
+so in this slide let's um derive the gradients
+26:33
+um so here to keep things general um we are making prediction at each time
+26:41
+step but we can we are very flexible so we can just make a single prediction at
+26:46
+the end of the sequence right um or we can delay the predictions as well so we we
+26:54
+will we will look at applications where we will process the input without making
+27:00
+any predictions after the input is finished we will decode you will make
+27:07
+predictions and then you will um calculate losses and back propagate so
+27:12
+we are very flexible in using um this architecture in different ways but to
+27:18
+keep things general I just I I'm we are going to look at um an example where we
+27:26
+have predictions at each time point and we calculate loss at each time
+27:31
+point okay so let's um let's start by looking at the gradient of the loss
+27:40
+total loss with respect to the variables parameters in the output
+27:52
+layer output layers mapping the hidden state to the output
+27:59
+um we can use chain rule um it is a simple direct
+28:06
+application of chain rule with the critical um note that we have multiple copies of
+28:14
+the same parameter so we need to get the gradient to each copy and we should add
+28:20
+them up so if you look at this
+28:27
+um every at every time point we have losses and these losses actually depend
+28:35
+on these um these parameters right so
+28:40
+what we should do is we should calculate the loss of the last time step with
+28:47
+respect to uh with respect to the
+28:54
+prediction and given that using the chain rule we can
+29:00
+calculate um the gradient of the prediction with respect to the parameter
+29:11
+here so this is the loss of the last time step so yes loss of the time last
+29:18
+time step it's gradient to the output variable
+29:24
+is this clear this is not the only chart right no more
+29:29
+is more more around the way so this is just for the last copy of
+29:35
+the parameter here we need to do the same for the
+29:41
+previous copy uh for the previous time step right so
+29:46
+for yeah I just wanted to
+29:53
+ask with respect to some vector and some matrix then
+29:59
+we are consider that we are doing it actually with respect to scalers scalers
+30:10
+um then for the next one we have uh the graded of
+30:17
+the output with respect to the hidden layer and actually this way
+30:25
+we use the chain rule at each time step to get the gradient of the loss at the
+30:31
+time step to the copy of the variable for that time step
+30:39
+and we can write this down in a more compact
+30:47
+form gradient of the loss at time step t
+30:52
+uh with respect to the prediction at the time step
+30:58
+and the prediction of the time step we take its gradient with respect to the uh
+31:06
+parameter you
+31:11
+want is this clear
+31:25
+oh true oh sorry here um h
+31:34
+wh yeah we should start with from one one to
+31:40
+end right so one two
+31:54
+and it
+32:02
+clearly the same scalers on each
+32:10
+horizontal time the these why they are the same oh they're the same yes that is
+32:16
+what unfolding implies right
+32:22
+so here this is why so at each time step actually we are
+32:29
+using the same exactly the same why we have parameter shaving that's right
+32:36
+yeah that is how we can mimic the dynamic of INF actually otherwise if you
+32:42
+have different parameters it's a different network
+32:52
+yep and also with every time our calculations get more and
+33:00
+more expensive right because we predict to the first one and those functions are
+33:06
+always different so those functions are same but the estimate is getting changed
+33:14
+so it becomes more expensive or are you memorizing some
+33:20
+compounds what do you mean things get more difficult for example inputs K and B
+33:29
+later the loss propagated first input second
+33:36
+okay so you are referring to sequential unfolding of the Okay for
+33:43
+example or short yeah so the we need to
+33:50
+unfold the RNN for the length of the sequence for the number of time steps
+33:57
+and we cannot parallelize this although we are using the same weights across time we cannot make
+34:04
+things parallel because to process the information at a certain time point let's
+34:10
+say XT actually I need to know the processing I need to wait to process
+34:16
+processing up to that time point because I need the hidden state representation right so this is one of
+34:23
+the issues with um inference
+34:30
+um during training um or or dur pass during training or inference it
+34:38
+cannot be paralyzed the reason should not be paralyzed is the functions hidden state
+34:45
+representation yeah otherwise we'll just stack up the V and make
+34:52
+when we talk about transformers this this will be at
+35:01
+least okay so if things are clear for the gradient with respect to
+35:09
+the output layer we can proceed with the more complex part so this was the easy part
+35:17
+okay so how about let's say the gradient with respect to the variables connecting
+35:24
+the hidden state to the next hidden state or the gradient from the input to
+35:31
+the hidden state so let's start with with the first one the
+35:39
+loss the gradient of the loss with respect to
+35:46
+um a variable connecting the hidden state to the hidden state
+35:52
+this is more tricky
+35:58
+and we should we will start from the end
+36:03
+of the network con considering that this is a feed forward network like a multi remember we start from the end of
+36:12
+the network and using chain rule we um backate so we will do the same
+36:20
+so this is equal to the gradient of the
+36:26
+loss at the end at the last time
+36:32
+point we will take the we will use a chain rule we will take the gradient
+36:38
+with respect to the hidden state of course we need I mean if you to keep
+36:46
+things simple I didn't open this up here just this gradient needs to be
+36:53
+calculated following several steps by using chain rule right you need
+37:00
+to um take the gradient with respect to the output variable then from the output
+37:06
+variable you can take the gradient respect to the hidden state to keep things manageable
+37:11
+on size I just write that is a single term is this
+37:27
+clear okay so then once we have the gradient with respect to hidden state we
+37:34
+can calculate the gradient with respect to the U variable connecting
+37:40
+the hidden state to hidden state right the gradient of the hidden
+37:47
+state with respect to
+37:55
+WH of course we need to take the gradient with respect to the hyperbolic tangent etc i'm skipping those
+38:03
+so I just write it as a compact simplified easy to follow
+38:09
+um multiplication of two terms the gradient with respect to hidden state
+38:15
+hidden the gradient of the hidden state with respect to the variable this is the easy
+38:22
+part so let's consider the gradient to this
+38:29
+copy right again let's take the gradient of
+38:35
+the loss at that time point with respect to uh the hidden
+38:43
+state at that time point but to this hidden state actually
+38:50
+there are two gradients one coming from the
+38:56
+output at that time point one coming from the next time
+39:05
+step right so we need to combine the gradients in forward pass this hidden
+39:11
+state contributed to two parts the output and the next hidden state we need to get the gradients through
+39:18
+both so here we need to
+39:31
+um we need to get this gradient as well
+39:43
+the gradient coming from the output the gradient coming from the next
+39:50
+time step
+39:56
+i think we should also apply chain rule to
+40:02
+chain rule to what no we are taking a loss with respect to H minus
+40:08
+yeah it's not finished so this is the gradient of the
+40:17
+loss with respect to h n minus
+40:27
+one then once we have the gradient with respect to the hidden state we can
+40:32
+calculate the gradient with respect to the um parameter we want
+40:42
+right like we did
+40:49
+here then the next time step or the previous time step
+40:56
+right the gradient at the time
+41:02
+point we take its gradient with respect to the hidden state but we need to get
+41:09
+the gradient from the following time steps
+41:15
+right so we need to put this in
+41:21
+here so to keep to make it simpler I will just write it like this
+41:39
+let me write it better
+42:03
+right so we have accumulated we have accumulated the gradient with respect to
+42:09
+the hidden state both coming from the output layer and from the following all
+42:16
+following time steps right then we can
+42:23
+calculate its gradient with respect to the hidden state
+42:36
+If you open up this [Music]
+42:42
+term if you look at this term it is a multiplication
+42:49
+of many gradients actually coming from the following time
+42:56
+steps
+43:02
+we need to repeat this for all previous time
+43:14
+steps does it make sense
+43:21
+okay um so it is written in a more compact form
+43:26
+here so at each time step we get the gradient of the loss with respect to
+43:31
+that hidden state right once we have that we take its gradient with respect
+43:38
+to the um variable you want um so at
+43:43
+each time step what we are doing here is getting the output at the time step the
+43:50
+gradient of the output at the time step respect to hidden state and we get the
+43:57
+gradient of the loss with respect to the next hidden state and use the gradient
+44:03
+of the hidden state to the hidden state so here actually we have multiplication of a lot of gradients
+44:14
+so if you consider um u an unfolded network with 100 time
+44:22
+steps for the first um for the first
+44:28
+copy the gradient getting the gradient means multiplying 100 partial
+44:38
+derivatives multiplying 100 partial derivatives 100 in times so if we have
+44:47
+this is very difficult to train right considering that we have squashing activation function in between so the
+44:54
+gradients are already small we are multiplying hund of those and it's very
+44:59
+difficult to train such a network okay so this is how things would
+45:07
+be for the u
+45:13
+variables connecting hidden state to the hidden
+45:19
+state um just keep this in mind we will use the same
+45:27
+derivative the derivative with respect to the hidden states we have stored them we have calculated them we can store
+45:34
+them and when we want to take the gradient with respect to the input
+45:40
+parameters input layer we will use that it will make things easier for
+45:47
+us so let's look at the gradient where is
+45:54
+this if you look at the gradient of the loss with respect
+46:00
+to the input layer this is again starting from the
+46:06
+end of the network this is the gradient of the output
+46:13
+uh the loss at that uh time step with respect to the hidden state and once we
+46:18
+have that if you have the gradient with respect to the hidden state we can
+46:26
+easily calculate the gradient with respect to the uh input
+46:33
+layer plus the gradient of the loss
+46:39
+um at the previous time step with respect to hn1 and hn minus one plus the
+46:48
+gradient of ln with respect to hn hn with respect to hn minus one like
+46:57
+we did for the previous case and once we have this
+47:04
+gradient we can calculate the gradient with respect to the um input
+47:10
+layer so this is almost the same for what we did
+47:17
+for the parameters connecting the hidden state to the hidden
+47:22
+state is this clear so here we have the same issue of
+47:28
+vanishing gradient problem so if you have a 100 um 100 time steps um then the
+47:35
+earlier copies earlier copies will have very
+47:42
+very small gradient so it will be very difficult to train at the
+47:47
+network there was a question
+47:56
+yeah yeah so these are already
+48:06
+calculated um okay so in the slides I have the derivations so in some
+48:12
+resources they write it like this so the gradient with between two consecutive
+48:19
+hidden states so they write it as a multiplication of many hidden state
+48:25
+gradients it's the same thing I just I mean here it is easier to trace
+48:33
+what we are calculating so whichever is easier for you you can follow
+48:42
+okay um so as we have discussed uh one
+48:48
+issue is how do we initialize the hidden state um before the starting time
+48:57
+point so we start
+49:09
+sorry we start with the um first time step with
+49:17
+x1 in obtaining in calculating h1 we need some previous hidden
+49:24
+state so this we call this the initial
+49:30
+um initial hidden state and we need to have some value
+49:36
+here in H0 so that we can update
+49:41
+H1 and for this we have several options we can keep it
+49:46
+uh can provide a constant value for this we can initialize this with some
+49:55
+random um values but those random values should
+50:00
+be used during whole training for each data we cannot use
+50:06
+some other random values because hidden state initial hidden state it it is
+50:11
+important where we start is important it needs to be
+50:18
+consistent or we can make it
+50:24
+learnable and in general um we keep it learnable it's a learnable
+50:31
+variable we back propagate we update that using gradient descent and the most
+50:37
+suitable value for the initial hidden state is learned directly from the data
+50:48
+um okay um and for the other parameters um I mean remember we are we are using
+50:55
+fully connected layers linear layers since these are linear layers we can use Javier
+51:02
+initialization so we talked about the gradient problem so here um if
+51:10
+you as we have mentioned if you open this up across time actually we have
+51:16
+multiplication of multiple gradients and uh depending on the norm
+51:22
+of the weights and since we are using expression activation function we have a
+51:29
+tendency uh to have a vanishing gradient problem but if the norm of the weight is large
+51:36
+let's say we have initialized the weights with large values or somehow we had u large learning rates and we had
+51:45
+errors and we obtained we end up with large weights if you have large weights
+51:51
+and if you multiply the gradients across time u it might be that gradients can explode
+51:59
+as well but this is maybe more rare
+52:05
+so we have problems with the gradients and because of that training RNN for
+52:10
+long sequences is a is a is really challenging one solution to address the
+52:18
+issues with the gradients is to explicitly control um try to
+52:24
+address the norm norms of the gradients control the norms of the gradients so
+52:30
+one option is to avoid the exploding gradient problem we can clip the norm of
+52:39
+the gradient i for us what is critical is the direction so the exact norm of the
+52:47
+gradient is not very critical so we can just clip the gradient from a certain value we still
+52:54
+get the direction and along that direction we make updates
+52:59
+so this is one issue one one solution and for the vanishing gradient problem we can add for example a penalty term to
+53:08
+our loss such that the gradient at consecutive time steps between
+53:14
+consecutive time steps is actually u is is not small so there are different
+53:22
+ways to write this down so in this study um they use such a u such a term so x
+53:30
+here denotes notation is slightly different x here denotes hidden
+53:37
+state the input is denoted by U right um
+53:43
+and what they do is if this term is close to one then actually gradient
+53:49
+doesn't vanish so these are possible but they
+53:55
+are not commonly used a common solution is to use um a
+54:02
+more advanced um version of RNN where we have more
+54:09
+explicit control over some memory
+54:18
+component that is long short-term memory so this was proposed in
+54:25
+1997 the authors are important of writer
+54:31
+um maybe he's not as well known as Yan Leon etc but he
+54:38
+has good contributions jurgen Schmidt Hubar um he's a famous figure he has
+54:47
+other contributions to the literature as well
+54:52
+long short-term memory is the his most important
+54:57
+contribution and in many applications where RNNs are used actually long
+55:03
+shortterm memory is used LSTMs are used so his contribution is really important
+55:11
+um so when we talk about pioneers of deep learning people
+55:16
+generally consider you know Hinton Yan Leun Yosha
+55:22
+Bangio often neglecting Yugan Schmid and he's his personality is a bit
+55:33
+um he feels upset about this exclusion and he publicly
+55:41
+uh states his opinions about this and he fights um and he argues with other
+55:49
+pioneers other people so that he should be recognized um more
+55:56
+better um maybe he deserves more credit I don't know but the way he does it you know might be
+56:07
+there might be better ways okay so let's look at long short-term memory LSTM so
+56:14
+to better understand LSTMs let's try to visualize what we are
+56:19
+doing with an RNN in with an RNN at each time step we have our input we multiply
+56:25
+this with uh we pass it through a linear layer and we have the hidden state
+56:31
+coming from the previous time step ht minus one we multiply that um with a
+56:39
+matrix so we have a linear layer we add them up here we have w xh * x1 xt plus
+56:52
+wh um * htus one we pass that through
+56:59
+hyperbolic tangent and with that we obtain the hidden state representation
+57:05
+and from this if you want we can calculate the output but here in this visualization we are not showing what we
+57:13
+do with the hidden state to obtain the output right so with LSTMs what we will
+57:21
+do is we will introduce an additional
+57:27
+memory variable memory lane that's we will call that C ct minus
+57:37
+one let me write
+57:49
+we will get CT minus one we we will do some operations here
+57:56
+we will obtain CT we will do some operations here we will obtain CT + 1
+58:03
+etc so this we will call that memory state so
+58:08
+H we will call that hidden state c we will call that memory state so what we
+58:16
+will do is we will introduce some extra operations at each time
+58:23
+step such that we explicitly
+58:29
+erase content from the memory or add content to the memory so we would use
+58:36
+this memory state C and we would have
+58:42
+explicit operations memory operations to erase content and add
+58:51
+content so how do we do
+58:58
+that so this is CT minus one this is the hidden state coming from previous uh
+59:05
+time step hidden state
+59:11
+uh memory state
+59:17
+right so we will have some operations here that will control what we are doing
+59:24
+on the memory so let's drive this step by step
+59:29
+so we multiply the input with
+59:36
+uh uh with a hidden layer we pass that with a to a hidden layer and we pass the
+59:43
+hidden state
+59:49
+uh hidden layer as well we can have bias here right or we can just make it as
+59:57
+part of the linear layer uh we have different options so let's denote
+1:00:04
+this with a variable A so it is a
+1:00:11
+vector we multiply the input with a matrix we multiply state with a matrix
+1:00:17
+we have the bias effectively we have two linear layers we obtain their results
+1:00:24
+and we add them up right is this clear so far
+1:00:32
+okay so here we have four gates so we call these
+1:00:38
+gates in an RNN effectively we just had
+1:00:43
+a single gate
+1:00:49
+here we have four gates so what we will do is we
+1:00:56
+will take this um vector and we will
+1:01:02
+split that into four equal length
+1:01:08
+vectors they have the same length so if there are L elements here there are L
+1:01:15
+elements here etc
+1:01:22
+let's call the first one a F the second one A
+1:01:31
+I the third one um A of G and the last
+1:01:36
+one A of O with this we
+1:01:44
+will we will we call this forgetting so for erasing content uh for forgetting
+1:01:51
+content from the memory we will use this vector so this vector will
+1:01:57
+control whether we should erase something from the memory we will use
+1:02:05
+this to add
+1:02:13
+content and we will use this while calculating the next hidden
+1:02:32
+state so let's see how we can forget so we take
+1:02:40
+the memory coming from the previous time step we multiply
+1:02:46
+that element wise multiply that with a sigmoid of a of
+1:02:54
+f remember sigmoid takes values between zero and one
+1:03:00
+with that if the values are close to zero we are erasing
+1:03:07
+some content from the memory right we are multiplying a certain variable with
+1:03:13
+zero or some small value we are we are raising something if the value of the
+1:03:19
+sigmoid is close to one we are preserving that
+1:03:24
+concurrent and it is dynamic so by looking at the input In the hidden state
+1:03:31
+we have calculated a of f this vector right in a sense by looking at
+1:03:39
+what we have now based on the sequence we are controlling whether we should
+1:03:46
+erase something and how much we should erase so it is it is dynamic so it is a
+1:03:52
+very beautiful concept right looking at the input and the hidden state we are
+1:03:59
+controlling some memory variable and since everything is
+1:04:04
+differentiable the network effectively learns to erase
+1:04:11
+content if necessary so this part was
+1:04:19
+erasing or forgetting after
+1:04:26
+erasing we can add the content we want to add and the content we
+1:04:34
+add should should not be always should not be always positive so we might want to add some negative content to reduce
+1:04:41
+for example the existing values we might either want to increase values keep the
+1:04:48
+values or reduce the values because of that we can use hyperbolic
+1:04:58
+tangent right and we multiply that uh with uh a sigmoid of a of i so from the
+1:05:08
+hyperbolic tangent in a sense we are determining whether we should increase or decrease and a of i is controlling
+1:05:16
+its magnitude in a sense we have two gates working together
+1:05:24
+to estimate how much we should increase and how much we should decrease certain
+1:05:30
+values in the memory right so the first part was erasing the
+1:05:37
+second part was adding or increasing
+1:05:47
+content with this we obtain the updated
+1:05:52
+memory uh state to be pro to be provided to the
+1:05:58
+next uh time step right
+1:06:04
+is this
+1:06:10
+clear oh no no
+1:06:17
+no okay so given the updated uh memory uh representation
+1:06:32
+um I think it was like this so
+1:06:55
+Yeah let me just check yes that's
+1:07:00
+correct and we use the updated memory representation we
+1:07:06
+pass that through um hyperbolic tangent so that we can get positive and negative
+1:07:12
+values as well for the hidden state and this controls the magnitude of the
+1:07:20
+uh hidden state representation with that we calculate the hidden state representation for the next time
+1:07:30
+step here everything is differentiable right so and we can use
+1:07:38
+chain rule and we can back propagate through the network of course compared
+1:07:44
+to RNN we have more operations we have more gates etc
+1:07:50
+but if you are careful with the application of chain rule it it work
+1:08:00
+yeah sigma i don't know why we I don't quite understand why we both
+1:08:08
+hypo tangent ensures that we can have negative values and positive values with the sigmoid we are giving flexibility to
+1:08:14
+control this magnitude but I mean there are variations of we will we will talk about
+1:08:25
+them I think we should get good results with sigmoid as
+1:08:31
+I brings the locality of the magnitude and the sign so maybe we should combine
+1:08:39
+both of them and just pass through each and more locality
+1:08:49
+it's worth trying um I don't know a study comparing that comparing these two
+1:08:57
+um but we should get some good results with that as well okay
+1:09:03
+so having looked at um LSTM and we repeat this across time why
+1:09:13
+does it address the memory the gradient issues remember with RNN's we
+1:09:20
+had gradient explosion or vanishing issues right so why don't we have that
+1:09:26
+issue here
+1:09:54
+oh
+1:10:02
+between gradients and check
+1:10:13
+okay uh in general negative feedback loops
+1:10:18
+create stability in systems and adding foretting is negative if that is large
+1:10:27
+and
+1:10:32
+forgetting similar okay what else
+1:10:49
+look at the definition of how we update the memory
+1:11:05
+stage look at this definition
+1:11:15
+any other
+1:11:23
+answers if you look at the dependence between CT and CT minus one there is no
+1:11:32
+nonlinearity ct ct minus one is not passed through a
+1:11:38
+nonlinear function a squashion function so the gradient of CT with respect to CT
+1:11:44
+minus one actually um is not passing through a squation
+1:11:49
+function so we don't have a vanishing gradient problem along the CT lane along the memory lane we don't have
+1:11:57
+a vanishing gradient problem and through the memory lane we
+1:12:02
+can get good gradients and we can provide good gradients then to the
+1:12:08
+hidden states through the memory lane and through to the other
+1:12:16
+variables this is um this is why LSTM
+1:12:21
+works better than RNN and it doesn't have the issues of
+1:12:31
+RNS um the same operation can be formulated in
+1:12:37
+different ways if you see such a formulation don't be scared it's just doing the same thing um so we have
+1:12:45
+discussed all of these so we are controlling gates so here in these illustrations this is explained step by
+1:12:53
+step um I will skip those um
+1:12:59
+okay so let's look at some of the well-known
+1:13:05
+variations of LSTMs in one variation um remember in controlling the
+1:13:13
+gates we use the input and the previous state i mean there might be some useful
+1:13:21
+information in the memory state to control these gates right
+1:13:27
+so in one extension actually here we are adding
+1:13:33
+the hidden state the memory state as well so we look at the memory as well to
+1:13:40
+control the gates and erase content or add content to the
+1:13:47
+memory um so erasing and adding content can be coupled so if we are not
+1:13:56
+erasing we shouldn't add to add we should raise right so we can couple them as well
+1:14:03
+so that is one extension a more well-known extension is called gated
+1:14:10
+recurrent units GRU this is commonly available in the
+1:14:18
+frameworks as well so in GRUs what we do is
+1:14:25
+um we have a single state representation K over time so remember in LSTM we have
+1:14:32
+hidden state and memory state but when we were introducing hidden state we were
+1:14:37
+saying that hidden state captures memory over time right so why do we need an
+1:14:43
+additional memory state so we can unify them and we can obtain we can use a
+1:14:51
+single memory state and if we can ensure that there is no vanishing gradient
+1:14:56
+problem over that hidden state representation then we can actually have a maybe simplified version with less
+1:15:04
+parameters to train i'm not going to go over um the
+1:15:09
+steps but here we have a hidden state representation which functions as the
+1:15:15
+memory state representation as well we use the input we use the hidden state to
+1:15:20
+control the gates for erasing content um and adding content
+1:15:32
+um GRUs
+1:15:38
+um are widely used actually as an alternative to LSTMs however on more
+1:15:45
+challenging data sets more challenging problems they have shown that GRUs
+1:15:51
+cannot generalize they cannot perform as well as arms so separating the hidden state and
+1:15:57
+the memory state somehow um is useful for more complex
+1:16:04
+problems so they have trained um LSTMs and GUS for recognizing
+1:16:12
+um sequences following certain patterns let's say N copies of A then B copies of
+1:16:20
+N copies of B if the sequence has this then we label as positive otherwise we
+1:16:26
+label as negative so to solve this problem the network needs to count how many A's there are then how many B's
+1:16:33
+there are and ensure that there are the same number of A's and B's right so this
+1:16:38
+is for us maybe this is a simple problem but recognizing that for a network uh by
+1:16:45
+a network is actually challenging so somehow GRUs fail to address these
+1:16:51
+problems so work better so depending on the complexity of the problem you can
+1:16:59
+give GRUs a shot but if you are not sure
+1:17:04
+just stick to LSTMs um people have developed
+1:17:10
+convolutional version of LSTMs uh things are more sophisticated
+1:17:16
+um and they we need to use batch normalization as well um actually without batch normalization
+1:17:23
+should be possible as well yeah
+1:17:28
+um there are other um variations of LSTMs and RNNs we are not uh going to
+1:17:35
+look at all of those there are a lot of tutorials a lot of visualizations i have
+1:17:41
+used some of some visualizations from this web page it is it is really well
+1:17:46
+prepared um and people um people also showed that
+1:17:54
+um actually scratching information can be um processed using a convolutional
+1:18:03
+architecture right so in a sense if you consider the unfolded network it is a feed forward network right since it is a
+1:18:10
+feed forward network I can also use convolution um across
+1:18:16
+time if we align receptive fields such that we are not looking at the future
+1:18:22
+values If we arrange convolution so that things are um causal
+1:18:31
+then it it is feasible so before the explosion of transformers people were
+1:18:38
+exploring convolutional sequential modeling approaches architectures they were
+1:18:44
+obtaining comparable results and about to maybe obtain better results than
+1:18:50
+RNN's then transformers changed
+1:18:57
+everything okay um we can stop here in the next lecture we will continue with language modeling

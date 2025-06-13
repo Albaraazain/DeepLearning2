@@ -1,0 +1,1182 @@
+
+Transcript
+0:03
+okay good morning again Let's start
+0:09
+um with a quick overview of the previous lecture So we
+0:15
+were talking about CNN's So we were spec specifically focused on um
+0:24
+convolutional layers So we talked about some important um hyperparameters that
+0:29
+we need to be uh that we need to control that we need to
+0:34
+uh set So one of them is stride It controls how much information we are
+0:39
+skipping when we are sliding um a receptive field So we said that we need
+0:45
+to be careful about stride If it is too big then we might lose a lot of
+0:53
+information So depending on where we are in the architecture we might um we might need
+1:03
+to be careful about this driver Now
+1:08
+um we talked about the depth which is the number of channels So this is directly termed by the number of liters
+1:14
+in a convolutional layer Um and we need to be careful about the boundaries If
+1:20
+you don't do something about the boundaries then the layer size is going to decrease If you want to preserve the
+1:27
+layer size in in convolutional layers we need to add padding or if we we use
+1:34
+padding also if you want the receptive fields to align properly um over the
+1:40
+layer Uh then given these hyperparameters we can calculate how many neurons there will be in the next
+1:48
+layer Uh then we after introducing the vanilla
+1:55
+form of convolution that we use in convolution layers we talked about um
+2:01
+its variations Um some some of the some of these variations are more commonly used
+2:08
+some of them are um very rare but it is good to be aware about those And one
+2:15
+option one alternative is to not share parameters across convolution This is
+2:21
+called unshared convolution Um we can place
+2:28
+um the parameters of the kernel by leaving empty spaces between them when
+2:35
+we are placing it over the over the layer So we call that dilation Um and
+2:40
+this is called dilute dilated convolution or atro convolution Um we have transpose
+2:47
+convolution which is commonly used when we are upsampling um and increasing the layer size
+2:55
+Uh what we do is we multiply um the kernel with um the values here one at a
+3:03
+time and we place the outputs here at their respective positions and then we
+3:09
+add them up Um we can do of course upsampling by
+3:17
+using um excessive padding or we can use dilation uh this is also possible We
+3:24
+talked about 3D convolutions in places where we have three independent variables like X Y and time we actually
+3:34
+need to slide the kernel over a third dimension So we call that three
+3:40
+dimensional convolution But considering that the filter has a
+3:45
+hidden or implicit um channel dimension actually the type of operation we are
+3:51
+doing is actually four dimensional but we as we discussed before the number of
+3:57
+independent variables is what we mean when we talk about the dimensional
+4:05
+convolution We commonly use one by one convolution to control the number of
+4:10
+channels to to reduce or increase dimensionality without any special um
+4:18
+integration of of of the data we can control the
+4:23
+dimensionality So we will look at some architectures there We will see the use of one by one
+4:30
+um we can separate um we can write a matrix as a multiplication of two
+4:36
+vectors Um and if we view um a filter a kernel a 2D kernel as multiplication of
+4:44
+two vectors then we can actually reduce uh by by forming
+4:51
+convolution as as a as two consecutive vector operations applied on on on the
+4:59
+data We can actually reduce the number of multiplications and reduce the number of parameters We can do this depth wide
+5:06
+as well This is called depth bicycle convolution Again here number of parameters and multiplications is
+5:11
+significantly reduced We can in a sense extend
+5:17
+stepwise separable convolution to group wise depth by separable convolution We
+5:23
+group channels in a sense then apply convolution separately to
+5:29
+those Um then lastly we talked about deformable convolution In deformable
+5:34
+convolution we we don't place a kernel the parameters of a kernel regularly in
+5:42
+a grid So we allow some offset to be placed for for each um for each
+5:49
+parameter So instead of this parameter focused on here by learning some offset
+5:55
+or estimating some offset this can actually multiply the value here this can multiply the value here etc
+6:02
+So we are expanding convolution in such a way that depending on the input the
+6:10
+parameters choose where they want to attend So this is very dynamic very
+6:17
+adaptive and this this works really well However this is computation very expensive um and therefore we we
+6:25
+generally don't construct a full CNN full network based on this maybe in the
+6:32
+top layers you can use one or two um such uh deformable convolutional
+6:39
+layers So we mentioned that here um
+6:45
+maybe I can talk about this a lot again So while trying to apply convolution on
+6:51
+on a layer So this part is trying to apply convolution and with a parallel
+6:59
+convolutional layer we are trying to estimate offsets for each
+7:04
+position of a kernel over the layer Um and we take the offsets So if you want
+7:11
+to perform convolution at this position for example we get the offsets for that
+7:17
+position from the estimated offset field we apply the offsets uh we move we
+7:24
+adjust the positions of the parameters then we perform convolution When we are back propagating
+7:31
+we have a challenge So normally we will be back propagating here but we need to back propagate to these off estimated
+7:38
+offsets as well However offsets or indices are not part of the computation
+7:44
+So we need to find a mechanism to um address this and actually that direct
+7:50
+becomes um um becomes possible because the
+7:57
+estimated offsets are not integers right so these are estimated offsets They are not integers But we can only work with
+8:05
+integers because we are trying to index um an array a tensor here Um to address
+8:14
+this problem we can use bilinear interpolation When you use bilinear interpolation then actually the index
+8:22
+the offset estimated offset becomes part of the calculation and we can back
+8:27
+propagate through that the key one or less or is it just
+8:38
+I think it is limited within the image space but I I think they normalize the width
+8:45
+and height between zero and one the height of the image and width of the
+8:50
+image So they estimate something between but I mean it can theoretically move far
+8:59
+away Yeah Yeah
+9:05
+Okay So that was uh a review of the previous lecture Any
+9:12
+questions um we have one more um convolution type that deserves um our
+9:21
+attention We will talk about that and with that we will conclude um our
+9:27
+discussion regarding convolutional layer or what kind of convolutions we
+9:33
+can use in a CNN Then we will talk about pooling and other operations that we frequently use
+9:40
+in CNN's nonlinearity um full connected layers normalization
+9:47
+uh but we talked about them already in the first part of the course So we are not going to focus um spend too much
+9:54
+time on that Then we will see we will discuss how we can back propagate
+10:00
+through a CNN
+10:07
+The last type of convolution I want to talk about is position sensitive
+10:13
+um convolution So let's say you have a problem um you have an
+10:20
+image right in your image let's say you have a shape and you want to train a
+10:26
+network to estimate let's say um the position of the object So you want to
+10:32
+estimate a single quantity that represents the position of the object So it turns out that actually
+10:39
+vanilla convolution a CNN um with vanilla convolution does not
+10:46
+perform really well on such tasks So in this paper they showed they
+10:53
+um introduced some toy data sets um having similar properties and they
+10:58
+showed that vanilla convolution uh doesn't work so so well and they
+11:04
+introduce um a mechanism where we add two extra
+11:10
+channels uh that mark the
+11:16
+position the I coordinate and J coordinate for each pixel here or in the case of a
+11:25
+feature map convolutional layer the neuron they are added as two
+11:32
+extra channels you get the question yeah so the reason why it's not good at
+11:37
+detecting position of an object would be that it's translating so why
+11:44
+use the first place why not less number parameters
+11:50
+compared to about significantly less So if I'm doing
+11:55
+anything that has an image I usually want to yeah we generally use conotional
+12:01
+neural networks but if you want to estimate something that is position
+12:07
+um specific right like the position of object for example then actually
+12:14
+convulsional layer as CNN with vanilla convolution may not perform really
+12:20
+well So they showed in this paper that if you add um I coordinate and J
+12:26
+coordinate for every neuron or every pixel as additional channels
+12:31
+then your network can learn So that that was the last type of
+12:38
+convolution I wanted to talk about There are lots of material on the web that
+12:43
+explain visualize animate um different types of convolution I
+12:49
+provided some here as reference so we can go over them if you
+12:55
+like Okay So let's continue with pooling Um
+13:01
+remember when we talked about why we need um an architecture
+13:07
+like CNN we were looking at some earlier um earlier models We talked about neo
+13:15
+neocognitron um and there there were two types of um
+13:21
+cells or neurons simple cells and complex cells So simple cells correspond
+13:27
+to convolution in CNN's and complex cells
+13:33
+do something uh similar to what we call pooling So the in a complex cell we are
+13:39
+trying to summarize information contained in the receptive field and that is what we are trying to do in
+13:47
+pooling Um so similar to convolution in a pooling
+13:54
+we have a receptive field So when we are designing a pooling operation in a CNN we need to determine
+14:01
+the feature size and we need to determine how much we will skip So we have a stride parameter hyperparameter
+14:10
+as well but the type of operation we are doing is slightly different So let's say
+14:16
+this is our receptive field What we are trying to do is we are trying to summarize the
+14:22
+information here So we have inceptive field So we have a set of numbers We want to
+14:30
+summarize all those numbers We can take their summation We can take their
+14:36
+average we can take their maximum minimum etc etc So we have different
+14:42
+statistics we can compute from a set of numbers and all of them most of them
+14:47
+have been tried in the literature right uh maximum sum average
+14:53
+weighted average alorm and some higher order statistics as well Um but it turns
+14:59
+out that for many problems taking the max
+15:06
+uh taking the maximum of um the values
+15:11
+here as the value in the next layer works really well for many problems This
+15:18
+simple operation taking the maximum of the values in the receptive field it works really
+15:25
+well We call that max
+15:31
+pooling However if you want um for your specific problem you can try different
+15:38
+options But um I think nowadays people directly use max pooling without trying
+15:44
+anything else So with pooling and it uh we
+15:50
+can summarize information in the receptive field and while doing so we can down sample we can reduce
+15:58
+dimensionality significantly So if you use for example a stride of
+16:03
+two for a channel like this So let's say this is
+16:11
+the receptive field size is 2x two right so this is one receptive field So if you
+16:18
+use max pools we have four values here We take the maximum
+16:24
+six Then try this two So the next position of the filter deceptive field
+16:30
+is going to be this one So we have four values we take the max right Then the next position is here
+16:39
+We take the Mox right and the next one is
+16:47
+here Yeah Detective is convolutional layer
+16:56
+Not necessarily what that is generally the case So there is generally a
+17:01
+nonlinearity in between or there might be some other operations when you want to reduce
+17:09
+dimensionality with pooling we we we can we can do that
+17:17
+So here in this example the we had a 4x4
+17:23
+channel 4x4 input layer for pooling With pooling with a stride of
+17:31
+two we reduce dimensionality to 2x2 We had a very significant reduction from 16
+17:39
+values we reduced um the size to four 2x two Right so
+17:45
+there's a huge reduction in information content So we need to be careful when we
+17:51
+are applying pooling So stride is really critical If you keep it large then might
+17:59
+be that you we are losing important information Um we need to be we need to
+18:05
+be careful about the stride value So one um critical difference with
+18:13
+pooling is that especially if you use max pooling there is nothing learnable We are not learning any
+18:21
+parameter in pooling right in convolution we learn the parameters of the
+18:27
+kernel That is one significant difference The second is that each
+18:33
+channel is pulled independently and
+18:39
+separately Right so if there are 32 channels there will be 32 channels after
+18:47
+pooling So the number of channels don't change to through
+18:53
+pooling So we just change the width and height of the channels But the number of
+19:00
+channels don't
+19:05
+change Um so these um are very common So a
+19:12
+pooling with um with size 3x3 with stride two or a pooling with 2x two
+19:20
+still um stride of two But again for your problem you need to play play with
+19:27
+those So before the rise of deep learning
+19:33
+people were exploring um average pooling and we will look at Alex no le for
+19:39
+example there we will see a different type of pooling with learnable parameters
+19:44
+um but now nowadays max pooling works really well So pooling um provides some
+19:54
+invariance to translation So if you consider this receptive field for example and
+20:02
+let's say um the input slightly moved to the right and since we have convolution
+20:10
+layers let's assume that the activations just slightly move to the right by
+20:18
+one so the maximum value is still within the receptive field right then when you
+20:25
+take the max the neuron in the next layer is still going to get the same
+20:32
+value Right if you use max pooling you get some level of um
+20:40
+invariance to translation But if the translation amount is too large then with one
+20:47
+pooling layer we cannot obtain that in But maybe with multiple layers of
+20:53
+convolution and pooling we can obtain some maybe stronger form of um inance to
+21:03
+translation Um as I said with pooling we can down sample by controlling the stride but we
+21:11
+need to be careful with that Um and it's it is possible to design a CNN without pooling So in in
+21:20
+convolution actually we have filter size we have
+21:26
+stride by controlling the filter size and the stride we can down sample with
+21:31
+convolution and the parameters are learnable So we can design actually
+21:37
+whole CNN directly using convolution and of course other nonlinearity maybe fully
+21:43
+connected layers as well but pooling is not a must However it can
+21:50
+down sample and it can summarize content without using learnable parameters So
+21:57
+that is a benefit actually Okay So with this we can
+22:05
+conclude um convolution and pooling operations that we commonly use in a CNN
+22:12
+Uh with those actually we have we provide some bias some strong bias to
+22:20
+the network with convolution we are making our network translation equivalent So if
+22:29
+the input is translated well since the parameters are shared in convolution the
+22:35
+activations are going to be shifted as well So we have um a really nice way to
+22:42
+integrate equines with convolution and the parameters are learned and we with
+22:48
+pooling we we are trying to summarize content and it can provide some
+22:54
+in translation So with this um I mean these
+23:01
+are really good examples for the type biases we can include in uh in a
+23:08
+networks and we call that inductive bias and they can be really by
+23:15
+controlling their hyperparameters like the filter size stride um padding etc If you tune them
+23:24
+carefully you can get really good performance for many different types of problems
+23:32
+So essentially it's just like you don't do something Yeah So in
+23:40
+the list of possible operations we saw the max the altitude order and whatnot
+23:45
+So does this also potentially act like a realization where it just makes our parameters rather small is that
+23:53
+which one like when we take maximum or lender one mhm
+24:00
+Yeah Does it act like regularization or am I No it can it can actually So we are
+24:07
+in a sense controlling the activations the norm of the activations and that can be helpful can be good regularizing
+24:17
+Any other question okay So let's briefly look at
+24:25
+the other operations we commonly use in a CNN Um since we have discussed these
+24:32
+um in depth So I will be very quick regarding these So of course we will
+24:38
+have nonlinearity So we will use activation functions and we have many different options for these
+24:45
+um and we discuss them in detail and in general we
+24:50
+use nonlinearity in Sienna So we don't use sigmoid or hyperbolic
+24:56
+tangent and we discussed um the advantages and dis disadvantages of
+25:02
+those So um um it shouldn't be so
+25:08
+surprising and we will have a normalization operations commonly used
+25:14
+in CNN's One reason for using
+25:19
+them maybe more more using them in in CNN is that CNN's are generally deeper
+25:26
+compared to multiple perceptrons Why because we have restricted receptive field size and to
+25:34
+be able to for a neuron to be able to look at the whole input we need to
+25:39
+increase actually the depth set the field size is small we increase the depth of the network so that a neuron
+25:46
+can attend actually to whole input Of course that makes training
+25:55
+challenging because we need to ensure that the activations across layers um
+26:00
+are nicely distributed so that we can get gradients um uh to all layers
+26:09
+Well normalization is a good method for um enforcing
+26:15
+that And one um one of the first examples for
+26:22
+normalization used in a CNN is from AlexNet Um this is not used in the
+26:28
+literature anymore but I will briefly explain what it is trying to do If you
+26:33
+consider um a convolutional layer or or or a layer actually in a CNN
+26:42
+So let's say this is the input layer we want to normalize
+26:48
+So what they do is they take a coordinate here X and Y So at this coordinates if
+26:56
+you consider the channel dimension um if there are C channels at this
+27:03
+position actually there are C
+27:13
+values So here they perform this summation over uh C values
+27:22
+Um they take the square of the activations They multiply that with alpha They add a small constant to avoid
+27:32
+um division by zero and they normalize the activation by this quantity and they
+27:40
+also take its power Right so they take for a certain position in
+27:48
+the feature map They take the activations or on that position but on
+27:55
+different channels and by looking at their values by calculating some
+28:01
+statistics based on those values they normalize the activations
+28:07
+So this um didn't work so well for many different
+28:14
+problems The improvement obtained with this method was not uh very significant
+28:19
+Actually people showed that with other forms of normalization we can get much better
+28:25
+um activation distributions across layers and better performance We already
+28:32
+talked about B normization but since now we have an additional dimension the
+28:38
+channel dimension let's talk about that again how we do that um in a CNN so in a
+28:45
+CNN so this is the batch dimension so we have n samples in a
+28:52
+batch um height and width they are shown as a
+28:58
+single dimension to simplify the drawing and we have channel
+29:04
+dimension So this is just for one input If you consider this slice this is
+29:11
+just for one input one sample
+29:18
+what we do in Bomization if you want to apply Borization
+29:23
+um in a CNN we for one neuron um in a channel we
+29:35
+calc we look at all of the samples right we calculate the mean and
+29:41
+standard deviation across those samples for one neuron and we um perform
+29:49
+normalization So each channel is normalized independently in in batch
+29:54
+normalization in a CNN Layer norm on the other
+30:02
+hand applies and requires just one input So we don't need a batch in layer
+30:08
+normalization So we have one sample given one sample across
+30:17
+channels not only one channel across channels we calculate the mean and standard deviation and we do
+30:26
+normalization An instance in instance norm again applies a normalization for
+30:33
+each sample but for each channel
+30:39
+independently So we have one sample we take one channel we calculate the mean
+30:45
+and standard deviation over these neurons and we do normalization So for each channel we
+30:52
+perform normalization independently
+30:58
+Then we have group norm Group norm is an extension of instance norm over groups
+31:04
+So in over the group we calculate the mean and standard deviation and we perform
+31:13
+normalization Um in CNN's we generally use batch norm but if batch size is
+31:21
+small then your batch statistics are not going to be reliable So then maybe you
+31:29
+can consider layer norm or instance norm where over one sample you can calculate
+31:37
+actually u mean and standard deviation Yeah
+31:44
+Oh the x-axis is decreasing That's sort of sorry in the x-axis is
+32:03
+[Music]
+32:09
+equivalentization M so here batch norm would calculate mean
+32:17
+and standard deviation over different samples If there's a one one sample then actually
+32:24
+it uses it can use only one neuron they are not equivalent So in
+32:31
+instance norm we are calculating the mean and standard deviation over over the channel
+32:42
+So here in this plot we are comparing Bnorm and group norm Um if B size is
+32:51
+small the plot is I don't know why they plot it in this way um the batch size
+32:58
+becomes smaller actually the error you get the performance you get with batch
+33:03
+norm worsens because I you cannot calculate mean and standard deviation in
+33:09
+a reliable manner so in that case you should use group norm or other normalization
+33:16
+methods so you're saying in instance normally only copy for one
+33:23
+no no uh over over the channel actually
+33:34
+Okay So to sum up in a CNN especially in a deep
+33:39
+CNN normalization is almost a must right because you have a lot of layers it's
+33:47
+it's going to be tricky to keep the activations um across
+33:53
+layers follow the same distribution For that reason in a CNN you should have
+34:01
+normalization In general when you are designing a CNN um let's say we have our
+34:07
+input uh we will have convolutional layers
+34:13
+Right we will have many convolutional layers pooling nonlinearity etc We
+34:19
+slowly we will try to reduce dimensionality Right
+34:27
+then we have some set of variables that we want to
+34:33
+predict So what we will generally do is we will
+34:38
+reshape the last um feature volume convolutional layer We will reshape that
+34:46
+into a vector and we will
+34:51
+use one or two uh the sizes didn't align
+34:57
+very well but just ignore that part So we will use
+35:03
+a few fully connected layers to map these vectors to the output that you
+35:09
+want to predict Those outputs can be either classes discrete labels or continuous values as in as in education
+35:17
+problem So this part contains convolution
+35:27
+um nonlinearity uh
+35:33
+pooling normalization right and at the end we
+35:40
+have fully connected layers with nonlinearity
+35:52
+So we have already seen what is a fully connected layer
+35:58
+what is the linear layer what it implies and how we can take multiple linear
+36:04
+layers so that we can have a learnable um function So I'm not going
+36:11
+to discuss that in detail
+36:16
+um but we will look at some architectures in detail I'm not going to discuss this in detail So but I can
+36:23
+maybe provide a a quick um
+36:30
+gist um we can briefly look at this architecture This is lenet So we have
+36:37
+convolutional layers we have pooling we have convolution layer pooling Then we we reshape this feature map We obtain a
+36:47
+vector and we add fully connected layers to obtain a 10 dimensional
+36:54
+vector We have 10 classes So we estimate 10 output variables
+37:04
+Um although this is very common um actually this is very problematic So
+37:12
+fully connected layers at the end of the network they introduce some issues for
+37:17
+us One issue is that even if we reduce
+37:23
+dimensionality at the end of the convolutional layers that dimensionality
+37:28
+is generally very high like on the order of thousands or
+37:35
+10,000 and if you add fully connected layers actually you are adding a lot of parameters
+37:42
+So because of the photoconnect layers we get significant number of parameters
+37:51
+um um to learn and more parameters as we
+37:56
+discussed before means more data to train uh the network Second problem is
+38:04
+that remember in network before the full connectic layers we have convolution pooling etc Through
+38:11
+those operations actually we get some equarian or invariances and we the these
+38:18
+operations are not affected by the input size Convolution
+38:24
+pooling are are are independent of input size If you increase dimensionality
+38:30
+without learning anything new without learning any new parameters we can still use the same
+38:36
+convolution pooling It's not affected by the input size However the full connected layers
+38:43
+at the end of the network they are affected by the input size So they are
+38:48
+they have been trained to work with only a certain fixed input size
+38:57
+So all this part before fully connected layers they
+39:02
+are independent of input size After training network I can we can apply them to any
+39:09
+input input with any dimensionality but because of the photo connected layers we
+39:14
+are restricted So because uh the FC layers expect a fixed length
+39:23
+here fixed dimensionality here So the these are significant
+39:30
+limitations in CNN's One solution for this is global
+39:37
+average pooling So it it sounds like
+39:44
+um we are losing a lot of information but it works really well So what we do
+39:50
+um so these are channels in a in the last u convolution layer the output of the
+39:57
+last convolutional layer we generally call this feature
+40:04
+map and later on we will see that actually if you vectorize this we can
+40:10
+use that as a feature vector and use them in many different
+40:16
+tasks We will we will see several examples of that So in global average pooling what
+40:23
+we do is each channel is reduced to one
+40:33
+number So we have a huge channel with height and width We have many neurons in
+40:39
+that channel We reduce that channel one whole channel to
+40:45
+a single number is sum the values in the channel and you
+40:50
+obtain a single number for each channel So if there are C many
+40:59
+channels you will have C many numbers
+41:10
+Then we take these numbers
+41:16
+and use full connected layer or layers on top of those In general one full
+41:22
+connected layer is sufficient because the dimensionality is very small The
+41:28
+number of channels is not on the order of thousand It is just maybe 100 around 100
+41:38
+So we again have a fully connected layer but this time the fully connected layer
+41:44
+is not affected by the dimensionality of the input Dimensionality of the input
+41:50
+changes width and height of the channel map It doesn't change the number of
+41:57
+channels The number of channels is fixed when we are designing the network
+42:02
+width and height it can change with the dimensionality of the input So now we
+42:08
+have um replaced full connect layers in the top of the network with an operation
+42:14
+that is independent of the dimensionality of the input width
+42:20
+and height of the input So let's see formally what this
+42:27
+means So for each um channel
+42:34
+um channel map we go over all of the positions in that channel map We take
+42:40
+the values of the neurons we add them up right
+42:46
+so we we just sum up the values and we take these values as input
+42:55
+to a layer linear layer right and with
+43:01
+that linear layer After that linear layer we have actually a score a row
+43:06
+score for each class If this is a classification problem we have the
+43:12
+scores for the classes and then whatever loss function we want to use we can use that on these
+43:18
+scores and we can back it So although it appears that we are
+43:26
+reducing a lot of information to a single number uh we can train networks in this fashion
+43:34
+and it turns out that the network learns to construct confidence maps in
+43:42
+these channels Right so it turns out that different channels correspond to
+43:49
+different objects and the for different
+43:54
+objects in different channels we have the confidence maps
+44:00
+highlighting uh the shape of the object So by looking at the activations in a
+44:05
+channel we can see that okay there is this object and we rough we can visually
+44:11
+see how that object looks like and when we sum the content let's say this is for
+44:19
+the car object let's say this is for the house object right by summing up the
+44:27
+confidence values in these channels we are effectively
+44:33
+obtaining here information about the presence of objects in these
+44:39
+channels Maybe we are losing position information but in these channels we
+44:47
+have information indicating the presence of the objects
+44:53
+Then a full con layer added on top of these confidence maps is going to be
+44:58
+sufficient to estimate the classes right So when when I first saw this I assumed
+45:05
+the channels RGB but I assume in a convolutional even though the input is
+45:13
+just channels this classification for this
+45:20
+classification at the end of the convolutional layers they're going to be a lot of depth right
+45:27
+you're saying eventually um each one of those channels of depth
+45:33
+depth is going to correspond to some object Yeah it makes sense
+45:40
+And is this actually used in practice yeah it is It is actually a more
+45:46
+modern operation using CN One last thing
+45:52
+um for this to work properly for the classification task at least we need um
+45:57
+like a similar number of channels and as as as number of objects right can't be
+46:05
+um I I gave the example in such a way that in a in a channel we have one
+46:10
+object but if multiple objects are present in one or more channels the
+46:16
+through this policy layer the network can still entangle
+46:23
+I was going to say
+46:32
+yeah I think there can be multiple multiple objects There was
+46:38
+another question My question was kind of similar to what he said and you also
+46:43
+actually explained but do you remember there were four objects one of
+46:52
+them rectangle
+46:57
+[Music] does these layers act in a similar
+47:04
+way for example two different layers are have very high values at the same time
+47:10
+two different depths Does it mean that the depths corresponding to those objects are not present or both of their
+47:17
+presence can mean a different object existence of a different object that has
+47:22
+properties of both of those channels um so we are forcing the network to have
+47:30
+some specialization for each channel right um but it might be that that
+47:38
+specialization might might include multiple objects that are maybe semantically similar or visually similar
+47:44
+So in one channel we might see activations from different objects that are related Uh so yes in a sense it
+47:53
+aligns with what we discussed So we are forcing some specialization
+47:58
+um of network um operations or layers
+48:13
+whether someone made a card that is in the shape of a cat both probably both
+48:21
+from that we have observed the layers and the values of the the high
+48:29
+values correspond to the same position Yeah we can say that there's a object that is a mix between a cat and a car
+48:36
+But there are different values There's both a car and a cat in the same picture
+48:41
+Yeah So if it is a single label classification problem we just need to choose one of them But if it was a
+48:48
+multi-lel classification problem network would be able to estimate multiple outputs But as you said I mean we are
+48:56
+losing position information So we are losing any reasoning about the positions
+49:01
+of the objects here Just increasing dimensionality of
+49:09
+the connected layer and you just also have a single position
+49:18
+just more
+49:28
+inut Yeah there can be extensions of this
+49:37
+Yeah Yeah I think it's possible So next week or maybe in Thursday we
+49:46
+will look at how we can visualize operations in a CNN I this is very
+49:51
+critical for a CNN because it is very complex right we have a lot of different
+49:58
+operations we have convolution pooling normalization nonlinearity full connect
+50:03
+layers etc It is it is really complex compared to what we were doing with a
+50:09
+multipetron So it is very important that we understand the operations what goes
+50:14
+on and what is calculated in a CNN um to make sure that it is really doing what
+50:21
+it is supposed to be doing So we will look at some operations uh tools we will
+50:26
+use for visualizing um a CNN the layers or operations in a
+50:32
+CNN One of them is going to actually use global leverage pooling and there we will we will try to visualize these
+50:38
+activation maps there it will be very
+50:45
+clear Okay Um so let's talk about how we can train a
+50:52
+CNN So I'm not going to talk about the whole back propagation through all of
+50:58
+the operations Um up to now we have seen how we can back propagate through a linear
+51:04
+layer When we talked about multi perceptrons remember we provided gradients through a multi perceptron
+51:11
+through linear layers and through nonlinear layers through loss
+51:17
+functions because of that I'm not going to um discuss them here again
+51:23
+uh what I'm going to just focus on is how we can back propagate through convolution and
+51:30
+pooling I will assume that we have back propagated through the end of a
+51:35
+convolutional layer or a pooling layer using chain rule We have seen how we can
+51:41
+do that So if the gradient to the output layer
+51:46
+is calculated how can we back propagate through convolution and
+51:54
+cooling i will illustrate this over a simple convolutional layer with accepted
+52:01
+field size of three and side of one So here we have three parameters and we
+52:07
+have parameter sharing So we share the parameters right since we are sharing the
+52:13
+parameters we need to be careful when we are trying to calculate the gradient of the loss with respect to let's say
+52:21
+W1 W1 occurs actually at different um edges at different connections So to
+52:31
+each copy we need to get the gradient and we need to add them
+52:40
+up Every occurrence of that variable should get the
+52:46
+gradient and we should add them up That is the main principle we are going to
+52:53
+use in shared parameters in any network Later on in the following weeks we will
+53:00
+look at recurrent neural networks their parameters are going to be shared as well There we we will follow the same
+53:09
+principle So let's talk about how we can feed forward through um this convolution
+53:15
+layer because we will use that index propagation Um so here
+53:22
+assume sigmoid nonlinearity is used but we are flexible we can use anything else
+53:28
+This is just for the sake of um um simplicity So if you consider this um
+53:36
+neuron one of the neurons we can um let's introduce an intermediate
+53:44
+variable to denote the accumulated value in the receptive field So this is uh we
+53:51
+are iterating over the uh receptive field So there are f values in the
+53:58
+receptive field and f parameters in the receptive field So we just multiply the
+54:05
+corresponding values in the input layer with the parameters of the filter and we add them up Right so we multiply these
+54:14
+with w1 this with w2 this with w3 We add them up We obtain the accumulated value
+54:21
+and we pass that through a nonlinear layer Right is this
+54:30
+clear um okay
+54:40
+There's no reason actually we are not going to use we are not going to do
+54:46
+anything regarding sigmoid So it's just some nonlinearity Okay So if you back
+54:53
+propagate uh through a convolution we need to we need to take two uh
+54:58
+derivatives So the derivative of um let's say the dative of the loss with
+55:05
+respect to um each of these are
+55:18
+calculated Um so these gradients are available let's say then given those gradients we
+55:26
+need to calculate the gradient to each uh parameter first
+55:32
+Next we need to provide the gradient to the input layer Right so we need to calculate two
+55:39
+gradients So let's look at the first one The gradient with respect to the
+55:44
+weights As I have mentioned we want to calculate the gradient with respect to
+55:50
+W1 So this is if this is u w1 then this
+55:55
+is going to be the gradient of the loss with respect to uh a1 l We assume that
+56:03
+this is calculated already right using chain rule And then we need to take the
+56:11
+gradient of A1 L with respect to its input
+56:17
+right T1 L Then we can take the gradient of T1 L
+56:24
+with respect to um W1
+56:34
+We calculated the gradient with respect to A1 Then we calculate the gradient of A1 with respect to its input Then with
+56:42
+respect to W1 as I have mentioned we need to add to
+56:47
+this the gradient through the other neurons Right the gradient of the loss
+56:53
+with respect to A2 L The gradient of A2
+56:58
+L with respect to T2 L and the gradient
+57:03
+of T2 L with respect to
+57:09
+W1 So through each neuron here as all of them use W1 we need to
+57:18
+get the gradient to W1 and add them Is this
+57:27
+clear um we can write this in a more compact form like this So
+57:34
+for weight k we need to get the gradient to each neuron Then from each neuron we
+57:41
+integrate the gradient to double k And using chain rule using these definitions
+57:48
+we can expand this as uh a a i l with respect to its
+57:56
+input and t i l with respect to double k
+58:11
+Okay So oh okay This is I wrote it here
+58:17
+already How about the in the gradient to the earlier layer to the input layer so
+58:22
+we need to pass that gradient so that earlier layers get the gradients So let me illustrate that over
+58:31
+one neuron here So this neuron in forward pass it contributed to these
+58:38
+neurons just these three neurons right in backward
+58:44
+pass through these three neurons we need to get the
+58:50
+gradient and accumulate them right so this neuron contributed
+58:57
+the three neurons through back propagation when we are back propagating we get the gradient through these three
+59:07
+neurons And if you look at the
+59:12
+um operation that we need to do we need to take the gradient with respect
+59:18
+to A1 L right then the gradient of A1 L to A3
+59:27
+L on first to to its input right so let me
+59:32
+Show it here Gradient of the loss with respect to A1 The gradient of A1 with
+59:39
+respect to its input And the gradient of the input with respect to this
+59:47
+neuron Similarly we do that for A2 with respect to its input and the input with
+59:54
+respect to A3 And we do that for um the last one as well
+1:00:00
+Okay there's an index here Uh so this should be three This should
+1:00:06
+be three These are three
+1:00:11
+right then if you take um the these
+1:00:17
+gradients the last one actually it is w3
+1:00:24
+So the gradient of this with respect to this actually it is
+1:00:30
+w3 The second one is w2 and the third one is
+1:00:35
+w1 So I wrote for the sake of simplicity I wrote this as a single uh term This is
+1:00:42
+a single term and this as a single term
+1:00:47
+And as you see actually in backward
+1:00:54
+pass we also have a receptive field right So this in a sense these are the
+1:01:01
+values in the receptive field We multiply them with the weights right and
+1:01:08
+we obtain the gradient for this
+1:01:13
+neuron So this is what we see here The difference compared to forward pass
+1:01:19
+is that the indices are flipped Right so in forward pass we
+1:01:28
+are multiplying the values in such a way that the indices
+1:01:35
+were aligned So one one u two 2 3 etc In
+1:01:41
+backward pass the indices are flipped but still this is very similar
+1:01:49
+to convolution In backward pass we perform convolution as well Right we
+1:01:54
+perform convolution with flip indices um on on the
+1:02:02
+gradients Is this clear
+1:02:14
+and let's look at um gradient through a pooling operation Since we are commonly
+1:02:21
+using max pooling we can talk about max pooling in forward pass Um as we
+1:02:29
+mentioned let's say for the first neuron in the output layer we take the maximum
+1:02:34
+of those right we take the maximum and we directly use that value
+1:02:41
+The gradient for a max operation is uh taken in such a way that if let's say
+1:02:48
+this was the maximum in the receptive field then the gradient
+1:02:57
+um here is directly taken as the
+1:03:05
+gradient for for that neuron
+1:03:10
+You take the gradient as it
+1:03:15
+is and the others have zero
+1:03:22
+gradient The neuron that was maximum it takes the gradient The
+1:03:29
+others take the gradient of
+1:03:36
+zero Okay So this means that when we
+1:03:45
+are performing forward pass we need to keep track of which neuron was
+1:03:51
+maximum right so that we can take propagate and we can provide the
+1:03:57
+gradient to the correct route in the network So but but it is it is not a
+1:04:03
+difficult operation Is this clear
+1:04:19
+yeah there is Yeah there's it Let me
+1:04:30
+check Yeah there's a there's a
+1:04:35
+typo What
+1:04:42
+this TK is for the output layer
+1:04:47
+I is for input here So they they can be
+1:04:56
+different but there there's a typo here So this should be three and this should
+1:05:02
+be three These these should be three I will I will correct that in the
+1:05:12
+slides Any questions are these clear
+1:05:19
+fully connected differentiation is a bad idea
+1:05:26
+because here we have not so many um but multiple
+1:05:32
+copies of those parameters so it's still
+1:05:39
+notable yeah is there any instance
+1:05:49
+numerical methods Yeah In um sometimes
+1:05:54
+we use operations that um do not provide useful gradients for
+1:06:02
+us Um we use the so-called step function
+1:06:07
+Um so it is zero here and it is one here
+1:06:16
+um step function If you look at the step function the derivative is either zero
+1:06:23
+or it is undefined So with this we cannot train a network Um and in such
+1:06:28
+cases um in networks where we need such an operation there are many different
+1:06:35
+approximations we can use One option is to take the gradient of the output there
+1:06:41
+and pass it as it is We call that stretch to estimator Or we can uh let me
+1:06:48
+use a different color Or we can for an interval
+1:06:59
+here For an interval here we can approximate the derivative with a
+1:07:05
+line or can try to place it with a sigmoid and try to control the width of
+1:07:12
+the sigmoid this So there there are different approximations for this but and numerical um differentiation is
+1:07:20
+one of
+1:07:25
+those Okay So with that we conclude back
+1:07:30
+propagation As I said we discuss back propagation in detail when we talk about multiple perceptrons I'm skipping um how
+1:07:38
+we can back propagate through loss functions nonlinearity connected layers etc because we just focused on convolution
+1:07:47
+and uh pooling With this you should be able to implement back propagation
+1:07:52
+through any CNN action
+1:07:58
+Um but today yeah we can stop early and
+1:08:04
+we can

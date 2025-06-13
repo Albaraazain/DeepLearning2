@@ -1,0 +1,1158 @@
+
+Transcript
+0:03
+okay uh morning again so after a short break um let's continue with our um
+0:12
+lectures so as usual let me go over what we covered in the previous lecture so we
+0:18
+looked at the remaining tools for visualizing understanding CNN's we
+0:25
+talked about class activation maps where we um exploit um the benefits of global
+0:34
+average pooling remember in global average pooling we summarize each channel with a single number
+0:41
+and we add a linear layer on top of these numbers and this forces the
+0:47
+network to learn somehow a map of the important regions
+0:52
+um for for the problem at hand um and we
+0:58
+actually multiply these channels with the corresponding weights and if you add them up you obtain actually um
+1:07
+useful maps illustrating which parts of the input are important for the problem
+1:12
+at hand so this is um this can be made um extended and made better by using the
+1:21
+gradient ele and it it can provide uh better
+1:31
+visualizations um we mentioned that we can invert the features provided to us
+1:39
+um to get a better feeling about actually what the network is encoding at different layers in a
+1:46
+network so this can be really useful um and actually we can exploit this for
+1:53
+many generative tasks for example if you have one image um and let's say you have
+2:00
+a painting you want to generate a version of the image
+2:06
+by getting the style of the painting so we can actually use something like this
+2:12
+method we call that style transfer we talked about um the problem
+2:20
+of adversarial attacks so we can generate actual noise images that can
+2:25
+corrupt um the and mis that can cause a
+2:30
+network to mispredict actually uh for a given input visually a human wouldn't be
+2:36
+able to understand that there has been an attack but a network's predictions
+2:41
+can be easily changed choice this is a really serious concern
+2:48
+and this is an active research area um then we looked at commonly used
+2:58
+and well-known um CNN architecture we started with um one of the earlier
+3:03
+examples lenet in lenet we just have a few
+3:10
+convolutional layers and pooling layers followed by a set of fully connected
+3:16
+layers it is a very simple straightforward CNN compared to what we have nowadays but back then it was
+3:23
+really influential it was very um one of the pioneering examples and it could be
+3:30
+trained using gradient descent to solve um practical problems
+3:37
+then we talked about alexnet which can be considered one of the factors for the
+3:44
+um explosion of deep learning it is considerably big compared
+3:51
+to lenet it has many layers and it is using mostly
+3:59
+the more recent more modern operations for example instead of sigmoid it is
+4:05
+using rectifi unit instead of average pooling it is using max
+4:11
+pooling and we have 40 million parameters which was very large to store
+4:19
+in a GPU back then so they split the architecture into two GPUs and we have
+4:25
+two branches running in parallel on two different GPUs so this
+4:32
+is um they did a lot of engineering and as a result they obtained really good
+4:39
+results another interesting architecture is Google net which was the 2014 imageet
+4:45
+challenge winner it has two interesting novelties one is the
+4:52
+inception module actually inception module was proposed before but in this
+4:57
+architecture in this paper they address um a a certain issue in that in
+5:04
+inception module so in inception module the number of uh
+5:09
+channels um explode increases um and
+5:15
+this is a prohibitive factor in designing deep networks
+5:21
+um in Google what they do is they use one by one convolutions to control the
+5:28
+number of channels coming through each branch and this way they can ensure that
+5:33
+if there are C many channels in the input layer there will be C many channels in the output layer so we can
+5:41
+control using one by one convolution we can control the number of channels so this is the first contribution um maybe
+5:49
+more interesting um contribution um is
+5:55
+the um is is the predictions provided through the intermediate layers so not
+6:02
+only at the end of the network um at the at two different intermediate
+6:09
+layers we make predictions and through those predictions we provide
+6:14
+gradings so we have two um contributions and through those they
+6:20
+obtains the best results in 2014 however um it had reproducibility issues
+6:28
+and the features that were learned by Google net were not generalizable to
+6:36
+other tasks downstream tasks because these intermediate predictions actually
+6:44
+made the earlier layers more problem specific
+6:51
+remember our previous discussions we have been saying that in general the
+6:56
+earlier layers are problem independent so they encode generic features that can
+7:02
+be used and utilized for many different downstream tasks so with Google net by
+7:11
+adding these intermediate predictions and providing through these intermediate predictions actually we are
+7:17
+u we are losing that property generalizability
+7:24
+property uh in that same year um the second
+7:29
+um contender for the imageet challenge was VGET it is a very plain architecture
+7:36
+there is nothing interesting about the architecture it's just convolutional layers and nonlinearity max
+7:42
+pooling used one after each other we have different uh versions with different number of layers um but it was
+7:53
+reproducible and it provided really generalizable features because of those actually vet was very popular compared
+8:01
+to Google um then we have in the next year restn
+8:07
+net was produced um in restn net they tried to increase the number of layers
+8:14
+and they noticed that up to a certain number of layers actually performance degrades so we expect to get um
+8:23
+improvement even if slight some improvement in performance if you increase the number of layers but after
+8:29
+a certain number of layers they reported um perform performance
+8:36
+degrade so this was a bit counterintuitive and they uh found the
+8:42
+solution uh in in in using these skip connections or residue connections so
+8:49
+through these resilon shortcut connections we are actually adding the identity function to be part of the
+8:57
+solution the network doesn't have to learn the identity function as as part of the solution we are giving identity
+9:03
+as to be part of the solution in forward pass the implication is that in forward pass the identity can
+9:12
+be implemented as part of the solution in residual blocks um and in backward
+9:17
+pass and this can be helpful for many different problems and in backward
+9:23
+pass through these residual connections gradient can flow um without any
+9:30
+vanishing issues so this turned out to be really
+9:36
+effective and nowadays I mean if you are designing a deep CNN this is actually
+9:44
+very a very common um um architectural design choice we
+9:51
+use the effect of resil connections actually is to smooth the loss surface
+9:58
+so without these connections you can end up having such complex lo surfaces if you add skip
+10:05
+connections actually you can some of the lo surface becomes smoother
+10:13
+um one reason for this might be that if you consider uh that this is
+10:21
+with respect to the weights of the network so we are visualizing the loss with respect to the
+10:27
+weights of the network um so since we are adding identity as
+10:34
+part of the
+10:39
+solution right uh this is coming from the residue connection if you slightly
+10:46
+change the weights let's say you just consider a
+10:56
+small neighborhood around the ways right so this part might change but this the
+11:06
+information coming from the little connection is not affected by that weight change so in a sense the identity
+11:12
+transform provides some robustness to slight changes in the weights right and
+11:19
+that's actually might be why the loss surface becomes smoothed when you add
+11:27
+residual connections and another way to interpret
+11:35
+what a resnet provides us is to actually
+11:41
+um by by looking at the different paths information can travel across several
+11:48
+residual blocks we can see that actually in a sense we have an ensemble
+11:54
+of multiple um functions being implemented being used
+12:01
+by the network by adding these skip connections simply we are actually
+12:07
+modeling multiple functions m pathways through multiple
+12:15
+functions any questions from the previous lecture
+12:31
+okay so today we will uh continue with CNN's we will we have a few more things
+12:37
+to discuss um about well-known CNN architectures
+12:43
+then we will look at the next model
+12:48
+um in in the syllabus recurrent neural networks we
+12:54
+will try to motivate why we need recurrent architectures and how we can
+13:00
+address um problems sequence patterning problems using recurrent architectures
+13:09
+uh today or latest tomorrow we are planning to announce the second take-home
+13:15
+exam and the exam date is going to be 28th of May so I will make a post about
+13:23
+this and the details will be in in the
+13:29
+post okay so continuing um our discussion
+13:34
+on having skip connections residual connections there were many papers that
+13:40
+studied um that provided similar insights so
+13:45
+this is for example one study that tried to train a 10,000 layer
+13:52
+CNN 10,000 layer CNN so it it is it is a huge um architecture and
+13:59
+their main takeaway message is that um resil
+14:07
+connections and batch normalization are very key in obtaining
+14:13
+good results in very deep networks and this is not surprising because batch
+14:19
+normalization ensures that activations follow a certain distribution in forward
+14:24
+pass and the gradients follow a similar nice distribution in backward pass as we
+14:30
+have discussed before and residue connections help that as well so in
+14:35
+forward pass we have the identity function as part of the solution in backward pass we have gradients flowing
+14:43
+nicely and in addition of course the lo surface becomes smoother etc and because
+14:49
+of these benefits it becomes easier to find and converge to a good
+14:57
+solution we have direct nets that extend resue connections uh the skip
+15:03
+connections are multiplied by learnable weights parameters in direct
+15:08
+nets and they show that actually this uh this can work very
+15:14
+well rest next another commonly used strong um CNN
+15:23
+architecture it is extending residual um networks by utilizing multiple paths
+15:31
+um acting on the same input layer so if you consider a restn
+15:40
+net in restn net let's say we have multiple convolutional blocks so these
+15:45
+blocks represent let's say um a function of x right so x is propagated here and
+15:55
+at this point we have x plus f ofx in this next we have actually
+16:05
+multiple functions acting on um the same input so
+16:12
+if this is x this is f_sub_1 of x this is f_sub_2 of x etc and so this is f32
+16:23
+of x and here we have x so at this
+16:28
+point we have x plus f_sub_1 of x
+16:34
+plus f32 of x so we have multiple functions being learned being
+16:40
+represented by rest next uh this is this idea of having multiple
+16:49
+convolutional paths um is similar to what we had in Google
+16:54
+net remember in Google net we have the inception
+17:00
+module right on the same data um we have different um convolutions and
+17:07
+operations acting on on that data the difference here is that the filter
+17:14
+sizes are different in different paths right in inception module in
+17:21
+Google net whereas here in rest next
+17:28
+the sizes are the same we can of course combine both
+17:37
+approaches you know we can have a version version of rest next where we
+17:42
+have different filter sizes and we have the skip conviction so that is also fine but in in this architecture at least
+17:49
+they didn't consider that rest next is a strong um
+17:58
+architecture it can provide better performance than restn net however
+18:03
+because of the multiple paths it is
+18:08
+slower compared to restnet so if running time is not an issue you can try rest
+18:15
+next otherwise you might um consider
+18:21
+restnet any questions
+18:29
+okay so residual connection inspired other
+18:35
+architectures um another one um is denset in dense net we have residual
+18:42
+connections not only skipping the next block but
+18:47
+skipping to and making connections to all following blocks right
+18:55
+so from this layer we have skip connections to all following layers if you do that for all following
+19:03
+layers having skip connections for all following layers it becomes a very dense
+19:08
+uh network and this might be may more difficult to implement maybe uh but it
+19:15
+can provide better performance than breast met um although the idea is interesting
+19:23
+it can provide uh better performance compared to
+19:28
+um uh restn net
+19:35
+um I'm not sure why it didn't become as popular as rest as widely used as rest
+19:44
+net but I think this is this is promising as well
+19:49
+then we have highway networks i wanted to talk about highway networks because
+19:54
+it provides an important mechanism that we can use and utilize in other problems
+20:00
+as well so normally a convolution layer or a fully connected layer can be
+20:08
+represented like this so we have x we have um here a function in this fun um
+20:17
+paper they use h to denote that function it's uh uses it takes an x and
+20:25
+it uses actually it has some parameters right this can be convolution or a linear layer and here we might have
+20:34
+this nonlinearity as well so we have a linear layer or
+20:40
+convolution plus
+20:46
+nonlinearity and as a result we produce an output wave
+20:53
+um a skip connection would bypass this and we would have um
+21:02
+plus x here right in highway networks what they do
+21:07
+is they multiply the skip connection by a learnable
+21:12
+function a function of x with some with its parameters and they
+21:21
+also m multiply this by another function g a function of g with its
+21:30
+parameters so we add more flexibility to the network where we can modulate the
+21:37
+skip connection you can adjust the contribution going
+21:43
+through the ski connection as well as the contribution going through the
+21:49
+normal path yeah
+21:56
+g is multiplying H so let me go over with the notation
+22:06
+introduced in the paper so this is the normal path h we are multiplying that with a
+22:15
+function parametric function taking x and the parameters are here then we have
+22:23
+skip connection skip connection is modulated by again a parametric function
+22:28
+acting on x with this parameters u wc
+22:38
+if you look at what we are trying to do uh let's say this is x we have uh here
+22:49
+um if you look at this uh formulation
+22:59
+um we have h of x w * t x
+23:09
+wt plus x
+23:20
+um c x
+23:25
+wc so x is being actually uh passed through these and t
+23:35
+here t is this one t controls the information coming through here and
+23:45
+uh and with this we are also controlling um how much
+23:51
+x is propagated to the next layer um I'm not sure about this additional
+24:03
+connection because of this okay so they extend
+24:09
+this by using u t + x * 1 - t so here
+24:16
+through this actually we have um resil
+24:22
+connection this I mean this idea is interesting however it's
+24:28
+not highway networks were not as common as resnets but the idea of gating you
+24:35
+know using implementing a function on x and
+24:40
+using that function to modulate the forward pass either convolution or linear layer
+24:46
+is actually interesting so this is actually utilized in many different
+24:52
+architectures there are other architectures that were introduced later on
+24:58
+um one architecture that we will talk about towards the end of the term is com
+25:11
+next uh call next is a CNN that takes inspirations from transformers to make
+25:18
+convolution architectures more modern and faster and better but to discuss CO
+25:26
+next we need to first look at transformers which will be towards the end of the term after that we will look
+25:32
+at COM next um so we can compare different
+25:38
+architectures and different versions of those architectures in terms of the number of operations required for
+25:46
+um enduring inference um their performance for example accuracy and
+25:54
+model size so the um diameter of the circles represent the
+26:00
+model size so we want um we prefer
+26:05
+architectures that require less operations that provide better performance while being uh while
+26:13
+occupying small amount of memory so we prefer architectures
+26:21
+here that provide better performance that are faster and they that have small memory
+26:31
+footprint so this is just an illustration from
+26:37
+2016 there might be recent um versions of this where with better with newer
+26:45
+architectures this just provides a general um perspective about what we are
+26:51
+looking at and comparison between actually different architecture we have seen so far so as we see restn net
+27:01
+um actually generally the family of restn net architectures generally performs better compared to for example
+27:07
+alexn net or
+27:12
+vget um so we have been implying
+27:18
+that generally it works well if you increase the number of
+27:24
+players and reduce the filter size and if you do that probably you need patch
+27:31
+normalization and skip connections but there are studies showing promising
+27:37
+results with shell over networks as well so maybe you don't need very deep
+27:43
+networks to solve problems with good uh performance but training shallower
+27:51
+networks to obtain good accuracy might be
+27:56
+trickier uh you might need to do really uh you might need to tune this really
+28:05
+well um another line of interesting work here
+28:11
+is to u represent the weights or the input and
+28:18
+activations in the network in binary so this is to increase um the inference time reduce
+28:27
+inference time sorry and to reduce the memory footprint so in many practical
+28:33
+applications we have to run these networks on low resource devices edge
+28:39
+devices for example and there it will be very difficult to run and
+28:46
+execute deep architectures requiring a lot of memory so in binary networks people are
+28:54
+trying to replace um for example uh real valued weights
+29:01
+with binary weights and this would then get rid of multiplication for
+29:08
+example and this would by switching to binary weights we can obtain
+29:14
+significant gain in terms of the memory footprint
+29:21
+um albeit the reduction in performance so
+29:28
+we get 30 times around 30 times gain in terms of
+29:33
+memory but we lose some accuracy in some
+29:39
+applications where for example number of classes you want to recognize is small
+29:44
+and the classes are easily uh distinguishable right
+29:51
+memory accuracy might not be a an issue and with such an approach we can
+30:00
+actually obtain a version of CNN with binary weights requiring significantly
+30:08
+less memory if you um change the input to
+30:16
+binary and work only with binary uh values throughout the network then
+30:21
+actually uh in in addition to obtaining significant memory gain you can actually
+30:29
+get very large uh gain in running
+30:38
+time of course by doing so we again lose in terms of accuracy
+30:46
+depending on whether this is acceptable for your problem this can be uh
+30:55
+considered um I mean people have been trying alternative ways to design CNN
+31:01
+architectures and actually learn the architecture design from the problem as well in
+31:08
+neural architecture architecture search people are actually trying to learn to design um CNN architectures after
+31:16
+talking about the current um neural networks and maybe
+31:22
+reinforcement learning we can we can go back and discuss this in more detail so
+31:27
+here in this paper they showed that we can generate um a CN
+31:34
+architecture randomly by using random connections random weights and in those random
+31:40
+connections and random weights there are some random functions that might already
+31:45
+capture some useful information about the problem we are trying to solve
+31:52
+and on top of these you can just add one or a few uh linear layers to to map the
+32:01
+predictions of these random functions to the um outputs we want to obtain we can
+32:08
+use this idea in multi-layer perceptrons we call that extreme learning machines
+32:14
+so we have a set of multi-layer perceptrons multiple
+32:20
+layers fully connected layers we initialize the connections and the
+32:25
+weight randomly it is feed forward we don't touch those random connections and
+32:30
+weights we hope that we assume that in those random connections and weight
+32:36
+there are some useful functions and on top we had a linear layer and we only train the linear layer
+32:44
+with small amount of data with that linearly we can obtain good
+32:51
+results and um in recurrent architectures this is utilized as well
+32:57
+as uh we will see later on yeah yeah
+33:05
+you can if you like but without doing that can
+33:17
+obain okay so with this we can conclude um CNN's right we talked about the
+33:26
+operations we use in CNN's how we can design a CNN architecture by stacking those operations together we looked at
+33:33
+different design choices um extending and you while you know
+33:41
+designing a CNN architecture um in general
+33:46
+we saw that with CNN's we are adding some biases so convolution and pooling
+33:52
+are strong biases about the uh function we want to implement in the
+33:58
+problem we are trying to solve with convolution we are obtaining some equariance to
+34:05
+um translation for example with um pooling we are obtaining some invariances to um small
+34:13
+translation um and while doing so we reduce the number of parameters um and can get good results with less
+34:23
+amount of data compared to a multietron we have looked at sample
+34:30
+architectures well-known architectures by doing so while looking at those architectures we saw that actually we
+34:36
+have a lot of flexibility in terms of how we can bring these operations together
+34:45
+um yeah people are trying to work on how we can understand CNN's
+34:50
+better make them deeper faster more efficient etc and maybe compressing them
+34:57
+pruning them u making them smaller etc
+35:02
+but with the rise of transformer based architectures
+35:08
+CNN's might be considered as maybe the
+35:13
+second class of architecture nowadays but
+35:21
+um when we are talking about transformers we will compare them and we
+35:26
+will say that we might still need CNN's for many different uh
+35:34
+problems any questions regarding
+35:44
+CNN's okay
+35:50
+so with multi-repceptrons and with CNN's we looked at problems where
+35:59
+by looking at a small portion of the problem we can make prediction but there are many problems
+36:07
+where we have a sequence we need to process that
+36:14
+sequence sequentially right and we we don't know the length of
+36:20
+the sequence we can have for example in a character recognition problem we can
+36:26
+have four characters to recognize or 100 characters to recognize
+36:33
+and maybe more importantly the information at a certain
+36:41
+point what that information is and should be processed and what we should
+36:47
+make out of that might depend on the information we have seen so
+36:53
+far so we have some history of or
+36:59
+context of information we have seen up to that point and to process
+37:07
+information at at the next time point we might we generally need what we
+37:14
+have processed so far so we have some history of information we have looked at that we
+37:20
+have processed that we will use that history we will use that
+37:26
+context while processing the information at the current position at the current
+37:33
+time point so we have many such
+37:40
+problems yeah and with sequences with sequential data we can study different
+37:47
+types of problems so we might have a sequence we might be interested in classifying the sequence
+37:55
+so for example we have some u speech we can try to estimate whether that speech
+38:01
+was referring to one subject or another subject or whether it was positive
+38:07
+neutral negative etc we can have a sequence segmentation
+38:14
+problems or segment consideration problems where um given the sequence we
+38:21
+try to identify and label each part of the sequence so character recognition
+38:27
+problem for example we have a sequence and in that sequence we are trying to
+38:32
+segment the sequence and identify the labels of the segments
+38:40
+um or we can have um temple um
+38:47
+um classification problems where we have a sequence as input and the output
+38:53
+itself is a sequence so up to now we have seen such
+39:01
+type of problems so either using a multi passive drone or a CNN we were given one
+39:10
+input X for example an image and we had a onetoone problem so
+39:18
+for that image we estimated a class or a number
+39:25
+right so the input had a single input and that single
+39:31
+input was mapped to a single output but we have many
+39:39
+problems where we need to work with sequences we can for example have a single input and we might need to map
+39:47
+that to multiple outputs so we we might have a input to sequence uh problem
+39:57
+um or we can have a sequence to uh sequence as input and from given that
+40:03
+sequence we might estimate we might be required to estimate a single
+40:08
+output we can have a sequence to sequence mapping problem with some
+40:15
+delay right after processing the input sequence we
+40:21
+sample and we estimate values in the target
+40:27
+sequence or we can have a sequence tosequence problem where at each time
+40:32
+point at each position we make a prediction so let's look at these
+40:40
+problems so what kind of problem can you give as an example for this one one to
+40:51
+many what problem can be considered as a one to many mapping problem
+41:02
+object
+41:08
+detection okay you know we can Hinton formulated that as a sequence
+41:15
+modeling problem but generally we don't do
+41:28
+that so possible
+41:41
+yeah so a very good example for this is image captioning
+41:51
+uh problem so we provide an image as input we will look at this as an example
+41:56
+problem and image captioning problem is the problem where we provide an image as
+42:03
+input and we try to summarize the content of the image in sentences or in
+42:10
+words sentences and words compose a sequence right con
+42:16
+sequence so here we have words right and
+42:22
+words are actually forming a sequence so we have an we have a one to many problem
+42:30
+right we will look at this how we will see how this can be modeled with an arna
+42:36
+and the other one what kind of problem can you give as
+42:43
+an example for many to one sequence modeling
+42:58
+take many words for this language okay we can have a
+43:05
+description textual description about what we want to generate and the output
+43:10
+is for example the image right spam detection
+43:16
+spam detection so we have uh a sequence of words right email
+43:24
+content and so that the content of the email is the sequence and as a result we
+43:31
+predict a single thing is it a spam or is it not a spam so many we have many uh such
+43:40
+problems where we have a sequence as input and we obtain a single
+43:49
+output many to one delay many to one let's say where we have sequence as
+43:55
+input sequence as output what kind of problem can you give as an example
+44:14
+Yep language translation what translation language translation language
+44:20
+translation so language translation is a problem
+44:27
+where we have text in one language here for example
+44:41
+Turkish each word is actually
+44:46
+provided separately as different input at different time steps and after the input
+44:55
+sentence in the source language is finished we make predictions in the
+45:01
+target language so for example in English today the
+45:08
+weather is blah blah right so we have a sequence
+45:15
+provided as input um word as words in one language and the
+45:22
+target sequence actually is um then the words the sequence of words in the
+45:28
+target language yeah how different is it using a
+45:34
+onetoone architecture of different
+45:40
+um a onetoone architecture expects fixed length
+45:46
+data that that is a problem um later on we will see how we
+45:55
+can extend one to one architectures to sequential data but
+46:02
+by the architecture recurrent neuron networks we will see by definition by
+46:09
+design are very suitable for sequence modeling problems
+46:19
+and the last one so many many prediction problem without any delay
+46:37
+what do you mean
+46:44
+but with all Okay
+46:50
+okay so given the input we want to predict the
+46:55
+output at each time point in for example in encrypted communication that is one
+47:02
+example or speech recognition so live uh speech recognition online speech
+47:09
+recognition so we are we have a stream of audio as input and we want to
+47:17
+simultaneously recognize and predict what is being
+47:23
+spoken so this is a good example for many many sequence modeling without any
+47:29
+delay so recurrent neur networks are by design
+47:35
+uh very suitable for addressing all of these sequence
+47:40
+modeling problems normally as uh we have seen so
+47:47
+far in either multilayer perceptrons or
+47:52
+CNN we have a feed forward architecture we have our input
+48:01
+We have some mapping applied on our input either a linear layer or convolutional layer we have many such
+48:09
+layers right for the sake of simplicity here I illustrated this as a single box
+48:16
+but we have many such um functions stacked on top of each
+48:22
+other and all of them are feed forward information propagates travels in one
+48:29
+direction towards the output in recurrent neural
+48:37
+networks we give an input x time t let's
+48:43
+say we process that input we obtain the hidden state representation at that time
+48:52
+given that hidden state representation we make the prediction
+48:58
+right however in addition this um forward pass we have a connection here
+49:06
+that feeds back to the hidden
+49:12
+state a hidden representation give a curve
+49:28
+connection and through this recurrent connection the hidden state value is
+49:35
+provided to the next time
+49:43
+point because of this recurrence we our network in a sense has a memory
+49:52
+capacity through this recurrent connection in the hidden state in the hidden representations it can actually
+49:59
+summarize and it can contain information about what it has seen so
+50:06
+far in a feed forward network we don't have that option
+50:12
+but the network has seen for the previous input we don't know right so we just
+50:20
+obtain the hidden state representations hidden representations for the current input we don't know what the
+50:26
+representations for the hidden states were for the other uh previous input through this current
+50:35
+connection the network can update its hidden representation by
+50:41
+looking at the current input and what it has seen previously so
+50:47
+far because of this connection we have memory capacity and because of that RNNs
+50:55
+recurrent neur networks are touring complete that means anything that's
+51:01
+computable by a touring machine can be in theory represented by
+51:09
+a recurrent neuronet network it doesn't mean that we can converge to
+51:15
+such a solution but there is a solution right so we have a similar
+51:22
+issue with a multipetron remember multiperrons are universal approximators we can represent any function with a
+51:29
+multi perceptron with small error but it doesn't mean that we can converge to
+51:34
+such a solution we have a convergence issue training issue there so within RNN
+51:41
+we have a similar um situation so we have a strong
+51:46
+capacity it can represent any uh the solution to any computability
+51:55
+problem but u it doesn't mean that we can convert to such
+52:02
+solutions we can have recurrent connections in different ways in general
+52:08
+the RNNs we will look at are going to be in this form so we will have our input we will have the hidden state we can we
+52:15
+can call that the context as well so we have current connection here and we at
+52:21
+each time point we can make a prediction but we have flexibilities over the years
+52:28
+people have explored um other options which we are not going to look at um in
+52:35
+this course and actually in the architectures we
+52:41
+look at they are not like this either but just keep in mind that we
+52:47
+have a lot of flexibility okay
+52:54
+so this compared to um a feed forward architecture the current having a return
+53:02
+connection sounds promising so it can have some advantages
+53:08
+but there are some challenges the first challenge that we need to address is how do we back
+53:19
+propagate how do we take the gradient um of the error of the loss and back
+53:27
+propage to the network in forward pass in a forward
+53:32
+feed forward network this was easy in in in a feed forward network
+53:38
+using chain rule by following the chain rule we could easily back back propagate through
+53:45
+the network and update and calculate the gradients and updates the weights in the
+53:50
+network but in a recurrent architecture let's
+53:56
+say from the output we calculated the gradient with respect to the hidden layer hidden state but how do we handle
+54:05
+this part how do we handle gradient through the recurrent
+54:12
+connection that is that is a challenge
+54:18
+the solution to that is to approximate a recurrent connection a
+54:26
+recurrent network by as a as a feed forward
+54:32
+network so let me illustrate how that would work so here I'm drawing again a
+54:39
+feed forward network to uh make the comparison more meaningful so we
+54:46
+have a recurrent network here we have the current connection
+54:52
+what we are going to do is we will
+54:58
+um so let me call this X right at the
+55:03
+first time point we will um do our
+55:10
+mapping generally linear layer we will calculate the hidden state
+55:18
+then from the hidden state we will calculate the
+55:24
+output then at the next time point we
+55:29
+will use the same
+55:38
+weights to calculate the hidden state while calculating hidden state we would
+55:44
+have a connection from the previous hidden state and this recurrent connection
+55:51
+means that we are using the previous value of the hidden state so let's use
+55:59
+um um a matrix not by w hh denoting that
+56:05
+it is from hidden to hidden and this is from x to hidden and next time point x2
+56:13
+we get new input we have um a linear
+56:20
+layer acting on fx we estimate h2 Again
+56:26
+we need to use this hidden connection so I forgot here the
+56:33
+output and from here we predict um an output as well
+56:40
+etc so we are unfolding the current connection right and this way we are
+56:47
+converting the problem to actually a problem where we
+56:53
+just have heat forward connections
+56:58
+if you look at uh the architecture information
+57:05
+flows only in a feed forward manner
+57:15
+so
+57:21
+here if you consider that this is a linear layer we
+57:26
+have a linear layer with parameters double xh this recurrent connection is a linear
+57:34
+layer um with weights double h to h and here
+57:40
+we have a linear layer mapping the hidden state to the
+57:46
+output sorry here I forgot to write that this is
+57:52
+WH2Y this is WH2Y wh to
+57:58
+R by using the same weights
+58:06
+here here here here we use actually the
+58:11
+same weights so we share the weights across time and all of
+58:19
+them where is Where is the pen
+58:24
+here so these are the same and it's the same with this
+58:31
+one and the hidden to hidden
+58:37
+weights they are the same as well and it's the same as this one and hidden
+58:43
+output weights are the same we share them and they are the same as
+58:52
+They are the same as this one so we unfold the
+59:00
+network we process input at each time point as we have drawn
+59:09
+here and by sharing the weights across time we are emulating the recurrent
+59:15
+network
+59:22
+i cannot see the pen it change [Music] color
+59:35
+okay so the thing is um it is unfolding we convert the
+59:42
+current connection the current network into a feed forward network
+59:53
+and since we are sharing the weights so these weights are the same these weights are the same these
+1:00:01
+weights are the same right by sharing the weights actually we can use this
+1:00:07
+network for sequences of vine length so we can have just three values here or
+1:00:15
+10 values here or 100 values here so we can use the same network
+1:00:22
+for different sequences with different lengths so in a sense we are emulating
+1:00:30
+this by this unfolded feed forward
+1:00:36
+network is this clear
+1:00:44
+okay we can have other types of recurrent networks we can unfold them as
+1:00:50
+well we are not going to see such architectures in practice but actually the same idea can be applied on
+1:00:58
+different types of recurrent architectures and by unfolding we can
+1:01:05
+address all of these problems with uh recurrent architectures we will look at
+1:01:12
+uh problems example problems and we will see how recurrent networks can be used
+1:01:17
+for them okay so we will for example look at
+1:01:24
+u text we will have words or characters as input we will for example um use
+1:01:32
+words as inputs at different time points so let's say this is x0 this is x1 this
+1:01:38
+is x2 etc so we need to we cannot
+1:01:43
+directly provide words as input we will need to convert words into vectors we
+1:01:49
+will see how we can do that we will have words we will multiply the words with weights we will obtain hidden state
+1:01:55
+representations then for the next time point we will get this next word you
+1:02:01
+will update the hidden state etc this way once the sequence is complete the
+1:02:08
+hidden state representation here is a summarizes the content it has
+1:02:16
+seen so far the whole sequence you provided as input is
+1:02:24
+actually summarized here in this hidden state representation so RNN's such
+1:02:33
+recurrent architectures are very good at mapping a sequence to a single vector a
+1:02:40
+summary vector
+1:02:45
+we can have multiple um recurrent connections so can have for
+1:02:53
+example X we can have hidden state uh representation
+1:03:00
+one we can have a recurrent connection here and we can have a hidden state representation two right then we can
+1:03:07
+have the output we want to estimate such a two layer recurrent architecture can
+1:03:14
+be unfolded in this way at each time point we provide the input
+1:03:21
+we obtain hidden state representation for that then hidden state representation for the second layer then
+1:03:28
+we have the second input we update the hidden state representation for the first layer and
+1:03:35
+the second layer right then the third time point etc right so this way we can unfold
+1:03:43
+actually any number of current layers
+1:03:49
+this way you mean this is the actual representation yes this is actual representatives
+1:04:04
+and if you want to for example have a single prediction and many to
+1:04:12
+uh one mapping can take this hidden state
+1:04:18
+representation which summarizes the whole content across different layers
+1:04:24
+and from this vector you can have a prediction
+1:04:34
+um we will use unfolding when we are working with RNNs
+1:04:40
+uh this means because of unfolding we will use weight
+1:04:47
+sharing right so we are sharing weight at different time points that's important this has implication on
+1:04:53
+backward uh pass when you want to back propagate to a certain weight we need to
+1:04:59
+calculate the gradient to all copies of that weight and we need to add them
+1:05:05
+up and another thing is by unfolding We are emulating the current connection but
+1:05:13
+we are emulating it for the number of time steps we are
+1:05:18
+unfolding in general in practice what we do is
+1:05:27
+um on our training
+1:05:32
+set we have sequences of different lengths you have x
+1:05:38
+y right um and x is let's say a
+1:05:45
+sequence different x's can have different
+1:05:52
+lengths since x might have different lengths batching data for creating
+1:06:00
+batches of data to have fast training is tricky
+1:06:06
+right you cannot represent a batch of different length sequences as a
+1:06:14
+matrix so what we generally do in practice is we find the longest sequence
+1:06:21
+we take that length let's say 100 time steps shorter sequences are zero padded
+1:06:29
+so that all sequences have 100 time steps
+1:06:36
+right so this way we can get batches of data batches of
+1:06:41
+sequences and the network can be unfolded for 100 time
+1:06:47
+steps and it can be trained as a regular feed forward network with weight
+1:06:55
+chain right that is how we use RNN in
+1:07:01
+practice because of this um we are effectively emulating the
+1:07:08
+recurrent network for a fixed number of time steps 100 time
+1:07:14
+steps if during inference you have longer sequences generalization of this to
+1:07:21
+longer sequences is an
+1:07:28
+issue okay any questions so far
+1:07:44
+then let's see how we can back propagate through um an RN we call that back
+1:07:51
+propagation through time because if you consider the unfolded network we have
+1:08:00
+information is passed passing through the network across time we need to back
+1:08:05
+propagate across time as
+1:08:20
+well i start this I don't think I will be able to finish this
+1:08:32
+okay let's leave this to um Thursday i don't want to break this into
+1:08:38
+two so on Thursday we can look at back propagation

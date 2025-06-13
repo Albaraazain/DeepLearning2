@@ -1,0 +1,1348 @@
+
+Transcript
+0:06
+okay morning again So let's look at what we discussed in the
+0:14
+previous lecture as usual Um so we looked at different ways to encode
+0:23
+um text So we mentioned that we can work at character level and we can encode
+0:29
+characters using one hot encodings Um or we can work at the word
+0:35
+level and we can encode words using word
+0:41
+to back methods for example As a result we get word embeddings Um and then we
+0:48
+looked at um an alternative approach where we look at frequently occurring pairs
+0:57
+um of um characters of byes and we try to encode them um as independent tokens
+1:07
+With this we we are able to work um at the subword level So we can um have
+1:16
+characters infrequent characters can stay as independent tokens but
+1:21
+frequently occurring pairs of or sequences of characters are represented as um uh tokens So this would allow us
+1:31
+to um actually represent um word
+1:36
+subwords or prefixes and suffixes that are frequently used across different
+1:44
+words and we briefly discussed um the advantages and disadvantages of these
+1:51
+three approaches So one challenge um of language models is to generalize across
+2:01
+um different words and if you encounter a new word that you have not seen before
+2:06
+generalization to such words is a is a challenge is a difficulty
+2:13
+Word embeddings would obviously struggle here because we train one vector for each word in the
+2:21
+vocabulary Right if you encounter a new word then we basically don't have any
+2:28
+representation for that new word So this is a challenge for word embeddings
+2:34
+Character embeddings are not affected by um this because it is working at the
+2:39
+character level But it would have difficulty
+2:45
+capturing any semantics of this new word Um by the pair encoding in some cases we
+2:53
+can capture and represent new words So if the new word
+2:59
+is basically composed of some frequent blocking um
+3:06
+subverbs suffixes and prefixes then actually bite pair encoding can better
+3:11
+handle this Vocab size is a challenge with with
+3:17
+word embeddings because we have a large number of words character embeddings Um
+3:25
+if you use character embeddings the vocabulary size is small right we have
+3:31
+characters and punctuation marks um alphabets characters etc So the vocab
+3:39
+size would be uh less compared to word embeddings Um and by pair encoding
+3:46
+provides a balance is is somewhere in between
+3:52
+And as we mentioned by P by pair encoding handles subvers prefixes
+3:58
+suffixes better So if we are working with a language that is using suffixes
+4:05
+or prefixes then actually pair encoding can be
+4:10
+better So for languages like Turkish etc this can be a better choice and word embeddings
+4:19
+are language specific So the embeddings that you have learned in one language
+4:25
+will obviously not generalize to another another language because words are different But if
+4:33
+um subwords are partially shared between
+4:38
+two languages maybe bite pair encoding can be um a better choice in this
+4:45
+regard Then we talked about um two problems
+4:51
+where RNNs can be helpful image captioning and machine translation In an
+4:57
+image captioning actually we are mapping one modality to another modality So we
+5:02
+have image right So our input is image
+5:08
+and we are trying to map that to a different modality text right Um and we
+5:15
+saw that actually this is um this can be achieved in a very straightforward fashion So we have an RNM here
+5:24
+So with this RNN u we decode So this is an RNN
+5:30
+decoder we are decoding a sequence a sequence of words right So what we did
+5:38
+actually was very straightforward So remember we initialize the hidden state of RNN with a fixed uh value or we keep
+5:47
+that a learnable parameter So instead of doing that um we can take the feature
+5:56
+um representation from a CNN let we have a pre-trained CNN let's
+6:02
+say RestNet right with RestNet we extract features um of the image right then we
+6:11
+use a fully connected layer a linear layer to map the features u image
+6:17
+features to the hidden state of U hidden state of
+6:24
+RN So this way once we initialize hidden state of RNN with the features
+6:30
+summarizing the content of the image we can decode we can sample a sequence can
+6:37
+generate a sequence Um so here we can use a pre-trained word
+6:44
+embeddings or if you have um sufficient amount of data the word embeddings can
+6:50
+be learned from data as well and here we can use a pre-trained
+6:56
+CNN which we keep either frozen so we don't update the weights of
+7:03
+this CNN or if you have enough data we can back propagate
+7:10
+through RNN all the way to CNN update parameters of CNN But that might be
+7:16
+difficult if we have long text If uh the text we are working with um are long
+7:24
+then we would have problems with the
+7:29
+gradient Then we looked at um machine translation Um so in machine translation
+7:37
+we have a similar approach So we have a decoder So this is an RNN
+7:45
+decoder Again we are initializing the hidden state of the decoder with some
+7:53
+content This time that content is coming from actually another
+7:59
+RNN So we get the content from somewhere else We initialize it state of RNN Then
+8:06
+we decode a sequence The idea is the same The input is different So if you
+8:13
+have any mapping problem from one sequence to another sequence from one
+8:19
+modality to a sequence right so this approach
+8:24
+um worked well in practice So emission translation
+8:32
+um we have an RN encoder
+8:37
+summarizing the input text right into
+8:43
+u feature compact feature vector compact representation hidden state right at the
+8:51
+end of the sequence what we have here is a summary of um the input text we
+8:59
+provide that to the decoder we initialize the
+9:04
+hidden state of the decoder Then we sample a sequence We know the ground
+9:10
+truth So we can calculate for example cross center loss Then we can back
+9:16
+propagate through uh decoder all the way to encoder and update the parameters of
+9:23
+both the decoder and encoder
+9:28
+So this works this worked really well in 2014 It provided state-of-the-art
+9:35
+results and it changed the literature in nature language
+9:41
+processing Um however it had some issues So if you consider um problems where the
+9:50
+input text is long let's say 100 words here and the target text might have
+9:59
+around 100 uh words So the unfolded RNN
+10:04
+would be around 200 layer feed forward um network
+10:11
+and since we are using scratching activation function it is very challenging to get useful gradients to
+10:18
+earlier um earlier steps of the encoder
+10:24
+So let's say we are trying to predict a word here at the end of the decoder and
+10:30
+if this word needs to depend on content
+10:35
+in the earlier parts of the encoder we have a very long long-term
+10:42
+dependency issue Right so the information from earlier part of the encoder needs to somehow be propagated
+10:50
+all the way across around 200 time steps
+10:55
+to the decoder So in forward pass this is very
+11:02
+challenging because of the saturation problem with squashing activation functions In backward pass this is very
+11:10
+challenging because of the vanishing gradient problem it's very difficult to get useful gradients
+11:15
+uh to earlier parts um of the
+11:23
+encoding Um before looking at mechanisms for improving this
+11:30
+addressing this long-term dependency issue we looked at um so-called ecostate
+11:37
+networks or reservoir networks In such approaches reservoir um approaches we
+11:46
+create a reservoir of random neurons with random waves and
+11:52
+random connections in echostate networks In this reservoir we also have recurrent
+11:59
+connections and that would mean actually our reservoir represents a recurrent
+12:06
+architecture So the assumption the hypothesis is
+12:12
+that in this randomly initialized reservoir there are some
+12:18
+useful random functions and from these random functions the output of these
+12:24
+random functions we can train a simple linear layer to
+12:31
+estimate our output So if this reservoir doesn't have
+12:36
+recurrent connections we call that extreme learning machines So we have different options for this reservoir If
+12:45
+you have recurrent connections it is called echostate networks So if the amount of data is limited you have a
+12:51
+recurrent you have a sequence modeling problem let's say and the amount of data is limited then you can give a state
+12:58
+networks a shot Okay So the architecture that we
+13:05
+looked at here that was proposed in 2014 um for neural machine translation
+13:11
+problem where we have we have a vanilla RNN encoder and vanilla RN decoder and
+13:18
+this had issues in generalizing to long text as we have discussed So we unfolded
+13:26
+and RNN and decoder corresponds to a very deep pit
+13:33
+for network and we have saturation problem and meion gradient
+13:38
+problem So this study uh highlighted this issue and proposed
+13:46
+um a very uh u powerful attention mechanism So
+13:53
+when we are updating the decoder so this is the
+13:59
+decoder Um so when we are updating the state of the decoder instead of just looking at the
+14:06
+previous decoder hidden state or the final hidden state of the um encoder we
+14:15
+look at all hidden states of the encoder all time steps
+14:23
+um and we looking at the current position of the decoder and what we have predicted
+14:29
+so Far we try to determine some
+14:36
+weights that control the contribution of the
+14:42
+hidden states of all hidden states of the encoder We call these weights attention
+14:49
+weights They are dynamically computed based on what we are trying to predict what's the current state of the
+14:56
+decoder and and this way we dynamically adjust the information
+15:02
+coming from the encoder and we are allowed to look at
+15:07
+all time steps of the encoder not just the final hidden state of the encoder
+15:13
+which introduces a long-term dependency problem We are looking at all time space
+15:19
+So this is a very um effective mechanism to address
+15:26
+long-term dependency problem So here to calculate these
+15:32
+attention weights um we get the previous hidden state of the
+15:42
+decoder Um and this is um um
+15:50
+the encoders state at
+15:56
+um time j and this is the state at
+16:02
+uh time i minus one So we what we are trying to do is in calculating the
+16:10
+attention weights we are comparing the hidden state of the decoder with with hidden state of the encoder and through
+16:17
+that comparison we are trying to get um a coefficient a weight right that
+16:26
+comparison is in a sense checking how similar or how relevant or how aligned
+16:34
+these two states states are So we have vectors the vector from the decoder
+16:40
+hidden state of decoder and a vector from the encoder the state of the encoder at a certain time step we
+16:47
+compare two vectors based on their similarities we are trying to determine
+16:53
+um a coefficient So in the original paper in this paper from BA now um this
+17:01
+alignment uh function is a two layer multi-layer
+17:08
+perceptron So through this multi-layer perceptron we get a row score to be able
+17:14
+to use those scores as weights we need to normalize them We use softmax to
+17:22
+normalize those So this is saltmax right then once we have these
+17:31
+weights attention weights we multiply the hidden states all hidden states with
+17:37
+those weights right and then we get in a sense we get a weighted average of the
+17:43
+hidden states all hidden states of the enclosure So this way at each decoding step we are
+17:52
+able to look at all encoder states and dynamically determine dynamically select
+17:59
+dynamically attend to the most relevant
+18:06
+content Is is this clear any questions from this part from the previous lecture
+18:19
+okay So if we look at button method
+18:26
+um we can write two layer multiplayer in this way So we
+18:31
+concatenate the hidden state of the decoder and hidden state of the encoder
+18:37
+The concatenation will give us a vector and we will pass that through a linear
+18:46
+layer We have we pass it through um nonlinearity hyperbolic tangent Then we
+18:54
+have the second layer right So the two-layer multi can
+19:02
+be denoted in a compact fashion um like this So in Batonau's attention mechanism
+19:10
+we have a two layer multi perception to calculate alignment similarity between
+19:18
+two vectors So since we are trying to calculate some similarity some alignment
+19:24
+between two vectors we can use actually other similarity measures like cosine So we
+19:32
+have hidden state of the decoder hidden state of the encoder we can use cosine similarity
+19:39
+um we can um we we can use
+19:46
+um independent of the hidden state of the decoder we can just multiply the
+19:52
+hidden state of the decoder with a learnable weight to calculate attention scores But this would this would in this
+19:59
+would ignore the input or we can calculate an alignment
+20:05
+score like this or we can use dot product So we have two vectors we want
+20:10
+to calculate alignment or simulated in two vectors We can use that product
+20:16
+um and scale.product product um scales um that product with the
+20:23
+dimensionality of the
+20:30
+representation Oops sorry I forgot to update this part So today
+20:36
+um we will look at actually self
+20:43
+attention We will first look at a basic version a vanilla version and then we
+20:49
+will look at um the version that is used in transformers With that after introducing
+20:56
+self attention we will look at um transformer architecture A transformer
+21:01
+block then how a transformer block is used in a um transformer architecture Um
+21:09
+we will look at the sub the different operations that we use in a transformer
+21:15
+Um and next week we will switch gears and we will
+21:21
+quickly look at how transformers have been used in different domains U we will
+21:27
+look at the transformers that have been used in uh language processing We will
+21:33
+look at large language models Then we will look at vision language models
+21:40
+any questions Okay
+21:49
+So here um what we did was
+21:56
+um we we had vectors representing the
+22:02
+state of the decoder And based on that by comparing that with other vectors we
+22:11
+actually in a dynamic fashion we obtained um a representation
+22:19
+that better captures um information Right
+22:26
+so can we um employ this
+22:33
+um in a manner so that we are we are not restricted to
+22:41
+work with um sequential models So RNN is a sequential model
+23:06
+RNNs are um sequential models designed to work with sequence
+23:12
+uh uh sequential datas Um one challenge is
+23:18
+that during inference to be able to make a prediction at the end um time step we
+23:28
+need to actually wait the processing of all earlier time
+23:34
+steps during training and during
+23:40
+inference previous time steps need to be processed until we can proceed with the
+23:46
+next time step So for long sequences this can be
+23:53
+um an issue This can be a bottleneck So combining the ideas and the results
+24:00
+we have obtained with attention in RNN
+24:06
+um can we not have an approach where we can process different time steps or
+24:14
+different embeddings simultaneously in parallel
+24:21
+So let's say we have uh words we have a sequence of words right
+24:31
+we obtain their word
+24:39
+embeddings and through some
+24:47
+mechanism I want to be able to in parallel process all those
+24:54
+embeddings to obtain updated
+25:08
+embeddings With RNNs we need to process these embeddings
+25:15
+one um one at a time in sequence right we need to start with with first one then
+25:21
+continue second one third one etc Can we do that in parallel
+25:28
+so what we can do is we can actually
+25:36
+um taking inspiration from this attention mechanism where we compare two
+25:45
+vectors and calculate an attention weight from that comparison
+25:53
+Taking inspiration from this if I'm trying to update this
+26:01
+embedding I compare that with all other
+26:13
+embeddings Through that comparison I get an attention
+26:19
+weight calculating the importance or the relevance of all other embeddings to the
+26:27
+current embedding Then based on that I want to update the
+26:35
+embedding the current embedding right So I want to compare E 0 with
+26:44
+E1 Um using dot product we can do that I
+26:50
+want to compare E 0 with E2 E with E3
+26:55
+Right and through this comparison I want to obtain some
+27:01
+um weights
+27:08
+Um let me call this
+27:21
+all These are through that product the value the similarity score we obtain is
+27:28
+unnormalized We can use soft max to normalize them and as a result we
+27:36
+get attention
+27:46
+weights With those attention weights we multiply the um embeddings
+27:59
+And this will give us the updated embedding for um
+28:08
+E So if you write it
+28:17
+down we compare E0 with um the J
+28:22
+embedding We will use soft max So we will take this
+28:28
+exponent and we normalize that with
+28:34
+um the similarity with all other embeddings
+28:41
+and he multiply
+28:46
+Um so this let me change
+28:58
+color Sorry
+29:11
+Um this is
+29:16
+um alpha 0 J
+29:24
+So it is the attention weight between E 0 and EJ It calculates
+29:31
+how relevant EJ is to E 0 With that
+29:37
+attention weight we multiply the embedding and we have a weighted combination of the
+29:45
+embeddings So this is for E For E1 we do the
+29:53
+same If you want to update U E1 we take E1 we compare that with all other
+30:02
+embeddings We get attention weights We with those attention weights multiply
+30:07
+the embeddings we get the weighted average of the embeddings and we update
+30:13
+E1 The good thing here is that the
+30:19
+embeddings different time steps can be processed in parallel to process to process
+30:31
+enhance previous time steps I can just execute them in
+30:38
+parallel Is this clear
+30:46
+autoressive Mhm
+30:52
+Um to make it auto reggressive um we need to do a trick I will I will talk
+30:58
+about that So when we are decoding a sequence yeah we will we will mask future
+31:11
+embeddings Is this clear okay So this is we can call this vanilla
+31:19
+self attention Yeah
+31:32
+They are not but we will introduce we will extend that so that people have learnable parameters But what we have
+31:38
+just seen in the CN is fine Everything is learnable Yeah So
+31:45
+here this two-layer multi multi perceptron had learnable parameters So
+31:51
+here we don't have anything learnable yet but everything is differentiable So we can pass gradients through
+31:58
+this Okay So let's extend this So here
+32:04
+we took the embeddings and we compared embeddings directly to increase the
+32:12
+capacity of the networks such that similarities can be learned in a more um
+32:20
+effective fashion we can introduce actually some learnable parameters some
+32:25
+parametric functions that make um calculations of similarities um
+32:34
+better So again um we have
+32:41
+words so I'm giving an example with words but as we will see next week we
+32:47
+are not limited to words actually So these at different time steps we can
+32:53
+provide actually anything right and when we look at um
+32:59
+the use of transformers on images or vision language models we will see that
+33:05
+instead of words we can provide actually image patches So we can get patches
+33:10
+windows from images We can then instead of words we can actually use directly
+33:21
+pixels So we have words right
+33:28
+uh we use we obtain the word embeddings
+33:39
+This time from each embedding we obtain three
+33:49
+vectors A query
+33:56
+vector a key vector and a value vector
+34:32
+So these query key value functions funs are parametric functions So we have
+34:38
+different choices for these In the next slide I will show that we can actually
+34:44
+use a linear layer to obtain these
+34:49
+uh these vectors these representations So when I'm trying to update
+34:58
+E instead of taking the embedding directly I will take it
+35:06
+query So in a sense what we are trying to do when we compare an embedding with
+35:12
+all other embeddings is actually we are looking for something right we are trying to update
+35:18
+E We are searching for the representation the meaning the semantics
+35:25
+of E We are searching for something So we
+35:31
+take the query of E 0 We compare that with the
+35:38
+keys of all other embeddings So we take
+35:44
+this we compare it with all the
+35:55
+keys including its own key
+36:01
+Actually through this comparison we will get a
+36:07
+similarity value and we will normalize
+36:12
+that using softmax With that we will get the
+36:17
+attention weights With those attention weights we will multiply the
+36:25
+values of the embeddings So we take the query we
+36:31
+compare that with the PS and we obtain attention weights With those attention
+36:37
+weights we will weight adjust the values
+36:43
+of the embeddings value representations of the embeddings
+36:48
+So let me write that down for E 0 So we will take the query of E 0 We
+36:58
+will multiply that the with the key of E 0 We
+37:03
+will multiply that with the key of E1
+37:11
+etc Through these we will get some
+37:18
+unnormalized
+37:30
+scores and we will use soft marks to normalize
+37:37
+them
+37:45
+Right And with those we will multiply the
+37:50
+value of value representations for the embeddings
+38:02
+you will add them up and you will get in this way you will get the updated representation for E
+38:10
+0 So if you write it down in a single equation
+38:50
+So this is the attention
+38:55
+weight between E um zero time step and the J time steps
+39:08
+Is this
+39:17
+clear mhm I I will explain
+39:25
+that Is this clear for
+39:33
+everyone okay So this is self attention
+39:39
+So this is one tension and what we have described with query t
+39:48
+and value functions um is called
+39:54
+um self attention scales product attention So here we have
+40:03
+softmax for higher dimensional representations It turns out that this
+40:09
+similarity calculation doesn't needs to be normalized with respect to
+40:14
+dimensionality So we normalize this we divide this the square root of the
+40:21
+dimensionality of the um um representations
+40:28
+um and these value key and query functions are actually linear layers So
+40:36
+what we are going to do is we will have a weight matrix for the keys We will
+40:43
+have a weight matrix for the queries We will have a weight matrix for the values
+40:50
+We will multiply those with uh the
+40:56
+embeddings and this way we will get the query for
+41:01
+EJ the key Oh sorry Sorry Let
+41:16
+me the key for EJ query for EJ and value for EJ
+41:24
+But these are learnable parameters mapping the embeddings to
+41:32
+their query key and value representations
+41:39
+Are these we use the same weight for each word or are there
+41:46
+separate weights for the first word and second word no this is the same for all
+42:00
+So remember here I talked about I erased that but we had uh word
+42:09
+embeddings and we were obtaining query key and value for each So we were
+42:16
+actually obtaining that using these linear layers right we use
+42:23
+this to obtain the query We use uh the key matrix to obtain the key
+42:32
+vector and we use the value matrix to obtain the value vector And we apply
+42:40
+that to all embeddings Of course there are
+42:47
+alternative projections In a sense we are projecting the embedding to three different spaces A query space a key
+42:55
+space and a value space Of course there are alternative projection functions
+43:00
+that we can think about and people have explored are are exploring those
+43:07
+So if we put together all T's
+43:15
+right as rows of a
+43:21
+matrix so this is the U key for the first time step This is the key for the
+43:29
+second time step etc
+43:36
+we obtain a key matrix So we can
+43:41
+actually with matrix
+43:49
+multiplication So let's say we have an the if you put embeddings into a
+43:56
+matrix through matrix multiplication actually we can in one step we can
+44:04
+calculate the keys the queries can be represented as a
+44:09
+matrix as
+44:15
+well and value um matrix can can be represented as a
+44:21
+matrix as
+44:29
+well And with a single matrix multiplication we can get the key matrix
+44:34
+With a single matrix multiplication we can get the query matrix And with a single matrix multiplication we can get
+44:40
+the value matrix And this computation
+44:46
+here can be denoted can be implemented with matrix
+44:53
+operations So we get the query matrix we get the key matrix we
+44:59
+calculate the similarities between queries and keys using matrix multiplication and we do normalization
+45:07
+here scale correction and we pass that
+45:12
+through salt marks Then with salt marks we get the attention weights and with
+45:19
+those attention weights we multiply the value representations of the words or
+45:26
+the embeddings So in different resources you would see this computation described in
+45:34
+a compacted manner like this as matrix multiplication effectively what we do is
+45:41
+actually here described in more
+45:47
+detail Is this clear please make sure you understand
+45:53
+this part This is very fundamental but nowadays we are using transformers or
+46:00
+its variations for different problems It is important that you understand how this works
+46:06
+So the result of this matrix
+46:12
+dimension right through this multiplication we will get a
+46:19
+vector a vector of row scores Then through soft max we
+46:24
+will we will obtain attention weights a vector of attention weights and then
+46:30
+after multiplying that
+46:36
+V is a matrix Oops I erased that So I just want to understand
+46:46
+um so these are attention weights uh let me call that denoted with alpha
+46:53
+Then we v is a matrix with that we will get a matrix as a
+46:59
+result and in that matrix we will have one row for each embedding that have
+47:05
+been updated through self attention
+47:16
+Mhm $10
+47:51
+Yeah people are trying to actually simplify this So we will look at one
+47:56
+method specific method for doing that Yes this can this can be
+48:01
+implemented in different ways
+48:12
+Yeah we can
+48:19
+Any other questions is this
+48:26
+clear okay So you must have seen visualizations
+48:33
+like these in different tutorials in different resources videos etc So now we can see what it represents
+48:43
+what it um implies So this
+48:50
+part actually describes this
+48:55
+computation So we take the query matrix key matrix V matrix We have seen how we
+49:04
+can calculate those using a linear layer on
+49:10
+embeddings We multiply query uh with key
+49:18
+matrix We do scale correction This
+49:24
+one we do masking in special
+49:30
+circumstances We will we will talk about that So sometimes during training if we
+49:37
+don't want to look at future embeddings we actually mask their
+49:43
+attention weights Um so this is optional Then we
+49:49
+have salt max right After this step we get the
+49:55
+attention weights alig between every
+50:01
+embedding With those attention weights we wait the value
+50:10
+representations as we have described here and as a result we get the updated
+50:16
+embeddings E 0 prime E1 prime
+50:24
+etc Is this
+50:32
+clear okay So this is um self attention that is used in
+50:40
+transforms So this is very powerful tool in in the
+50:46
+next lecture next week I will provide an alternative interpretation to what this
+50:52
+is trying to do effectively but for the timing I will proceed and I will illustrate how this
+51:00
+is used in um transformers So with scale.product attention with one uh scale product
+51:09
+attention actually we are implementing some semantic relationship between
+51:15
+embeddings in in many cases Let's say we are trying to
+51:20
+interpret a sentence and a word might have multiple different
+51:27
+interpretations So with one scaled um dot product attention we are actually
+51:35
+looking at just one potential interpretation of a word or
+51:41
+birds If you want multiple potential
+51:47
+interpretations to be calculated and taken into account we need to
+51:53
+do multiple self attention with different weights simultaneously working
+51:59
+on the same embeddings So what we do is you will again get the
+52:06
+same um V query T
+52:12
+matrices We will through linear layers we will project them to lower
+52:18
+dimensional spaces in order to control the number of parameters and
+52:25
+dimensionality So we could keep the dimensionality the same but that would explode the number of parameters So to
+52:31
+make this manageable we lower the dimensionalities of the um embeddings
+52:37
+query key value embeddings right and we get
+52:45
+h many different query key and value
+52:51
+matrices right so this is let's say there are layers drawn
+53:00
+Here with the first one we get let's say v1 k1 and
+53:06
+q1 So let me write like this So after the linear projection we get
+53:12
+v1 k1 uh q1 The second linear um projection is
+53:21
+v2 k2 q2 etc If there are h we call them
+53:27
+heads If there are age heads we have actually age many of these age many
+53:36
+um value key and query messages that are lower dimensional than
+53:45
+these And through each um lower dimensional version of value
+53:52
+key and query we perform um self attention They are applied in parallel
+54:00
+on the same embeddings right and through those we get the updated
+54:06
+embeddings through different attention heads and we concatenate them And after
+54:13
+concatenation we apply one more linear layer to upscale the uh representations
+54:19
+the original uh dimensionalities Um and this way the
+54:25
+embeddings that you provided here they have been um
+54:31
+updated Is this clear
+54:52
+okay So let me explain this um maybe more detail So
+55:01
+from value key and query matrices we obtain
+55:13
+um age many different uh
+55:21
+versions Oops
+55:37
+And through each
+55:46
+oops through each we perform self attention
+56:06
+Through self attention you obtain updated embeddings
+56:26
+[Music] um e um zero prime e1 prime e2 prime
+56:38
+etc So this is for the first one Uh
+57:06
+You concern them
+57:26
+Through this concatenation we obtain um an update representation for uh E 0 um
+57:35
+E1 E2 etc And we pass those through a linear
+57:41
+layer to upscale dimensional ticket control
+57:48
+dimensional Is this more clear
+58:08
+y they are matrices
+58:19
+So in this value matis for example we have one row for for each word
+58:36
+Okay So um so let's go over an example
+58:45
+Um so let's say we have two words we obtain data embeddings
+58:52
+uh x1 and x2 we have learnable uh matrices to project those to query t
+59:01
+and values So we take x1
+59:07
+uh we multiply that vq or the order I'm very losing with the
+59:14
+order here based on the representation u the shape of the weight matrix we need
+59:21
+to swap the
+59:26
+order with this multiplication with the we obtain the query representations by mult Multiplying these with uh key
+59:36
+matrices we obtain the key vectors and by multiplying those with the value
+59:44
+um matrices we obtain the value
+59:52
+vectors Um after obtaining those if I want to update the representation for
+1:00:00
+X1 we take its query we compare that with all
+1:00:08
+keys using dot product let's say it gives us 112 and
+1:00:14
+96 right we um divide those with the
+1:00:22
+dimensionality Although the drawing here is um different um we we divide by eight
+1:00:31
+um I mean in this tutorial they assume that it is eight u through that scale correction we
+1:00:37
+obtain 14 and 12 and then we multiply those we pass those through softmax and
+1:00:44
+we obtain attention weights So these attention weights
+1:00:50
+quantify measure how similar um different embeddings
+1:00:58
+are Then we will get those attention weights and we will multiply them with
+1:01:04
+the values Right we multiply this with the value we
+1:01:13
+obtain the updated um value We multiply
+1:01:19
+this with this We obtain the updated value We add
+1:01:25
+them up and that addition would give us the updated embedding for
+1:01:35
+X1 Is this clear so this is just for X1 For X2 we
+1:01:41
+need to do the same but we can do that in parallel Different words can be
+1:01:47
+processed in parallel So this is very suitable for um
+1:01:54
+architectures hardware that can process data in parallel So here we see
+1:02:00
+attention weights um for an example text So let's say this is our text right
+1:02:08
+so the embeddings etc they are not shown here but what we see here is the
+1:02:15
+attention made from ever it to all other words So it is a word
+1:02:23
+that is very ambiguous in different context it might refer to different things right So with
+1:02:30
+those attention weights actually we are able to map this ambiguous word to
+1:02:38
+most relevant content So we see that for the these
+1:02:44
+words we get the highest attention weights and all other
+1:02:51
+words have lower attention So somehow through the learnable parameters the
+1:02:56
+network has learned to relate the verb it to most relevant content so that it
+1:03:03
+can disambiguate its representation and solve the task that is trying to
+1:03:11
+solve Yeah So the
+1:03:17
+tension mechanism rather
+1:03:28
+simp and we just do one matrix
+1:03:34
+multiplication that's but the embeddings the embeddings are
+1:03:39
+updated as well Yeah
+1:03:46
+Yeah Refers to the animal really hard to believe that such
+1:03:52
+a simplistic model can differentiate such
+1:04:00
+lexical So could it be that this this procedure is a bit more detailed or am I
+1:04:05
+just so this is just layer five So there are earlier layers that do maybe some of
+1:04:12
+the disembigation and we are just looking at layer five So you are right
+1:04:18
+So if you just have a single layer I think in one layer we wouldn't be able to resolve
+1:04:27
+this Any other questions is this
+1:04:34
+clear okay So let's look at the transformer architecture So in
+1:04:41
+transformer we use self attention multi head self attention The number of heads
+1:04:47
+is a hyperparameter and we need to tune that This is one of the important
+1:04:53
+hyperparameters in self attention in transformers Okay So in um transformers
+1:05:01
+we have two um parts So we have an
+1:05:06
+encoder Sometimes for some problems we just need the
+1:05:12
+encoder If we want to map um a sequence to another sequence whose length might
+1:05:20
+might be different then we need a decoder transformer
+1:05:27
+decoder So let's look at encoder So one thing you should notice
+1:05:34
+here is that through this set attention
+1:05:41
+calculation actually we lose position information of the embeddings So this
+1:05:47
+calculation is going to be the same The output is going to be the same irrespective of the order of the words
+1:05:54
+You change the orders the weights the updated embeddings will be the same
+1:06:00
+And the order of the word where it is in the sentence is not going to change the result But in many circumstances the
+1:06:08
+position of a word or the location of a pixel in the image or the
+1:06:15
+uh the signal its position in time it will have
+1:06:22
+importance To address that what we will do is to the embeddings to each
+1:06:29
+embedding we will have we will add a positional um representation
+1:06:37
+We will call a positional embedding Position embedding To each
+1:06:45
+embedding before processing them
+1:06:50
+um with the transformer we add position information where it is in the
+1:06:59
+sequence We will talk about how this is calculated
+1:07:04
+Then we will get the embeddings We
+1:07:09
+will pass them through
+1:07:15
+um key t key T key T key T key T key T key T key T key T key T key T key value
+1:07:25
+query key value query So from the
+1:07:31
+embeddings we will calculate um key value query matrices and we will perform
+1:07:38
+multi and self attention on those and we have a skip connection
+1:07:45
+here Through that skip connection we get the embeddings as they are as well and
+1:07:50
+we will add them with the embeddings coming from cy attention Then we will do
+1:07:58
+layer normalization so that embeddings after addition are actually
+1:08:05
+normalized Then we have a feed forward network that is shared across embeddings
+1:08:12
+The same simple multron is used at each
+1:08:18
+time step We have a skip connection Um right we get we add the
+1:08:27
+representation from here with the value we obtain through feed for network and
+1:08:32
+we have layer normalization So this is just one
+1:08:40
+transformer block
+1:08:51
+So this is a very standard block which we repeat as many times as we
+1:09:00
+want Right with by stacking these transformer blocks we obtain a
+1:09:05
+transformer architecture Everything clear so far
+1:09:21
+okay So if we need a decoder let's say we are
+1:09:29
+trying to sample a sequence we have a machine translation task and we are
+1:09:34
+trying to sample a sequence in the target language Uh during
+1:09:41
+training we have all the words that we know because we have the
+1:09:47
+ground truth right we can um add we can obtain their embeddings we add positional
+1:09:55
+information to those we pass those through mult attention but it is
+1:10:02
+masked so when we are when we are processing the current time step I don't want to look at the future
+1:10:09
+words in the in the text because during inference I want to know the future text
+1:10:16
+So during training I want to make sure that I don't look at future
+1:10:21
+values we have a skip connection etc So it is the same almost the same with this
+1:10:28
+part with the difference being that you know we have must multi self attention
+1:10:35
+we have a skip connection normalization we get the queries from
+1:10:43
+here the queries are oops the queries are taken from this key and value are
+1:10:52
+taken from the encoder So we have we call this cross
+1:10:59
+attention The decoder attends to the representations
+1:11:05
+of the encoder It looks at the input
+1:11:11
+representations to see what is there and dynamically through self attention it
+1:11:20
+obtains a representation point So
+1:11:25
+here we have cross
+1:11:34
+attention key query is coming from the decoder Decoder is looking for something
+1:11:42
+So we are using the queries of the decoder and key and the value are coming
+1:11:48
+from the encoder Encoder has the representation has the information So we are searching in the encoder
+1:11:56
+embeddings with the queries of the decoder Does it make
+1:12:07
+sense okay So then here we have skip connection as
+1:12:15
+well We have layer normalization We have feed forward network We have skip
+1:12:20
+connection addition and layer normalization So this is one decoder
+1:12:28
+block Decoder transformer block Note that it is slightly different from the
+1:12:33
+encoder uh block We have cross attention and we have
+1:12:39
+multi head self attention Here we can stack this as many
+1:12:47
+layers as we want Then at the end
+1:12:53
+uh we have as many u time steps or embeddings as required
+1:13:01
+by the uh task we can calculate
+1:13:06
+um our losses and we can back propagate all the way through decoder and encoder
+1:13:17
+Yeah
+1:13:34
+Um so here in a sense it does and one thing
+1:13:40
+that addresses that long-term dependency issue is when we are decoding
+1:13:47
+um a sequence in the decoder we pay attention to all content all time steps
+1:13:54
+right so similar to the attention mechanism in RNNs we address that long-term dependency problem
+1:14:02
+here So this is how we would use decoder during training During
+1:14:10
+inference decoder works one step at a time So it predicts the first word it
+1:14:17
+takes the first word puts that as input to for the next time step
+1:14:22
+We perform we repeat to the decoder we predict the next word then take that and
+1:14:29
+use that as input for the next time step So during inference decoder works
+1:14:35
+sequentially during training we can parallel you we can train decoder in
+1:14:41
+parallel right the embeddings can be processed in parallel during training but during inference it is
+1:14:50
+spential So this is one of the limitations of um decoder So we were
+1:14:56
+saying that RNN's are sequential so they can be slow for long
+1:15:02
+sequences but decoder here can suffer from the same problem during
+1:15:09
+inference Okay So how can we calculate positional encodings we can either use
+1:15:17
+handcrafted methods or we can keep positional encodings learnable
+1:15:24
+parameters and the network can learn the most relevant most um useful positional
+1:15:31
+information for solving downstream task In the next lecture I will contrast
+1:15:37
+them So if you use an handcuff method we can use trigonometric functions that
+1:15:45
+take the position of the sequence the position of the embedding
+1:15:51
+So our embedding is let's say at time zero right and let's say the embeddings
+1:15:59
+have a dimensional five The positional embedding needs to have the same dimensionality because we are going to
+1:16:06
+add the positional encoding with the embedding So this dimensionalities should
+1:16:11
+match So here D is the number of dimensions So it's five in this case and
+1:16:18
+I is the index of the dimensionality So we plug in these
+1:16:24
+values and we provide that to the to a sign function trigonometric function
+1:16:29
+Then with that we obtain for the zero embedding for the I dimension the
+1:16:36
+positional information So by for different
+1:16:46
+positions we see that we get different results and for different positions for
+1:16:53
+different dimensionalities dimensions we see that we have different values
+1:16:59
+So this way we can represent um we can encode
+1:17:04
+position information Um so remember here we talked about skip
+1:17:11
+connections and normalization and feed forward network as I mentioned pit
+1:17:16
+forward network is shared across embeddings So here if you go back to our example
+1:17:25
+thinking machines So we have the embeddings We add positional information
+1:17:30
+to those embeddings We have self attention here between those Right we
+1:17:36
+update the um we have the updated embeddings We have skip connections here
+1:17:41
+We add the embeddings and the updated embeddings We do layer normalization We
+1:17:47
+pass each um embedding through piv for network Again we have se connection We
+1:17:54
+add them and we normalize it Um
+1:18:02
+okay Um and we have something similar in the decoder So we have the embeddings
+1:18:11
+um of the decoder uh we pass them through self attention
+1:18:16
+We have skip connection Um so here we
+1:18:21
+have cross attention we get the queries from here and key and value are coming
+1:18:29
+from the encoder We have skip connection we have normalization we have p network
+1:18:36
+etc And we repeat this as many times as we want
+1:18:43
+Um people are studying variations of these
+1:18:49
+um changing different um operations in transformers changing
+1:18:55
+similarity calculation changing um attention weight calculation changing normalization etc
+1:19:03
+So here in this paper they are trying to replace normalization with hyperbolic tangent In any case we need a mechanism
+1:19:12
+to keep the embeddings in a range
+1:19:17
+Right so here we see how the decoder is
+1:19:24
+uh sequentially generating a signal So it predicts something then we take what we
+1:19:31
+have predicted and we decode that we pass it through the decoder and predict the maximum So during influence it is
+1:19:41
+sequential So there are many stories on the web um if you want more
+1:19:47
+illustrations more details uh um on different subp
+1:19:53
+parts Um one issue with um self attention is um
+1:20:00
+complexity So if you look at an RNN if you have n time steps the
+1:20:08
+complexity of RNN is big O of N So we don't go back to a time step
+1:20:16
+after passing through that So we process um each time step we update the hidden
+1:20:22
+state then we continue the next time step we update the hidden state etc So
+1:20:27
+processing a sequence with an RNN is big O of N where N is the number of time
+1:20:33
+steps In the case of self attention it is big O of N square because for one
+1:20:38
+embedding we need to compare that with all other embeddings So for one
+1:20:44
+embedding the complexity is big O of N Since we have n embeddings the
+1:20:50
+complexities speak of n² But we can calculate we can do the
+1:20:58
+calculation in parallel right we can uh speed this up But the complexity is
+1:21:05
+big of n square Right any questions
+1:21:13
+i think I do not see a
+1:21:19
+positional I think it's called but it's what
+1:21:27
+what good does it have whatenefit does this have
+1:21:35
+allies similar boundaries are taken by different position
+1:21:40
+similar but different sufficiently different and why not
+1:21:45
+just something by sign um we want to ensure
+1:21:52
+that across time we get different values but it needs to be
+1:21:58
+bounded So we could in theory use a linear uh
+1:22:06
+function but we need something that change across dimension as well
+1:22:25
+Yes but uh it fails to generalize to longer sequences than training sequences
+1:22:33
+transform
+1:22:39
+So I will talk about it in the next lecture So there the limitation is the
+1:22:44
+positional encoding So during training we train our network with some
+1:22:51
+positional encodings If we keep the positional encoding learnable parameters
+1:22:56
+right so we have learned only to represent as many positions as we have
+1:23:03
+seen in training set So if during inference we have longer text let's say
+1:23:09
+we have during training we have trained 100 time steps So we have 100 different positions that we can work with So if
+1:23:16
+you have 110 long um sequence during inference
+1:23:22
+how do we encode the positions that we have not seen before So that is a challenge So I
+1:23:28
+will talk about that in the next lecture Okay Uh we can stop here Next
+1:23:35
+week we will continue

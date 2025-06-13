@@ -1,0 +1,1298 @@
+
+Transcript
+0:04
+okay uh good morning again so we have been talking about
+0:12
+um self attention and transformers so last week we introduced
+0:20
+concept of self attention we started with the basic version then we extended
+0:25
+this by using a query function a key function in the
+0:32
+value function u parameter functions uh projecting the embeddings to more um
+0:41
+useful spaces that we obtained self attention or scaled that product attention and we saw
+0:49
+that we can write this in a more compact form um as we gen as we generally see in in
+0:59
+um equations and we mentioned that um this
+1:06
+corresponds to the diagram that we generally see in um different
+1:11
+architectures architecture drawings so we have query the and value and we
+1:17
+basically perform the operations here in these boxes
+1:24
+and in general one um attention mechanism is not sufficient
+1:30
+we for many problems for many challenging problems we require actually
+1:36
+performing multiple independent um attention
+1:41
+mechanisms on the same data on same representations so what we do is we get value key query
+1:49
+matrices we project them to lower dimensional versions through these
+1:54
+linear layers and we perform each
+2:00
+many self attention in parallel we get the updated representations for the
+2:06
+embeddings we concatenate them and we pass them through a linear layer uh to
+2:12
+perform multi head attention um so we also looked at the transformer
+2:19
+architecture which uses self attention together with other operations to
+2:26
+construct um actually um a deep
+2:34
+architecture depending on our problem we can either use the so-called
+2:42
+encoder which um just encodes the input and based on if you have n
+2:50
+um time steps n tokens in the input then we have n um
+2:56
+outputs um from from the encoder so what we do is to to our embeddings we have we
+3:03
+add positional encoding because here um we don't have any position specific
+3:10
+processor and we lose position information of the tokens in the
+3:16
+sequence um so we either using a handcrafted
+3:22
+approach or learnable approach uh we obtain these position encodings and we
+3:28
+add them to the embeddings uh we perform multi attention we have connection we
+3:34
+add normalization here and then we have a small multi
+3:41
+perceptron together with a residual connection and normalization so this is just one transformer block and we and we
+3:49
+repeat that as many layers as we want that would be the encoder so for some
+3:57
+problems using just um an encoder is sufficient so today we will look at some
+4:03
+examples um but if we want to map one sequence to another sequence um then we
+4:11
+need uh we might need a decoder which is drawn here um
+4:19
+in the decoder we again have multi head attention uh similar to here uh but we have two
+4:28
+critical differences one difference is that when we are training the decoder we
+4:35
+actually have the full data we have the data from the future time steps as well
+4:41
+so we don't want the processing stages to see the future inputs so to prevent
+4:49
+that we have masked multi detention so what we do in mask multi attention is
+4:56
+after performing after calculating attention weights we mask the attention
+5:02
+weights of the future time points um the second difference so this
+5:08
+is the first crucial difference second crucial difference is um
+5:13
+that the query here comes from the decoder inputs but
+5:22
+key and value are received from the encoder so in a sense the decoder
+5:29
+attends to the representations obtained by the encoder right so we are trying to
+5:36
+decode something and to determine what we want to decode we looked at the encoder representation so this is
+5:43
+similar to what we did in RNN with attention remember when we introduced uh
+5:48
+the attention mechanism on top of RNN to improve the performance of let's say
+5:55
+natur machine translation on long sequences we had something similar when we were
+6:01
+decoding we looked at the encoder states right so we are doing something similar
+6:07
+here and we can repeat this as many times as we want um so when we are training
+6:16
+um the decoder during training we can train different time steps
+6:23
+simultaneously but during inference it needs to be sequential so we need to predict a word then use that word as the
+6:30
+as input for the next time system so it needs to be sequential but during training it can be the different time
+6:37
+steps can be trained in parallel so we looked at how we
+6:43
+can obtain positional representations using um a sign function for example by
+6:51
+changing um this I and this variable here based
+6:59
+on the position of the token in the sequence and the dimensionality of the embedding we can
+7:06
+actually obtain um such trigonometric functions and with that we can uniquely
+7:12
+encode the position of each token and in each
+7:19
+dimension so we talked about a significant issue itself attention it is
+7:25
+expensive completionally expensive it is quadrant right so if there are n tokens
+7:31
+then actually processing u cotension is big o of n
+7:39
+square and in the literature people have explored mechanisms to improve this
+7:47
+complexity um in this course we are not looking at those but if you take a
+7:53
+follow-up course um a graduate level follow-up course on deep learning we will discuss those alternatives in more
+8:03
+detail any questions yeah
+8:09
+can we say
+8:15
+normalizing similarities some some of the similarities
+8:24
+normalizing similarities in a sense yes so based on similarities
+8:31
+it we use um we obtain these attention weights these weights sum up to one and
+8:39
+with those weights we obtain weight average of representations
+8:47
+any other question
+8:56
+yes it is a normalizing normalizing constant so this is constant
+9:04
+yeah so it actually different
+9:13
+[Music]
+9:26
+of value if you are similar to everything then
+9:33
+actually this might be higher yeah so we normalize with respect
+9:38
+to how similar that word might be to other representations
+9:47
+yeah okay today we will um do a very fast overview of how things
+9:56
+progressed after transforms so we look at how we can pre-train
+10:03
+um transformer based models or especially nature language processing
+10:09
+tasks from that we will see the emergence of large language models we
+10:16
+will look at a few of those then we will see how transformers can be used in uh
+10:21
+vision tasks on images we will look at some vision transformers and we will
+10:27
+look at vision language models and multimodel language models or multimodel
+10:34
+models um and then I will conclude today with um a general
+10:42
+um perspective a new paradigm where we can use these models foundation models
+10:48
+as agents acting together for solving different uh tasks more challenging
+10:55
+tasks so here to cover those I I need to be quick
+11:02
+i will skip many details if you want in
+11:07
+the graduate level at deep learning course we will discuss the in more detail
+11:12
+um so just to give you a glimpse of how things are I wanted to include those and
+11:19
+you're not going to be responsible from those in the exam but I strongly suggest
+11:25
+that you pay attention to um to to the details okay so
+11:33
+um after or in parallel to the introduction of transformers people were
+11:38
+looking at how we can pre-train um networks deep networks for different
+11:45
+natural language processing tasks right so there are different tasks we can formulate in natural language processing
+11:52
+which all work on words or sentences so people have been thinking that
+12:01
+Since the different tasks are using the same words same tokens same same useful
+12:09
+representation somehow should be able to be learned and used utilized for
+12:14
+different tasks uh word embeddings that we have talked about before is actually uh a
+12:22
+good example for preining right so on out of data we
+12:29
+pre train a simple network after that pre training we we obtain a single
+12:34
+matrix and with that matrix we already have some useful representations of
+12:39
+words right and by concatenating those word embeddings or by adding them we
+12:45
+obtain actually a good representation of a sentence or a text
+12:51
+um but people showed that um and as we
+12:56
+will see today in more detail um we can train a whole
+13:02
+network in an unsupervised fashion with available data large amount of
+13:08
+availability on the web and then it turns out that the representations
+13:13
+learned by the network can be very useful for many different downstream
+13:19
+tasks so for example uh we can train NLSTM to predict the next word in the
+13:27
+sequence right auto reggressive language modeling then after this preining for
+13:34
+any downstream task I can use uh this
+13:39
+network I can either fine-tune the whole network or I can just add a linear layer
+13:45
+at the end on top of the final um uh hidden
+13:51
+state um and then this turns this works really
+14:01
+well um people explored in different ways we can train an LSTM prest in a
+14:09
+left to right and in a right to left fashion then we can concatenate the embeddings of those so this is just a a
+14:16
+slight variation and um with
+14:23
+GPT1 proposed by open AAI we saw the application of this autogressive
+14:28
+language modeling to transformers and they showed that after
+14:34
+pre-training a transformer on large amount of data then similar to what we
+14:40
+did what we saw in LSTMs we can actually use that transformer for different down
+14:46
+syncing tasks after some fine tuning and this is in a sense the basis of the GPT
+14:53
+versions and large language models b is um a very common very well
+15:00
+known example it was proposed I think in the same year or maybe in the next year
+15:06
+after GPT1 we will look at that in more detail we in B we have a transformer we
+15:12
+pretrain this transformer with two different um pre-training
+15:19
+tasks okay so let's look at GP21 so in GP21 we have a transformer
+15:30
+encoder it is a 12 layer transformer encoder so we will see
+15:38
+that in in these models we will see the use of transformer architecture without
+15:44
+any modifications so they deliberately wanted to keep the architecture the same
+15:50
+as simple as possible without significant modifications and what they wanted to
+15:57
+show is by adding a lot of data and by changing the pre-training strategy we
+16:03
+can actually solve complex tasks um so in GPT1
+16:11
+uh so it is decoder only uh this is this is wrong so there is no
+16:17
+encoding on um on an available data set
+16:23
+they um retrain this network in an unsupervised fashion autogressive
+16:29
+language modeling they were they trained transform to predict the next word um in the sequence and after that they
+16:38
+fine-tune that they show that they could fine-tune this transformer for different
+16:44
+tasks like classification and tainment whether two texts support each other or
+16:50
+not whether two texts are similar or not etc
+16:56
+so here we see um a pre transformer being successfully
+17:03
+used and fine-tuned for different tasks right so for each task we need to
+17:09
+fine-tune the network um separately
+17:15
+independently um so here we we see the authority language modeling loss so
+17:22
+given a sequence of tokens uh we are trying to predict the next token in the sequence we are trying to
+17:28
+maximize this likelihood um and when you want to apply this
+17:37
+pre-trained transformer for a down sync task we use a supervised fine tuning we
+17:43
+have some data set um given the data set with the label we are trying to actually
+17:49
+maximize the probability of that label and during finetuning they use
+17:56
+both loss functions right normally we use L1 this loss here during
+18:03
+pre-training in order to ensure that during discriminative finetuning
+18:09
+supervised fine tuning we don't lose what we have learned during pre-training
+18:15
+they they use um a weighted version of the
+18:20
+pre-training loss here as well so this is pervision
+18:26
+loss that tries to maximize the classification uh probability while
+18:31
+doing so in order to not forget what they have learned before they keep a weighted version of the pre-training
+18:40
+loss um then this architecture by using
+18:47
+special tokens for the problem at hand learnable
+18:52
+tokens we can fine-tune um the transformer and we can get really good
+19:01
+results and when it was proposed it provided state-of-the-art results for many different tasks I will skip those
+19:10
+Then after GP1 B was introduced B um is
+19:16
+birectional encoding um I don't remember the full acronym um
+19:24
+it's a birectional use of um um
+19:30
+transformers that part is not very critical actually what is critical is that it it introduced two um important p
+19:38
+training task so we have a lot of text available on the web uh from those uh
+19:45
+purpose they introduced mask language modeling as a as an important
+19:50
+pre-training strategy so we have sentences so we randomly
+19:56
+mask some words and we are we try to predict the masked words so we are doing
+20:03
+something similar to how we pre-trained word embeddings right so we have the
+20:08
+center word given the center word we try to predict the surround or given the surround or context we are trying to
+20:15
+predict the center word so here we are randomly masking a significant portion
+20:22
+of the word and we try to predict what we have masked so to solve this
+20:29
+challenging problem the network has to learn relationships between words in in
+20:38
+sentences so this is one training strategy the second one is next sentence
+20:44
+prediction so we have sentences following each other in um in
+20:51
+documents right so we take following sentences two following sentences and we
+20:58
+say that okay these follow each other so their supervision signal would be one and then we randomly pick two sentences
+21:05
+that do not follow each other then their uh prediction supervision would be zero
+21:12
+so from the data we create a supervision sign data
+21:20
+sorry no it's it's not so let's say uh we
+21:27
+train for mustang modeling for one iteration of one then we train it next
+21:34
+sentence prediction but we train the same
+21:39
+network um so here to um as input we provide two
+21:47
+sentences the first sentence we have a separator sentence or segment separator
+21:53
+and we have the words or tokens for for the second sentence we have a special
+21:58
+classification token i will explain this in a bit right so we provide sentences
+22:04
+either we mask words from the sentences and we try to predict the mask word or
+22:09
+we provide the sentences and we try to predict whether they follow each other
+22:16
+so this uh CLS token is a special token uh it is learnable um and this attends
+22:25
+to the words representations um of the words here in the what in what
+22:32
+we provide and through attention layers the representation of the CLS
+22:39
+token actually encodes the input that we have provided so through attending
+22:46
+attention to the words in the sentences the CLS
+22:52
+token includes a summary of the
+22:57
+content then on top of that we can add a multi-layer
+23:03
+perceptron to make predictions to classify text so next sentence
+23:08
+prediction for example is performed using this um CLS tokens
+23:17
+representations so after this pre-training we can take
+23:23
+transformer and we can either use the representations as they are and we just
+23:30
+concatenate them or we use the CLS token and we just add and fine tune the multi
+23:37
+perceptron or we if you have sufficient amount of data we can finetune the whole
+23:44
+transformer so we see two distinct stages here as well so we have pre-training and for each downstream
+23:52
+task we have different supervised
+23:58
+training b was really successful um it was applied to different NLP tasks and
+24:08
+people started extending that to vision and language um tasks as well so here
+24:14
+you can provide a sentence then instead of in the second part instead of a
+24:19
+sentence you can provide actual features from an image then actually you are
+24:24
+training a transformer that receives both text and image content and they can
+24:31
+attend to each other and you can solve actually vision language tasks
+24:40
+um I will skip u many of those
+24:45
+[Music] um okay so in mass language mask
+24:54
+language modeling task pre training task actually we are masking
+25:00
+uh a significant portion of the text and this turns out to be really effective we
+25:06
+need to find the balance between how much we are masking we don't want to mask too much otherwise we cannot um
+25:14
+provide we may not be providing enough context to predict the m words if you
+25:20
+mask it too little then the first the task might be too simple to learn something useful
+25:27
+and since we have a lot of um data available um actually it might
+25:34
+require more training to obtain useful representations so one challenge here is
+25:41
+we use masking during pre-training but we don't use that during fine tuning
+25:48
+right so there this introduces some discrepancy between training and testing
+25:54
+so to address this during training uh when we are when we decide to mask a
+26:03
+word 80% of the time we mask that word but 10% of the time we replace it with
+26:10
+some random word or 10% of time we keep the word as it is so we introduce some randomness this way the dependence on
+26:17
+the mask token is reduced there might be alternative solutions to this in the
+26:23
+literature um I didn't follow the literature on that so but but as we will see currently
+26:31
+we are not using masking um and next sentence prediction
+26:37
+so we have sentences if these sentences follow each other in the corpus then we
+26:42
+say that uh they are following each other otherwise if they are two random
+26:50
+sentences from the text then we say that they don't follow each other and we bet
+26:56
+train to predict those labels okay um so when we are feeding
+27:04
+our input to um B we have our um
+27:10
+embeddings right so embeddings for the words um to those we add positional
+27:17
+embeddings either we keep them as learnable parameters or we use sign uh
+27:24
+function um and to distinguish to separate the embeddings of the first
+27:30
+sentence and embeddings of the second sentence we add learnable segment
+27:38
+encodings right so this way method will uh easily separate the tokens or
+27:47
+embeddings coming from the first sentence and embeddings coming from the second uh sentence
+27:54
+so we add all of them um okay it is using a transformer
+28:02
+without any modifications um
+28:08
+yeah and they show that it provided good results that's why the paper was
+28:13
+published and if you compare that with GPT you see that it provides
+28:21
+significantly better results compared to
+28:26
+GPT1 okay um then let's look at the followup GPT
+28:33
+models so JP1 and BERT they were really influential people uh saw the potential
+28:40
+of pre-training transformers on large amount of data to obtain good results um
+28:48
+OpenAI followed up on GP21 and they scaled the architecture and the uh
+28:56
+training pre-training data and they showed that actually interesting
+29:01
+properties emerge interesting genation properties emerge once you pretrain
+29:08
+transformers so let's look at those so we saw um I in 2019 so is it two years after
+29:17
+GP1 I think um in GPT2
+29:23
+uh they showed that if you train a a large transformer on large
+29:29
+amounts of data you see that actually language models begin to
+29:35
+learn solving different tasks without any explicit supervision
+29:40
+so consider web so on the web we have a lot of books a lot of articles a lot of
+29:48
+content and in those contents actually we have different inputs and outputs for
+29:54
+different tasks available already so they gave this with the example of machine translation so if you
+30:01
+look at the large amount of corpus available you would see the translation
+30:06
+from English to French for example example
+30:12
+texts translating um English to French and similar
+30:18
+translation text examples are available for different language pairs as well so
+30:24
+once you pretrain a transformer a plain
+30:30
+transformer to predict the next symbol in the sequence so in an auto
+30:37
+reggressive language modeling manner then it will see such inputs and
+30:45
+outputs then after this training actually that transformer already knows
+30:52
+how to translate from English to French without any
+30:57
+downstream finetuning it can already it already knows how to
+31:05
+solve many different problems because of the large amount of the training data
+31:10
+just next simple prediction is sufficient to solve these different
+31:17
+tasks so this was um very influential
+31:23
+so OpenAI saw the potential that with this actually after training a large
+31:29
+model on very large amounts of data you can solve maintenance tasks without any
+31:35
+supervised
+31:40
+finetuning um and they showed that uh by increasing the amount of data and
+31:47
+the uh capacity of the architecture we can
+31:53
+still obtain good results without me memorization so somehow the model
+31:59
+was learning if you provided more data if you increase the capacity it could
+32:05
+learn
+32:10
+sorry the
+32:15
+uh maybe it is it's not a good uh strong
+32:21
+um justified claim so we can at least say it is not overfitting
+32:28
+to GPT is fitting uh to
+32:34
+um to the web text data for example but on the
+32:41
+fitting I'm not sure it is
+32:56
+also I think that what they are trying to imply is that the model's capacity
+33:05
+um is still lower than the data although the architecture is too big too complex
+33:12
+it is still underfitting right it is too simple for the data so we can increase
+33:19
+the scale of the day yeah if you remember our discussion with
+33:26
+bias and vines we talked about underfitting or fitting that is what it refers to
+33:35
+so after these promising results from GPT2 by the way GPT1 and GP2 papers they
+33:43
+were not published um so I'm not sure about the overall the
+33:51
+whole story but I think they didn't have technical novelty in those papers so
+33:58
+they just use transformer they just applied transformer and pre-trained those transformers on large amounts of
+34:05
+data so they might have encountered difficulty in convincing reviewers
+34:11
+um into the significance of this work um then with
+34:17
+GP3 they increased the capacity even further so they went all the way up to
+34:26
+175 billion parameters so pre-training strate is the
+34:33
+same next symbol prediction autography language modeling
+34:38
+but in the training uh loops they uh for
+34:44
+they introduce different contexts and in each context they tried
+34:51
+to predict the next symbol in sequence so for example we they had arithmetic
+34:56
+data sets given uh some tokens from the arithmetic data sets they try to predict
+35:03
+the next uh token in the sequence right then after making a loop on arithmetic
+35:10
+data set they continue for example with um uh with machine language translation for
+35:18
+example um or uh grammar correction
+35:24
+machine so they called this in context learning so you provide uh some example
+35:30
+tokens from one context and given those examples you try to continue uh with the
+35:37
+next uh token with the next symbol
+35:43
+after this pre-training strategy auto repressive language training strategy
+35:49
+with GP3 we see the emergence of promptbased interaction with a language
+35:56
+model so the first prompt based interaction with a single model to solve
+36:03
+different tasks right so after this pre
+36:09
+training as input we can provide such
+36:15
+um sentences right in those sentences we can describe the task we can give an
+36:21
+example about the task we can try to provide explanations of what we expect
+36:28
+and the pre-trained network without any fine tuning it predicts the next symbol
+36:36
+or symbols in the sequence and that would be the answer to the question we
+36:43
+want so this we can do that in a zero shot manner where we don't provide any
+36:49
+example at all we can provide do it in a oneshot manner so we just provide one
+36:55
+example for example or we can provide several examples but in either of those
+37:01
+we don't do any fine tuning we just use this
+37:07
+pre-trained transformer model so think about
+37:14
+so we are training a large transformer on lots and lots of um data available on
+37:22
+the web on the internet then it already knows how to solve different tasks you
+37:29
+just provide the prompt and it solves the task
+37:37
+um okay I will skip those so on different data sets compared to
+37:44
+different supervised or fine-tuned models it provided better
+37:50
+results um and they showed that the larger uh
+37:58
+versions of GPD3 um actually were very close to passing the
+38:04
+touring test do you know the touring test anyone who doesn't know the trim
+38:13
+test okay so in trim test what we are trying to do is
+38:19
+um behind the curtain
+38:24
+uh there's a machine that we assume is
+38:30
+intelligent um and there's a human right so we um a jury a judge
+38:41
+um over some communication uh channel asked
+38:47
+questions uh to both right and it gets the answers and
+38:53
+based on on the answers to the questions the jury the judge tries to determine which one is human and which one is
+39:02
+AI so this is um a very well-known test it has a lot of flaws there are there's
+39:10
+a lot of debate about the uh significance or importance or acceptance
+39:15
+of touring tests we are not going to talk about those but we see that GP3
+39:22
+uh came very close to passing the touring test so this uh random chance
+39:29
+means that the jury is not able to distinguish between the two answers so
+39:35
+his predictions the judge's predictions are almost random
+39:42
+so we see if you look at the these models GP1 B GP2 and this is a variation
+39:50
+of B um and GP3 we see that they are being trained
+39:58
+with more and more amount of data so that is one uh factor for their good
+40:05
+results and the other one is that we are increasing the uh capacity of the models
+40:13
+so we have smaller versions um and the ones that provide really good
+40:20
+results are the large ones with a lot of parameters
+40:28
+um if you look at uh the number of layers um and the attention heads etc you see
+40:35
+that's I mean they are beyond uh beyond what we
+40:40
+can afford when GPT3 was introduced it was a
+40:47
+big hype people were impressed astonished by its
+40:54
+performance it was able to write text in different domains um you you provided prompts and
+41:02
+it provided the answer so the people were I mean that was the first prompt
+41:08
+based interaction with a single model to solve different tasks so people were
+41:13
+naturally impressed by that um however it made a lot of mistakes and
+41:21
+often it missed the intention of the human in the prompt right it provided
+41:28
+some answer but often it missed the um real intention so there was an there was
+41:35
+a gap uh there was there was some misalignment between the answer and the
+41:41
+real intention um so that was addressed in
+41:49
+GPT2.5 which is called jet
+41:55
+GPT to address this um gap between the prompt and the human intention they
+42:03
+introduced a multi-stage training uh strategy first
+42:10
+um they they take GPT3 as a starting point so it has been already trained on
+42:16
+large and large amounts of data it is already a very good model um and the interactions with GP3
+42:26
+by everyone actually provided good supervision
+42:31
+signal some experts went over those data they
+42:37
+annotated good ones good answers and bad answers and with that
+42:43
+actually they supervised fine-tuned GP3 in a supervised fashion so before this
+42:50
+it was completely unsupervised it was trained on an auto reggressive fashion
+42:56
+here first we we train um GPD3 in a supervised fashion with
+43:05
+expert approved answers
+43:11
+right so the challenge um with JP GPS or GPT's answers is that
+43:20
+we don't know we don't have a mechanism to rate the answers
+43:27
+So if we can somehow train another model that can rate the answers of JGPT
+43:36
+actually that would be very useful so for that
+43:43
+actually for a single LLM model if you provide an input remember we have a probability
+43:50
+distribution over then we can sample multiple responses so that is what they did so given a
+43:57
+single prompt as input they sampled four different responses and they use experts
+44:04
+to rate or rank those responses so you get for four responses A B C D human
+44:13
+experts order them okay D is better than C C is better than A A is better than B
+44:20
+so we have these ordered ranking of the responses right so we
+44:26
+have a data set with these orderings and we can then train a rating
+44:35
+model that can rate the answers of a uh
+44:42
+GPT model but to this we call it reward
+44:47
+model uh we to this we provide two um
+44:54
+responses and we ask it to predict which one is better than the other
+45:00
+one after training that uh network we can use
+45:07
+this as a reward model for
+45:13
+training a GPT completely on its own so we provide
+45:18
+random inputs to GPT it provides an output and we ask the reward model to
+45:25
+rate how well how good the answer was based on that we fine tune the
+45:31
+GP so GPT can be trained on its own we don't need human expert
+45:38
+anymore right so it is a brilliant strategy a model supervising another
+45:45
+model to finetune itself yeah also do they
+45:51
+some like this far some
+46:04
+issues um maybe during this ordering maybe they do that or maybe even during
+46:10
+the finetuning stage they eliminate those or they they inject correct answers for
+46:19
+such
+46:29
+prompts um
+46:36
+there there's so much data so much new input output I I don't I'm not sure
+46:43
+whether they have observed any
+46:49
+over system to define it own reward
+46:56
+with this reward model in a sense not define its own reward but it learns the
+47:01
+reward model from human annotation So it it doesn't learn its own reward
+47:09
+model i know there were attempts to
+47:14
+bypass such advice
+47:25
+through you blah blah blah
+47:32
+system itself out the
+47:42
+Yeah so in um either the supervised step step one or step two probably they have
+47:52
+uh sample input output to reject um
+47:57
+answers to dangerous or sensitive input right but GPT learns that but if you
+48:06
+provide if you do slight changes if you hijack the prompt with
+48:12
+some changes then actually in a sense you you might be able to bypass what it
+48:19
+has learned and give you the answer to the sensitive input that you want so it
+48:25
+is it is possible
+48:31
+this um three-step strategy turned out to be really effective in providing in
+48:39
+training a large language model to provide answers that match human
+48:45
+intention in the problem so it was very successful we see that the CH
+48:55
+GPT and alternative models were successfully used for different tasks and everything changed in in couple of
+49:04
+years um this idea of um training a reward model and using
+49:12
+that reward model to train um fine-tune um the LLM using reinforcement learning
+49:20
+actually so here this step three is actually reinforcement learning
+49:27
+um reinforcement learning from human feedback
+49:33
+um it it was actually proposed before um GP GPT
+49:39
+GP3.5 by OpenAI uh it's called instruct GPT this
+49:46
+idea to finetune a model uh using a reward model it's called instruct GPT so
+49:53
+in a sense GPT3.5 or CH GPT is a combination of GPT GPT3 with insert GPT
+50:13
+um if you look at the training of the reward model so we have for a certain
+50:19
+input X so we have the prompt for the same
+50:28
+prompt we have two different answers um y subscript w and y subscript l so in
+50:37
+the humans annotated the data set such that y n is better than y
+50:45
+l so it is a better answer than y l so then we are asking the reward network
+50:53
+reward model which is a deep network to provide a better score for the first one
+51:00
+so the score the rating score for the first answer should be bigger than the
+51:06
+rating score for the second one that is what we do so it's a very simple um
+51:12
+training strategy for training a reward model but the crucial bit here is the data so we have we need human experts to
+51:21
+annotate different responses and rate or order them so once we have this reward model as I
+51:29
+have mentioned to a GPT we can provide random input it can provide us an answer
+51:38
+and this reward model it can get the answer and
+51:45
+u and the input this can be used in the in a reinforcement learning
+51:52
+method to fine-tune um the GP
+52:02
+architecture I will skip the results
+52:08
+Um so while these were happening so transformer architectures
+52:14
+being successfully used in language modeling problems and the emergence of
+52:20
+uh large language models followed um the earlier e efforts very quickly in
+52:28
+computer vision people started exploring how transformers can be used um for
+52:34
+vision tasks one of the first examples is um the vision transformer vit so one
+52:42
+challenge with images is that um what are words in an image right so in
+52:50
+sentences in text we have words they are our discrete tokens we can provide words
+52:56
+as input at different time steps right but with images that is not obvious so
+53:03
+how do you convert an image into tokens how do you tokenize an image
+53:12
+one very simple maybe naive approach is
+53:18
+to split an image into patches 16 by 16 patches and consider each patch as a
+53:26
+word so instead of providing word embeddings or words here we provide
+53:32
+patches 16 by 16 image patches uh to control dimensionality we
+53:41
+can pass them through the same linear layer with that we control
+53:47
+dimensionality and maybe we obtain more useful representations embeddings and we
+53:53
+use a transformer encoder as it is as if it is being used for a language modeling
+54:01
+problem whether it is applied as if it is applied to a words we apply that to
+54:07
+embeddings of image patches the same architecture applied to a different total different domain
+54:14
+without any change so we add positional um embeddings to
+54:22
+each patch right and we add um a CLS token similar to the
+54:30
+CLS token that we used in B right in B the first CS token attended to the words
+54:38
+in the uh input and through attention layers it's
+54:45
+encoded the semantics of the input right then we could use the representation of
+54:50
+the CLS token for different classification tasks so this is what we see here so this CLS
+54:58
+token it is learnable and through attention layers it attends to the image
+55:04
+patches the embedding of the image patches and at the end we can take its
+55:10
+um representation and and we can add the multipron on top of that and we can map
+55:19
+that embedding to the classes we want to predict
+55:25
+we can use cross entropy laws we can back propagate through the whole
+55:30
+network is this
+55:36
+clear so the same architecture the same idea being used to a total different
+55:43
+domain we just change how we tokenize um the
+55:49
+input otherwise same idea is used
+55:55
+so they applied vit for a classification problem but later on people showed that
+56:02
+vision transformers can be extended to other computer vision tasks as well that
+56:08
+require dense prediction like segmentation etc um and one interesting thing that was
+56:17
+reported in the VIT paper is that it didn't perform better than
+56:24
+CNN's right so with CNN's we can classify images
+56:30
+right and they showed that in the paper actually they didn't get better results
+56:35
+than CNN's but if you increase the amount of
+56:41
+training data you go to data set you train
+56:47
+transformer on data sets with 300 million images 300 million so imagageet
+56:55
+was the most challenging data set back then it had 1.2 million images it was it
+57:02
+was and it is still a very large scale data set if you train transformer on
+57:07
+imageet it doesn't perform better than CNN but if you train it on larger data
+57:15
+sets 300 million with 300 million images transformer performs better
+57:24
+so this is an important uh takeaway so if you consider training a
+57:31
+transformer or CNN from scratch based on the amount of data a CNN might be
+57:41
+better um they extended transformers um vision transformers in different ways
+57:48
+cin transformer is one of those in sim transformers to control and reduce the
+57:55
+computational complexity they divided uh an image into
+58:01
+windows for example into four non-over overlapping windows and in each window
+58:08
+we have patches 4x4 not 16 by 16 4x4
+58:13
+patches for example and attention uh self attention is limited inside
+58:21
+windows so a patch here can attempt to patches only inside
+58:27
+this window right so this way we reduce um this scale of um quadratic complexity
+58:37
+right otherwise it it might be too prohibitive but if it limits attention self
+58:45
+attention to windows then actually a page might not see other pages in
+58:52
+different uh parts of the image right so what if this patch here needs to attend
+58:59
+to this part to address that in consecutive layers they shift the windows so these
+59:08
+are the windows in layer one for example layer L in the next layer the windows
+59:14
+are shifted right you see that for example this part is uh taken as the next window
+59:23
+and these are actually taken as the next window so that we have uh it's like
+59:30
+circular on both sides right so this way they ensure that in follow following
+59:36
+layers different patches in different parts of the image can actually attend to uh each
+59:43
+other so this is one significant change the second significant change is that
+59:49
+when you go up in the network the dimensionalities of the patches are
+59:56
+changed so in vision transformers it is fixed it is 16 by 16 and it goes on like
+1:00:05
+that through the whole network so in sim transformer when you go up
+1:00:12
+actually in a sense tokens represent a larger space in the
+1:00:18
+input and they show that transformers can be applied to dense prediction tasks
+1:00:25
+as well like segmentation a more recent um
+1:00:32
+architecture faster VIP
+1:00:37
+um is a hierarchical approach it again divides um an image into windows
+1:00:45
+non-over overlapping windows and it limits attention so a patch here can
+1:00:51
+only attend to other patches inside the window and to
+1:00:56
+uh carry or share information across windows they actually
+1:01:04
+these dedicated uh patches can attend to each other as
+1:01:10
+well across windows so we have two types of attention local attention inside each
+1:01:18
+window and global attention between the windows so this uh combination of local
+1:01:24
+and global attention actually uh works really well while reducing the
+1:01:34
+complexity then people start exploring how we can pretrain these transformers
+1:01:40
+in a way that is similar to how people have trained
+1:01:45
+transformers or language modeling problems so with with bird we have seen
+1:01:52
+the application of masked language modeling it turned out to be a really good pre-training strategy that you mask
+1:01:59
+some words and you try to predict the masked words so can we do something similar for images so we mask patches
+1:02:07
+and we try to predict the masked patches from the input to be able to solve this
+1:02:13
+task the network needs to learn relations between patches so this is one of the first
+1:02:21
+papers to um show that this is possible and if you solve this
+1:02:27
+task if you pretrain a transformer to solve this task actually it can learn
+1:02:33
+really useful representations for different downstream tasks so we have an encoder and a
+1:02:41
+decoder uh we mask a significant portion of the input patches 75 85% of the patches are
+1:02:50
+masks right although we have removed a significant portion we can actually
+1:02:56
+complete um the the image so first we we
+1:03:02
+get through to the encoder we just provide the visible patches we encode
+1:03:07
+them then the masked tokens and the visible
+1:03:14
+tokens they are placed next to each other in sequence based on their order here then a decoder tries to predict
+1:03:24
+the must patches we we know the correct uh patch
+1:03:32
+we can calculate the loss and we can back propagate to decoder and the
+1:03:39
+encoder um so here you see example so this is the input image we have masked a
+1:03:45
+significant portion it is very difficult even for humans to identify what this is but the
+1:03:55
+network can actually complete it very well
+1:04:02
+then people started exploring transformers that can process both vision and language
+1:04:12
+right we have seen with vision transformer that we use a transformer as
+1:04:18
+it is we don't change the architecture we just change how we tokenize the input
+1:04:24
+but same model the same architecture can be used for images as well so then can
+1:04:30
+we take for example a pre-trained LLM like
+1:04:37
+GPD3.5 we keep it frozen it has been trained on large and large amount of data already so it works really well
+1:04:45
+already and I just train a vision encoder or fine-tune
+1:04:52
+a a backbone that maps uh an image into tokens
+1:05:01
+the we have text input as well so for this we can use a pre-trained um LLM
+1:05:07
+right and to this LLM we provide tokens
+1:05:12
+or representations coming from um an image and
+1:05:18
+text then the we provide here some question
+1:05:24
+so these are not available so the task is to continue the
+1:05:30
+sentence so in a sense this is part of the prompt so the
+1:05:36
+tokens coming from the image are part of the prompt the input
+1:05:41
+of the um large English model and the
+1:05:47
+next symbol prediction task is formulated in such a way that given this
+1:05:53
+as the input what is the next word in the
+1:05:59
+sequence but we keep this frozen we keep this frozen we just fine tune this or
+1:06:04
+update this uh vision encoding in a sense we are learning a function mapping function function that
+1:06:11
+maps an image into the semantic space of
+1:06:21
+LLM so once we train this vision encoder we can use
+1:06:26
+uh this vision language model for visual question answering so we can just
+1:06:32
+provide an input and we can expect the answer we can provide actually uh
+1:06:38
+multiple images and multiple text as input this might be tshot um uh visual
+1:06:46
+question answering um or we can even provide more examples so this is a very
+1:06:53
+flexible such an architecture provides us a very flexible way to combine
+1:06:59
+information from different modalities and following this line of work people
+1:07:06
+in different domains started exploring how such ideas
+1:07:11
+can be used for different tasks in robotics people have been exploring
+1:07:17
+vision language action
+1:07:22
+models so through such a model so this is one of the open-source examples we
+1:07:29
+have a we have an LLM that has been pre-trained we can keep it frozen or we can update that we provide an image we
+1:07:37
+tokenize that we provide text um and we tokenize
+1:07:43
+the text right um so image is tokenized
+1:07:49
+we get the tokens representation from the image and representation of the text
+1:07:54
+and this LLM processes the tokens
+1:08:00
+then we have an action D tokenizer that maps the output
+1:08:05
+of the LLM to actions continuous actions that can be
+1:08:12
+used and executed by a robot so
+1:08:19
+this this is a very novel use of vision language models and it turns out that it
+1:08:27
+works really well it can be trained one single model can be trained to control
+1:08:32
+different types of robots not a single one so different type of robots can be
+1:08:38
+controlled by the same um model and the input is an image and
+1:08:46
+textual description
+1:08:52
+so this is um one very recent example from
+1:08:58
+um the company called physical intelligence
+1:09:25
+okay so here we see
+1:09:32
+um a robot and different robots executing this vision detection
+1:09:37
+model um in in real environment
+1:09:45
+so this is very impressive one
+1:09:50
+model controlling a robot for solving different tasks based on just the image
+1:09:56
+and text that is provided as input
+1:10:03
+um so when we look at the um rapid progress in language models large
+1:10:10
+language models in just a few years we saw the emergence of uh really capable
+1:10:16
+models like J C J C J C J C J C J C J C J C J C J C J GPT I think in one or two years we will see a similar progress in
+1:10:22
+visual language action models and we will see very successful applications of those in robotics
+1:10:31
+uh here are other examples in uh for different
+1:10:44
+tasks okay so people went beyond image and text
+1:10:51
+they showed that um a transform model can be pre-trained uh to process
+1:10:58
+different modalities in addition to text and image so we can provide text we can provide audio we can provide images we
+1:11:04
+can provide video we can provide documents etc u what's critical is how
+1:11:10
+we tokenize them so once we determine a good strategy to tokenize different types of
+1:11:18
+um input then a transformer can be pre-trained to predict the next symbol
+1:11:25
+in the sequence and this way we can have actually multimodel uh foundation
+1:11:32
+models and the new paradigm is to use these models together to solve more
+1:11:41
+complex tasks that require multi-step reasoning multi-step
+1:11:47
+processing we can delegate these
+1:11:53
+u foundation models multimodel models as agents we can assign them different
+1:12:00
+responsibilities right so we can in the prompt we call that the system prompt we
+1:12:06
+can say to each LLM that okay your responsibility is this you have this
+1:12:12
+capability your task is to map this to that and control that etc and based on
+1:12:18
+that the LLM assumes that responsibility it acts as an agent when
+1:12:24
+it is provided an based on that system prompt it provides an
+1:12:30
+output then these simple LLMs working together they can actually solve complex
+1:12:39
+tasks so here is an
+1:12:45
+example
+1:12:54
+um not this one
+1:13:35
+so we have a prompt the one agent takes that prompt and generates a
+1:13:42
+plan it's responsibility is to generate an overall plan for a task so that agent
+1:13:50
+might not be performing probably it's not performing that plan it's not executing that plan so it is passing
+1:13:56
+that plan or steps of that plan to other agents they with their with different
+1:14:02
+responsibilities
+1:14:38
+okay so these ALMs um might be limited
+1:14:45
+so they might make errors but to to our design
+1:14:50
+here if you can add LLM that verify the answers of other LLMs right then based
+1:14:59
+on that verification if you make feedback loop so that the answers can be
+1:15:06
+changed based on the feedback you can get actually really really good performance even with simple low
+1:15:13
+capacity errors any
+1:15:22
+questions okay I think with that we can conclude our session end the term so
+1:15:30
+with this um we have seen how things progressed after
+1:15:37
+transformers it was very rapid um and I just provided try to provide this quick
+1:15:43
+snapshot of how things are how things progressed um in the graduate level deep
+1:15:51
+learning course we will discuss these in more detail so if you take that course if you're interested in these topics in
+1:15:58
+more detail you can take that course okay um good luck with your exams
+1:16:05
+and I hope the term has been very productive so see you around

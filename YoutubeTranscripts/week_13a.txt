@@ -1,0 +1,1462 @@
+
+Transcript
+0:02
+okay Um good morning again U let's start as
+0:09
+usual by going over what we discussed in the previous lecture So we were looking at we have
+0:17
+been looking at um recurrent architectures how we can use recurrent architectures for addressing sequence
+0:23
+modeling problems after introducing the
+0:30
+architecture and keep forward pass through um one layer um vanilla
+0:37
+recurring home network We looked at how we can back propagate through such an
+0:42
+architecture Um so the unfolded RNN is actually a feed forward network with
+0:49
+weight sharing across time We are sharing the weights We are using the same weights
+0:57
+uh we can directly use chain rule and calculate the derivatives So the only
+1:03
+thing that we need to be careful about is the fact that we are sharing weights across time
+1:10
+So in the previous lecture we dived the gradients for the parameters in the last
+1:16
+layer mapping the hidden state hidden layer to the output layer
+1:23
+uh which was straightforward But what we did was we took the derivative of each
+1:31
+uh loss at each time step Um and we use
+1:36
+chain rule to get the gradient with respect to output Then the outputs gradients with respect to the um out
+1:44
+parameters We did this we repeated this for every
+1:50
+time step and the gradient with respect to one parameter in the output layer is
+1:56
+actually the summation of all of these gradients So for each copy we need to get the gradient and we need to add them
+2:03
+up and the then we need to get the gradient
+2:10
+um for the parameters connecting the hidden states across time So here again
+2:17
+we can use chain rule However we need to be careful we need to start from the end
+2:23
+of the network because the earlier copies contribute to all following time
+2:30
+steps So we need to start from the end and step by step we need to back
+2:36
+properly Um so to make things easy we will try to accumulate and store the
+2:42
+gradients for the hidden states
+2:47
+um all uh gradients from all predictions
+2:53
+um following uh for following kind of steps they need to be accumulated and
+2:58
+once we have that gradient we can easily get apply chain rule to get the gradient
+3:03
+for the uh for this copy and we need to go back to the previous time step and
+3:10
+continue that Um so
+3:18
+here this if you open this up in the previous lecture I opened wrote an open
+3:25
+form of that here actually we have multiplication of a lot of gradients for the following time
+3:32
+steps Um the gradient with respect to the input layer connecting um the input
+3:38
+to the hidden state is similar So once we have the gradient with respect to the
+3:44
+hidden state we can apply the chain rule and um get the gradient with respect to
+3:50
+the uh parameters connecting the input to the hidden state We need to do that
+3:56
+for every time step and we need to add them Okay
+4:07
+Yeah Yeah Yeah
+4:13
+Um the initial state here h0 um how we initialize that is important
+4:20
+We can either um get it to a constant value or we can keep it a learnable
+4:28
+parameter which works best actually
+4:34
+Um and we can initialize the parameters learnable parameters using
+4:41
+initialization because effectively we are using uh we are using we are using a feed
+4:47
+forward multi system actually weight sharing we have issues with the
+4:54
+gradients in vanilla RNN um if the norms of the weights are large we have
+5:00
+exploding gradient problem if the um norms are small We have vanishing
+5:06
+gradient problem because of also um these question activation functions
+5:13
+Uh for this one solution is to directly um address this problem
+5:20
+by controlling the norm of the gradient clipping the gradient penalizing small
+5:26
+gradients etc Um but in practice we use
+5:32
+long short-term memory an advanced u version of long short-term memory where
+5:37
+we add an additional um state representation memory
+5:43
+representation that is maintained over time So in LSTM we
+5:50
+add explicit mechanisms operations that directly work on this memory
+5:57
+representation and raise content add content dynamically based on the uh
+6:05
+hidden state the state of the system and the current input So this is a really
+6:12
+um genius ingenious mechanism The nerve through gradient
+6:20
+sent the network learn to make use of a memory uh mechanism So this is this is
+6:27
+really effective Um so LSTM works really well
+6:34
+Over the years people introduce some variations gated recurrent recurrent units um are
+6:41
+are well known alternatives to LSTMs in a um a a G recur or GRUs We combine the
+6:52
+two state representation So we have memory state representation hidden state representation we combine them and we
+6:59
+obtain we use the single memory representation Um and we also couple me
+7:08
+erasing and adding content U but some
+7:13
+studies have shown that although GRUs can be
+7:18
+promising that STDMs are um more capable they can learn more um they they can
+7:26
+learn to solve more complex tasks Um and in LSTMs
+7:32
+um we said that LSTMs can address uh gradient problems because over this
+7:37
+memory lane um over this memory lane we don't have
+7:43
+squashing activation functions So we don't have vanishing
+7:49
+gradient problem Okay So today um after having
+7:55
+talked about um how we can you how we can construct a recurrent
+8:02
+architecture to address sequence modeling problems how we can feed forward through such an architecture and
+8:08
+backward pass through such an architecture We will look at some
+8:14
+um example problems applications where um the current architectures can be
+8:20
+really useful So we will look at language modeling at the character level and at
+8:26
+the word level So these are very good exercises for us to think about how we
+8:32
+can address um some well-known sequence modeling problems how we can use RNN for such
+8:38
+problems Then we will look at how we can use RNN to map to learn mappings between
+8:45
+different modalities So one um nonsequential modality another
+8:51
+sequential modality for example how can you map them captioning is a really good example for that Then um finally today
+8:59
+if you have time you will look at machine translation So we have one source
+9:05
+text a sequence of words in one language
+9:11
+then we want to obtain another sequence in another language right so we will see
+9:18
+that RNNs are easily usable um for for
+9:23
+such a problem any questions from the previous lecture
+9:34
+Okay Um so let's look at character level text modeling or language modeling So
+9:41
+when we talk about language modeling we generally mean um auto reggressive Oops
+9:49
+One second
+10:02
+What we mean is auto reggressive language modeling um auto regress first
+10:07
+let me talk about auto reggressive
+10:17
+modeling in auto regressive modeling um let's say we have um a sequence of
+10:29
+variables so what we try to do is we try to
+10:37
+um model the distribution or the prediction of X of T over
+10:46
+um the previous copies previous values
+10:57
+Um so we model this actually
+11:03
+u with a with a deep network given x t -1 x t minus 2
+11:12
+um x1 So we have a parametric function So this is a deep network So given the previous values we
+11:22
+try to predict the next value So this is autogressive
+11:27
+modeling Um in autogressive language modeling if we use
+11:33
+characters So we have a history of a sequence of
+11:40
+characters right then given those characters we try to predict the most
+11:47
+likely continuation of that sequence with the next
+11:52
+character Is the task clear and the
+11:58
+approach So keep this term in mind auto reggressive language modeling We will
+12:03
+use that in the next weeks So actually this is how large language models are
+12:09
+trained as well So they are we will talk about how we pre-train large language
+12:15
+models we will see that we will say that they are trained just to predict the
+12:22
+next character That's it So if if you solve that problem if you train a
+12:30
+network on large and large amounts of data just to predict the next symbol it
+12:36
+works really well
+12:43
+um we we say is training so we are from the data we are tra creating the spare
+12:51
+vision signal but I mean we can call that self-supervised
+12:56
+learning but uh we will if we have time we will talk
+13:02
+about self-supervised learning as well in self-supvised learning we do something else to create that self-provision
+13:08
+So in text in a sense it is directly available So we have the input we have
+13:13
+the output
+13:20
+Um in many cases the sequence of characters might be too long So if you
+13:26
+are working with long text then starting with the first character might not be feasible The
+13:33
+sequence might be too long So we might just consider for example n
+13:40
+last character So we might consider a window of characters Given a window of
+13:47
+characters we try to predict predict the next character So given for example a
+13:54
+sequence of characters a and k a r we want to predict
+14:01
+uh the next character is for example a And we want to uh train the network in
+14:08
+such a way that the probability for a is larger than the probability for all
+14:13
+other characters that are less likely So you want this pro distribution to capture the likely good of the
+14:22
+characters as a as a continuation of the sequence that we have seen so
+14:29
+far Okay So remember when we talked about RNN we
+14:35
+talked about these sequence modeling problems So what we are looking at is an
+14:42
+example of this So we have a character we have a
+14:48
+sequence of characters and given the sequence of characters that we have seen
+14:53
+up to now we try to predict the next character So for each time step we predict the
+15:00
+next most likely correct
+15:05
+one But today we will see another example for this problem Another example
+15:12
+for this problem So but for the timing we are just looking at
+15:17
+this language modeling
+15:29
+So let's look at an example Um a very simple example In this example
+15:38
+we just have a sing single uh text single string If you look at that uh
+15:45
+string we have some characters So that is actually our vocabulary
+15:54
+In our vocabulary we have four different
+16:00
+characters So if we are limiting our whole training to just this
+16:06
+string and this vocabulary then to be able to work with
+16:14
+um with such a problem we need to convert these symbols to numbers vectors
+16:20
+right So these are symbols Um a deep network cannot work
+16:26
+with symbols So we need we can only work with numbers numerical information So we
+16:32
+need to convert these to vectors So what we do is so there are
+16:40
+four um characters items in the vocabulary So we
+16:48
+can then use the so-called one hot
+16:55
+uh encoding So we have four entries in one hot
+17:02
+representation one of k representation Did we talk about one of um one hot
+17:09
+encoding before Yes When we were creating a probability distribution for
+17:14
+the labels and using cross entropy we introduced that Um so what we have in a one hot
+17:25
+encoding just to remember is that we have only one
+17:32
+nonzero entry Let's say this is non zero All others are zero So we have just
+17:41
+one nonzero entry as one and the others are
+17:48
+zero So if there are four
+17:53
+words we can use one hot encoding with dimensional four to represent the
+18:00
+different characters So h for example might be represented by this one E might be represented by uh the second one
+18:08
+being one the other being zero And l can be represented with uh 0 0 1 0 and o can
+18:20
+be represented using 0
+18:26
+01 So if there are n characters our one hot encoding
+18:34
+representation would have n different values and different dimensions and and
+18:40
+dimensional set Is this clear Okay So then we have our
+18:48
+representation input representation um and we have a string We can use this
+18:57
+string to to create supervision signal So how
+19:02
+do we do that So we start with the first character We take its one hot encoding
+19:10
+right The first is one the others are zero We multiply this uh with the uh
+19:18
+with a weight matrix So we have an we have a linear mapping Then we have hyperbolic tangent applied
+19:25
+on that and we obtain the hidden state So in this example in the hidden state
+19:32
+representation we have three values So hidden hidden state dimensionality is
+19:37
+three So depending on the problem this can be larger this can be smaller
+19:46
+So we obtain the hidden state representation Then we multiply that um
+19:52
+with um with the parameters of the output layer We then obtain row
+20:00
+numbers logits If you want probabilities we can
+20:07
+pass these through a softmax layer to obtain probabilities So now we have scores or probabilities
+20:16
+over the characters that we hope can uh represent
+20:24
+the most like the next character in the sequence We note
+20:33
+that so the next character should be e
+20:38
+So this value should have the maximum
+20:43
+score but that is not the case So it turns out that we have made an error and
+20:49
+an incorrect character has the highest score So we can calculate the loss right
+20:56
+So we know the correct character E right we know the
+21:01
+target 0 1 0 0 So this is the
+21:06
+target So we can convert these logits to
+21:16
+probabilities Uh we have the
+21:23
+target we can use cross entropy loss Right Then
+21:31
+after unfolding is finished we can back propagate for the next time step We know
+21:39
+the input because we we have this text right So we know the
+21:46
+next character in the in the data in our input We get that We again pass that
+21:54
+through uh the input layer We this time we need to
+22:00
+get the previous hidden state We need to combine them pass that through
+22:05
+hyperbolic tangent We obtain the predictions or the characters right The
+22:13
+row scores right The next correct character is L So this one and we see
+22:20
+that we have made an error But we know the correct value we can calculate a
+22:26
+loss and we are going to back propagate So this way we are
+22:33
+unfolding RNN and at each time step we are providing
+22:40
+um the character in the input right we get its one hot encoding
+22:47
+we provide it as input and we get the predictions or the characters at the
+22:53
+output we know the correct value we calculate the loss and we can back
+22:59
+propagate Does it make sense Yeah So central is just example right
+23:06
+Yeah Because before we just normalize it to the
+23:13
+probabilities but this is not I mean if we have a classification
+23:19
+problem which we have for this problem we can also use hinge laws So
+23:26
+cross cross entropy is commonly used but we can use hinge laws
+23:33
+Yes Any other questions Is this clear Does it make
+23:38
+sense Okay So this is training right So we are training the network
+23:53
+We are training the network to predict the correct character given the input
+24:00
+Right During
+24:06
+inference things um are slightly different right So here at each time
+24:15
+step we know the correct previous character right
+24:23
+During inference we will just make predictions and we will use the predicted value as
+24:29
+input for the next time step So let's say this we we were given the first
+24:36
+character as
+24:41
+input right we predicted let's say E and
+24:47
+we will take that E as input to the next time
+24:56
+step if E was incorrect during inference we cannot do
+25:02
+anything about it So if it was incorrect we will continue with the incorrect prediction and we will try to complete
+25:08
+that But if it was correct then we will complete that During inference we don't
+25:14
+know which one is correct But we will use our prediction We will use that as input for
+25:21
+the next time step We will um obtain hidden state
+25:27
+representation We will make prediction we will predict the next word Let's say
+25:33
+um it is uh
+25:40
+O So we predicted O for example which was incorrect but we don't know
+25:46
+that So we will continue with with
+25:55
+that During inference you will use the predicted value of the at the previous
+26:01
+time step as input for the next time step Um and in
+26:09
+general we will not work with a single string or text We will have
+26:17
+multiple such sequences So we will want to train um
+26:23
+our RNN over a large corpus where we have a lot of text a lot
+26:32
+of such sequences and those sequences will have varying
+26:37
+length Some will have four words some will have 100 words
+26:45
+So some will finish some sentences finish let's say after 10 characters
+26:52
+there's a full stop after 10 characters but there are some sentences that are
+27:00
+longer so what we will do is we will extend our vocabulary with some special
+27:11
+symbols to mark the start of the sequence and the end of the
+27:20
+sequence So to our
+27:26
+vocabulary we will add some symbols that cannot be part of text
+27:35
+right to mark the start of a sequence and mark
+27:40
+the end of a sequence So if there there is for example hello
+27:47
+and uh um
+27:52
+goodbye right there are a lot of such text What we will do is we will to each
+27:59
+or of these we will add a start
+28:05
+symbol or token at the beginning and at the end we
+28:11
+will add an end um
+28:17
+symbol And when we are training the network we will start with the start
+28:29
+um symbol It's one hot
+28:34
+encoding given So with this we are telling the network that we are starting
+28:41
+to sample a sequence We will provide start We will
+28:47
+predict the first word let first character
+28:54
+sorry Then given age as input
+29:01
+uh we will get the next character etc
+29:11
+Then when the network samples um predicts an
+29:18
+end sequence then we should understand that the
+29:24
+sequence has finished during training when we know when the sequence finishes So we can
+29:31
+train the network to pred uh to predict that end symbol and but
+29:39
+during inference if the network predicts the end sequence then we understand that okay um the sequence
+29:48
+generation the generated sequence of characters is finished So we can stop um
+29:55
+uh the sampling process Is this
+30:02
+clear Does it make sense for
+30:09
+everyone Okay So start and end
+30:14
+are special um symbols If you are using character level
+30:20
+modeling we can allocate
+30:26
+one representation for each of these But later on we will talk about alternative
+30:33
+representations and in those representations we can make these um
+30:40
+representations of these learnable
+30:47
+the start is always what will it always produce the same
+30:54
+I will talk about that right in in the next slides I will talk about that
+31:01
+during inference actually we can provide more than the start symbol
+31:07
+so because if we just provide the start symbol then I mean um it's very likely that it
+31:16
+will start with the same character with the same sequence So we can for example
+31:22
+say if um I start with the start symbol then the first characters are like this
+31:28
+For example I uh
+31:33
+like so these are the first characters I want the network start with
+31:41
+How would the network complete the this sequence So then during inference I
+31:49
+provide here um start I provide here um the next
+31:56
+character The next character there is space The next one is
+32:03
+L Uh the next one is I etc Once this is
+32:08
+finished the network will try to predict the next one Right
+32:16
+So during inference I can just start it start symbol or
+32:22
+any input I have that I want to be completed I can provide it as
+32:30
+input So the prompts that you provide to LLM are actually the starting
+32:40
+sequences starting sequence that you provide uh to an RNN like architecture So we can
+32:49
+consider this to be for example a
+32:57
+prompt So what an LLM does is given a prompt given a sequence of characters it
+33:05
+predicts the next character the next most likely character in the sequence
+33:14
+That's it It doesn't do anything else So it just predicts the most likely next
+33:20
+character in the sequence
+33:28
+So here um note that at each time
+33:34
+step if you pass these row scores
+33:40
+um through a salt max we obtain a probability
+33:47
+distribution Right So we have at each time step we have a probability
+33:52
+distribution over
+34:00
+characters So we have a probability distribution of the characters and given these these
+34:07
+probability distributions we can either take the
+34:12
+character at each time start with the highest
+34:18
+probability This is called the greedy approach Right
+34:24
+So if we iterate through this
+34:32
+code so here we have 10 time
+34:40
+steps and let's say four or five
+34:47
+um vocabulary So we have five different characters on
+34:53
+words
+34:58
+Uh so for the first time step we have these probabilities over
+35:04
+the characters For the next time step we have these probabilities for the characters etc
+35:13
+So in the greedy approach what we do is at each time step we just take the
+35:19
+character with the highest probability So if we iterate over this
+35:25
+example at the first time step we will take this character the fifth the last character
+35:32
+because it is highest probability Then we'll take this one then we'll take this one etc
+35:43
+So this is the greedy approach But
+35:48
+maybe especially when we look at language modeling
+35:53
+um for a given input sequence actually there might be
+35:58
+multiple possible continuations So if you use the greedy approach given
+36:06
+any input sequence we just have a single answer but maybe there are multiple
+36:13
+potential answers How can we obtain multiple
+36:18
+answers multiple most likely answers given a sequence Since we have these
+36:26
+probability distributions over the characters at each time step it should be
+36:32
+possible with beam search That is what we try to do Instead of providing just
+36:41
+one most likely sequence as the output we try to provide k most
+36:52
+likely sequences continuations So what we do
+37:02
+is let me start with the start symbol
+37:08
+Given the start symbol there are multiple possible
+37:13
+continations right So I will illustrate this over uh
+37:19
+verb Currently we have seen how we can do this task at the character level but
+37:25
+later on we will see that extending to work level is very easy
+37:32
+So let's say given this input um starting um symbol the network can
+37:41
+generate such
+37:48
+uh can predict such um such words So there are actually a lot of the the the
+37:57
+predictions are actually the side of the predictions is the side of the vocabulary Uh but let's assume
+38:09
+that the first two are the most likely So if you want
+38:17
+to obtain the two most likely predictions two most likely
+38:23
+sequences we look at at each time step we look at the most likely two
+38:30
+predictions So for the first time step let's say it is I and U right So they
+38:38
+have the highest probability Then we discard the rest
+38:47
+Then for this two we we store these
+38:54
+uh most likely uh
+39:00
+sequence Then for each one we look at the most likely
+39:07
+next continuation If we have start and I the next most
+39:15
+likely is for example like uh
+39:21
+sim uh run etc And if the next
+39:28
+um word the second word is first word is you then given start and you what is the
+39:36
+next one Right This can for example uh
+39:43
+um again the same words but with different probabilities
+39:59
+So we
+40:05
+have we have I like I swim I run etc You
+40:10
+like you swim you run etc And we combine
+40:15
+them We combine these confidences scores Right So for I we have um prediction
+40:25
+probability for like we have a prediction probability we combine them
+40:30
+and for IC we have a combined uh prediction score as well So we have many
+40:38
+such
+40:46
+u many such um uh
+41:05
+sequences And each of these has um a score
+41:18
+We sport the whole list based on the
+41:28
+score and we get the top uh
+41:34
+k sequences So if uh beam we call that beam number of
+41:40
+beams So if you want k most likely sequences as the output we just take the
+41:49
+top k ones So let's
+41:54
+say it is in such a way that the most likely are
+42:00
+I like and you
+42:09
+swim After the second time step we have updated the most likely
+42:16
+sequences most likely top two sequences to be I like and
+42:23
+you then expand this tree right
+42:28
+So
+42:37
+if if we start with I and like what are the most likely next uh uh words And if
+42:46
+you start with you and swim what are the most likely next
+42:52
+words and repeat this process for
+42:57
+uh until we see the end um symbol being predicted by the network
+43:08
+So we keep expanding this set but at each time
+43:14
+step we we only get top k sequences
+43:20
+right and at the end we will just pro produce most likely k sequences as the
+43:31
+output Yeah So we have an end symbol which is going
+43:38
+to now continue on Yeah
+43:49
+So we can use then a length model either at the charact at the
+43:56
+character level or word level to produce
+44:02
+k alternative responses So we provide an input sequence and once that model is
+44:09
+trained during influence we can generate multiple potential answers
+44:16
+Okay So this is um generally used during training So this is the sodo code If you
+44:23
+want to better understand just to make sure that you
+44:28
+understand it correctly I suggest that you go over the so code It is very simple Um some people try to integrate
+44:38
+beam search during training as well So normally during training we don't integrate we don't use beam search we
+44:45
+just have a single input single output right but if you have some data where
+44:51
+you have multiple potential continuations you can think about using
+44:58
+beam search during training as well but this is very expensive because during to be able to
+45:04
+train um this I mean you need to unfold this expans this tree right so it is it
+45:13
+is expensive so in general in practice we don't this is very
+45:21
+rare so what we are doing effectively is
+45:27
+um given um a sequence of let me change
+45:33
+color given a sequence of characters we are I mean with with an RNN we are
+45:41
+actually um expanding um um a tree
+45:48
+right an RNN actually learns the best continuation the best path actually in
+45:55
+this in this
+46:00
+tree Um so later on today uh we will talk about
+46:08
+word level and bite level um bite pair
+46:15
+level language modeling Character level language modeling has certain advantages
+46:21
+The first one is that vocabulary size is very small So if
+46:29
+you determine if you are set select a certain language we know the alphabet we
+46:34
+know the non alphabet characters symbols etc So we have the vocabulary and that
+46:41
+vocabulary is fixed and the size of that vocabulary is actually small relatively
+46:47
+small compared to the number of words for example that we can have in a certain language
+46:57
+Um so this makes um language modeling um
+47:04
+a bit easier at the character level at least in terms of
+47:09
+dimensionality Um later on we will talk about word
+47:15
+level language modeling and we will discuss its advantages and disadvantages Um so this can be
+47:22
+especially useful for examples for some languages where we have really
+47:29
+uh complexed continuations of characters So if you want to address this problem at
+47:36
+the correct word level then it might be more difficult because in Finnish in
+47:42
+Turkish as well So we have multiple words u with suffixes com or
+47:49
+prefixes combined together and in such languages actually word level language
+47:55
+modeling might be more tricky So
+48:03
+if although trying to solve this task language modeling uh problem at the
+48:09
+character level might look too simplistic um it works actually really well So
+48:17
+these are some predictions um provided obtained with a tree level
+48:23
+RNN The tree level means that we have the input
+48:32
+uh we have the input we have the hidden state second hidden layer the third
+48:41
+hidden layer then we have the output So we have three
+48:48
+such recurrent hidden layers But the unfolded
+48:53
+version
+49:03
+is
+49:16
+like and each hidden layer has dimensional T 5002F So this
+49:24
+is relatively large hidden state dimensionality So they have trained um
+49:33
+such an RNN on the works of Shakespeare and then they provided
+49:40
+some initial sequence of words I don't know which part of this is the input
+49:46
+sequence It's not clear But in any case if you look at the whole text actually
+49:54
+it's looks very realistic Of course compared to the state-ofthe-art that we
+49:59
+have nowadays this might be um
+50:05
+uh this might be too simple and that there might be close Nowadays we with
+50:12
+LLMs we can address this task much with much better performance but what we can
+50:19
+achieve with just a simple RNN is actually very
+50:26
+striking and these are prediction results this time using LSTM but for
+50:33
+character level language modeling and it is trained on Wikipedia
+50:40
+And we see that it has learned the
+50:45
+syntax syntax rules of um Wikipedia right So it can generate such internal
+50:55
+um references right And it can learn to provide um external references right So
+51:03
+this is an external reference to a an URL and this URL doesn't
+51:10
+exist right So it can hallucinate a
+51:15
+URL Note that this was trained at the character level right It it
+51:21
+just provided a sequence of characters and it's just trained to predict the next most likely character
+51:28
+This is sufficient to train to learn syntax and complex
+51:34
+rules Okay I feel like with the model we currently
+51:41
+have it should not have matching but
+51:47
+no if I mean so but it then it can learn to match
+51:57
+them So the opening parenthesis is part of the input sequence right So it is in
+52:04
+its in a sense it in its hidden state it represents that and at the right point
+52:10
+the most likely point it's predicts the matching
+52:17
+parenthesis So this is for example um it can be trained to it can be
+52:25
+trained on latte documents which is complex It has um
+52:31
+complex syntax um and given again input sequence it can
+52:39
+generate a complete latte
+52:45
+document It looks legitimate when you zoom in and when you
+52:50
+read the details you see that it is it has it is making a lot of
+52:55
+errors But what we can do again with such a simple model is very
+53:01
+striking So this is one text again that is generated with a character
+53:07
+level So it is making up some words So this is actually this word doesn't exist
+53:13
+Uh so this parenthesis doesn't match any open parenthesis So it's making errors
+53:20
+but still this is this is striking
+53:38
+Can we call that or fitting we are
+53:45
+given we are giving um a sequence an input sequence that is not part of its
+53:51
+training in a sense So maybe it is still in that space but the sequence that we
+53:57
+have provided is actually it has not seen before
+54:02
+Um so what it is trying to do it is interpolating in that uh space it has
+54:09
+learned and in that space it's just um maybe we can call that
+54:16
+overfitting like it is just making up some things that do not exist
+54:21
+and I think it is not something very
+54:27
+yes it does so It's learn agree So it's learned how an
+54:34
+English word would look like
+54:39
+Next character Yeah What does that based on how
+54:46
+much
+54:51
+predictation So we start with a sequence of characters that we provide in a sense
+54:57
+as prompt that should be completed right Then the things it has
+55:04
+predicted until the current character are also part of the input What you
+55:09
+provided and what it has predicted sentence
+55:16
+or last sentence If you predict the next
+55:21
+character you should always generate the same thing If you just English alphabet Mhm and you only
+55:28
+have 2900 or 26 then you have a very short very small
+55:35
+prediction space Yeah So I'm not sure what they did in this but in general we
+55:42
+either start from the beginning of the whole sequence Yeah
+55:48
+If it is too long we can just take the last n characters But I don't know what
+55:55
+they did for this specific example So these are other examples
+56:03
+Uh so so this was back then in 2015 16
+56:10
+this was very striking So you provide for example the meaning of life is this is the input you provide right at the
+56:17
+character level at each step you provide one character then what you see in red
+56:23
+is the prediction by the character level RN so the meaning of life is a tradition
+56:30
+of the ancient human reproduction so that is uh that's not bad so it is less
+56:37
+favorable to the good boy for when to remove her people so the just senseless
+56:43
+Um but this was very striking back then Nowadays of course we are we have much
+56:49
+better models Um so it can learn names dates numbers
+56:56
+It can learn to balance close quotes and brackets Um so it can learn syntax Um
+57:05
+however this is not transferable between different languages So it's it's just doing that for one language it's
+57:11
+character level Um so although we are not doing any semantic wise supervision
+57:20
+it learns to associate related words related
+57:25
+concepts So this is because of the context in in which those words appear
+57:31
+So this if you since we are looking at the sequence of words right um and In
+57:38
+that sequence some words are let's say more frequent So based on that actually
+57:44
+it can associate words as sequences of
+57:50
+characters So um although character level language
+57:56
+modeling is possible in general we do uh we address this problem at the work
+58:04
+level
+58:14
+Any questions in the meantime
+58:26
+I think when we write papers we try to summarize and describe what I did not
+58:32
+know But sometimes we to miscribe to us as
+58:38
+Even simple instead worth
+59:05
+So we mentioned that maybe you were not here Uh we add a special
+59:13
+symbol to mark the start of a sequence and to mark the end of a sequence So
+59:21
+when we are training the network when we are creating our training data
+59:28
+we we add this um uh starting symbol and the end
+59:35
+symbol as part of the sequence So when we are training the network we start
+59:42
+actually with the start um symbol Then we expect that the network predicts Mhm
+59:51
+uh we expect that the network predicts the end symbol So during training that is how we
+59:57
+train and during inference if the network predicts the end symbol then we
+1:00:02
+stop it
+1:00:23
+say um after the lecture let me go let's go to my office and I will give you one
+1:00:36
+copy okay so let's look at how we can address this problem at the bird
+1:00:46
+Again um the problem formulation is very similar more or less the same So we have
+1:00:51
+a sequence of words Given a sequence of words we want to predict the next um character So we want to model um a
+1:00:59
+probability distribution over the most likely u continuation of the sequence of
+1:01:05
+words So if this sequence is too long in
+1:01:10
+practice we can also consider just the last n words Again this is auto reggressive
+1:01:22
+uh uh language modeling this time at the word level
+1:01:33
+Um an example is for example um Ankara
+1:01:39
+is the capital of So this this is the sequence of words Although we see a sequence of
+1:01:46
+characters that is not how we are going to provide the input So we will provide actually uh Ankara
+1:01:58
+um is the capital
+1:02:07
+um of so this is our input Given this input we want to predict the next word
+1:02:13
+the next most likely word And we hope that the correct the probability for the
+1:02:20
+correct word is larger than the probability for all other words in the
+1:02:26
+uh vocabulary So how can we
+1:02:34
+um address this So the problem the challenge here is representing the
+1:02:40
+words So doing this at the character level with one hot encodings it
+1:02:47
+was practical It was manageable because vocabulary size the number of characters
+1:02:53
+and the symbols it was actually manageable But if you consider the
+1:02:58
+number of words it is actually huge So in English
+1:03:03
+for example we haveunded 70,000 different words and maybe over
+1:03:10
+time new words are introduced right so this vocabulary size is not even
+1:03:19
+fixed if you want to use um one hot encoding for the
+1:03:26
+words it would have 170,000 dimensionality
+1:03:34
+which is huge right so to an endn to a linear layer if you
+1:03:40
+provide 170,000 dimensional input then the number of
+1:03:46
+parameters Google input layer would be huge right we would have millions of
+1:03:51
+parameters in the input layer already so this is one
+1:03:57
+challenge so what we want to do is we want to obtain a
+1:04:07
+representation that is lower
+1:04:18
+dimensional and hopefully um
+1:04:24
+semantically more meaningful compared to one hot representation In one hot
+1:04:31
+representation every word are equally distant to each other
+1:04:39
+Right If you consider the distance distance between two different one hot
+1:04:44
+representations that distance is the same regardless of whether two words are
+1:04:50
+very similar or very dissimilar
+1:04:55
+So can we have a representation which is semantically
+1:05:05
+uh more meaningful We call this word embeddings
+1:05:17
+So we want to embed represent words in such a way that we have lower
+1:05:25
+dimensional representations and in those lower dimensional representations we have semantic semantically relevant
+1:05:32
+meaningful information captured
+1:05:38
+And often we use the term word to
+1:05:44
+ve representation embedding to refer to word embeddings as
+1:05:52
+well So what we are doing effectively is we are converting
+1:05:58
+words to vectors useful uh semantically
+1:06:04
+meaningful vectors In the case of characters actually
+1:06:11
+characters um were equally distant to each other Right If you talk about if
+1:06:17
+you look at one hot encodings representing different characters actually different
+1:06:23
+characters are equally distant to each other We cannot say that one character is semantically closer to another
+1:06:30
+character But for words we have a different situation So some words are
+1:06:36
+similar to each other For example running and jogging are very should be very close to each other in terms of
+1:06:43
+semantics compared to running and jumping or you know swimming right So we
+1:06:50
+want somehow the representation to capture that
+1:06:56
+information Um okay we talked about these
+1:07:02
+So after learning um we will talk about how we can learn
+1:07:08
+such embeddings It turns out that of the after we learn those embeddings we can do some those are
+1:07:16
+vectors and by doing vector arithmetics between those embeddings we can actually
+1:07:23
+obtain interesting things So we can for example get the
+1:07:30
+embedding for Paris subtract the embedding of France
+1:07:38
+from that So in the space of
+1:07:45
+um word
+1:07:53
+embeddings that would mean Paris is a point here Grants is a point here By doing
+1:08:01
+this actually we are looking at uh this
+1:08:09
+uh we are looking at this vector and we add that vector to the
+1:08:15
+representation of Italy Italy is a point here
+1:08:24
+If you take this vector and add that to Italy then you
+1:08:31
+obtain you a point in that space And it turns out that the point
+1:08:39
+here corresponds to the representation of uh
+1:08:48
+ROM So we will talk about two simple mechanisms for learning word embeddings
+1:08:53
+It turns out that after learning those word embeddings we can um we can do such
+1:09:00
+arithmetic So it turns out that that representational space is actually very rich in terms of capturing relations
+1:09:08
+between different concepts and semantically meaningful related
+1:09:13
+um words um are placed close to each other in this in in that space
+1:09:24
+Um other examples are for example if you take the vector um in that word
+1:09:31
+embedding space from men to woman you take this word and
+1:09:38
+you with that vector displacement you find the point starting from king then
+1:09:45
+the word that is closest to that point is queen right So it has learned the
+1:09:53
+relationship between men and woman and that's and
+1:09:58
+that it is translated translatable to king and queen
+1:10:04
+So if for example you'll find the vector between um
+1:10:13
+um what did we call this form of the word
+1:10:21
+jun from walking to walk then you take swimming and you want to find out its
+1:10:26
+past tense for example you can take that word
+1:10:33
+vector um find this position and find the word closest to that point which is
+1:10:39
+the which corresponds to the past tense for
+1:10:44
+swimming Now there are other examples and this can be also useful in machine
+1:10:50
+translation So you have two vocabularies words in two different languages You
+1:10:57
+know that some words um the correct translation for some of
+1:11:03
+the verbs right like for example quadro for chinko 5 etc And using those um
+1:11:12
+pairs you can align to word word embedding spaces And this way given the
+1:11:19
+word in one language you can easily find the corresponding word in the other
+1:11:24
+language Some for example forgotten languages that nobody knows I think we
+1:11:30
+cross for example Turkish and language and some simple things
+1:11:38
+then I think we can kind of translate that language
+1:11:47
+Um after we talk about machine translation ask your question
+1:11:55
+again Okay Um then for example we
+1:12:01
+can given any word um we can find the most semantically
+1:12:08
+most relevant related words right so given for example ciden then these are
+1:12:17
+the words whose cosign distance between its embedding and the
+1:12:25
+embedding of Sweden um is smaller
+1:12:31
+[Music] words Yeah All verbs
+1:12:43
+knowledge everything included Yeah Yeah
+1:12:49
+For example in English every word is a one and one Which one For English every
+1:12:56
+word is a one token and one vector Yeah But for Turkish
+1:13:08
+So that is a challenge with um um what do you call
+1:13:14
+it Languages Sorry Exitative language
+1:13:22
+So languages So that is one challenge with such languages If you want to do
+1:13:27
+language modeling at the word level Later on we will talk about an alternative byte pair encoding There we
+1:13:35
+will look at frequent combinations of characters and we will combine them as
+1:13:43
+tokens that will address that problem better break things down for
+1:13:53
+but um what we can obtain with a simple training strategy is actually strong So
+1:14:00
+let's look at that training strategy Yeah
+1:14:12
+um as far as I remember 128 256 512
+1:14:18
+there are different pre-trained versions available 512 512 dimensional
+1:14:25
+vector representing a word but it is not one hot encoding it's just full word a
+1:14:32
+full vector Um okay so how can we uh train
+1:14:43
+um a function to obtain these word embeddings So we will talk about two
+1:14:49
+approaches The first is continuous bag of words Um in cont
+1:14:56
+um we represent the input using one hot encoding one we talked about the issue
+1:15:03
+of one encoding so it is a really large uh
+1:15:09
+uh vector but there is a catch I will talk about the catch so we will we won't
+1:15:16
+actually use one encoding but assume that we use one encoding we have a linear layer mapping
+1:15:24
+the words to hidden dimensionality and from that we try to predict um actually
+1:15:30
+a word So in the first approach um so given a lot of corpus having a lot
+1:15:39
+of text paragraphs books right containing sentences we for
+1:15:49
+example I like running
+1:15:55
+uh every day given such a sentence for example
+1:16:02
+We take out a
+1:16:08
+word and we want to predict that word and the context as input So
+1:16:17
+we the context is the
+1:16:27
+input I like and
+1:16:32
+every day This is the
+1:16:37
+input context for the target
+1:16:42
+work Given the context we want to train train a network a simple network to
+1:16:49
+predict the target word So given the left words right word what would be the
+1:16:55
+word in the middle So we have a lot of text a lot of corpus
+1:17:00
+available on the web right We can create such a supervision
+1:17:07
+signal Um to predict the most likely word that is in the middle
+1:17:14
+To be able to solve this task the network needs to learn a suitable
+1:17:20
+representation for each word such that we can predict the word
+1:17:26
+in the center at the center So let's look at the architecture
+1:17:34
+in more detail We provide 100 encodings but we will talk about that Um
+1:17:42
+for each word we use the same linear
+1:17:48
+data with the same weight matrix We multiply them We add them
+1:17:57
+up There is no nonlinearity Given this summed vector we
+1:18:04
+have a second layer linear layer that
+1:18:09
+maps the sum up representation to the word that we want to predict to the
+1:18:15
+embedding that you want to predict Is this
+1:18:26
+clear Any questions
+1:18:32
+one is so the parameters for each
+1:18:45
+so let's look at W1 so V here is the
+1:18:50
+vocabulary size so if the I mean if our vocabulary has V many
+1:18:59
+words So this one hot encoding has uh B dimensionality
+1:19:10
+right So if you look at this
+1:19:17
+matrix it is V by
+1:19:23
+D V by
+1:19:28
+D What happens is
+1:19:35
+that in this weight matrix for each
+1:19:42
+word we have a row and that means each word is
+1:19:50
+represented by a dimensional vector
+1:19:55
+If you consider the multiplication by one hot encoding and this weight matrix
+1:20:01
+one hot encoding remember has a one non zero entry All other values are
+1:20:06
+zero If you consider the multiplication um with
+1:20:12
+um 100
+1:20:24
+encodings if you multiply 100 encoding with a weight matrix it effectively
+1:20:30
+selects a single row in that matrix
+1:20:37
+Right So what let's say this is the uh
+1:20:42
+10th dimension it will correspond to this
+1:20:48
+10th entry here So since each word has a different
+1:20:55
+one encoding each word has a row in this weight
+1:21:02
+matrix Is this clear This will be like summing up
+1:21:09
+the vectors for those corresponding words right Yeah So
+1:21:15
+effectively through this summation we take the
+1:21:22
+embeddings weights the the corresponding roles for different words we add them up
+1:21:30
+and we train the network in such a way that from that summed up representation
+1:21:36
+which captures actually the different words in the context we want to predict
+1:21:42
+the missing word in the at the center So to solve this
+1:21:48
+problem the network needs to solve two primary tasks representing
+1:21:54
+words properly in this weight
+1:22:00
+matrix and given the sum summation of those word vectors we can predict the
+1:22:09
+missing word So for us after training this what is
+1:22:18
+critical is this weight matrix W1 We discard the second layer We
+1:22:26
+discard everything else and we just get this W1 The entries in that weight
+1:22:33
+matrix are the word embeddings word representations we are
+1:22:39
+looking for Right Does it make
+1:22:53
+sense So we train a very simple network to
+1:22:59
+predict the center word Given a context we try to predict
+1:23:04
+center word to solve this task The network is forced to
+1:23:11
+learn word vectors which can capture relevance between word based on
+1:23:19
+the context If two word end up in similar context at
+1:23:27
+similar positions across the whole corpus then that must mean that those
+1:23:33
+words are semantically relevant For
+1:23:38
+example the capital
+1:23:44
+of Turkey is
+1:23:50
+Ankora The capital of
+1:23:57
+Greece is atoms Right
+1:24:03
+If you consider this trading strategy this is the center word This is the
+1:24:09
+center word for this This is the uh context This is the context Right So two
+1:24:16
+different words Turkey and Greece end up in similar contexts Right So if you train
+1:24:24
+um a network like this then actually since the context are similar
+1:24:33
+for these words then those the representation for these words Greece
+1:24:39
+and Turkey they will end up being
+1:24:45
+similar Okay So this is one training strategy The other
+1:24:50
+one is um trained in such a way that we have from the input we try to predict
+1:24:57
+the context So the inverse of what we did for the first one In the first one
+1:25:02
+we provided the context then we try to predict the center word This time we take the center word
+1:25:09
+and we try to predict the context We pass the one hot encoding
+1:25:16
+uh through a weight matrix through a linear layer We obtain a hidden
+1:25:21
+representation and from this using the same weight matrix we try to predict the
+1:25:27
+word in the context Again here this weight matrix is
+1:25:34
+what we are looking for Um as I have
+1:25:41
+mentioned since in this weight matrix we have one row for each word
+1:25:51
+actually we don't need to represent this input as a one hot encoding because the
+1:25:59
+word I mean if I represent the words with an index I can just index the corresponding
+1:26:06
+entry in that weight matrix instead of creating a 70 dimensional 70,000
+1:26:11
+dimensional vector for each word I can just represent I can just associate a
+1:26:17
+single index for each word and use that index to index the word embedding matrix
+1:26:26
+and get the word representation for that
+1:26:32
+word Um okay so here some more details are provided Uh I explained all of
+1:26:40
+these Um if you sum up this part I don't have time to sum up this
+1:26:47
+part Okay So in the next lecture we got

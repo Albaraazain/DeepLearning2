@@ -1,0 +1,1510 @@
+
+Transcript
+0:02
+okay um good morning shall we
+0:09
+start it's been several weeks since our last lecture uh I personally missed our
+0:16
+lectures i hope you did um as well
+0:21
+um in a sense it was a good um I mean schedule wise we are on track
+0:28
+um and before the exam as we planned we were able to
+0:34
+finish the fundamentals we covered um a basic architecture multipetron how we
+0:41
+can train that different aspects of um a deep network that we can change
+0:48
+activation functions loss functions etc so we were able to cover those
+0:53
+fundamentals in time before the exam is scheduled and we are on track and in the
+0:59
+rest of the term unless there is um another
+1:05
+unexpected um um break we should be we should be fine um so today
+1:14
+um I mean I can maybe briefly go over the last bits we talked about probably
+1:20
+talked about um weight initialization so we said that initializing weights
+1:25
+properly is really critical for um for training a deep network and we talked about how we can
+1:33
+initialize uh the weights of a multi perceptron we talked about how we are
+1:39
+initialization and we talked about uh batch normization so to be robust
+1:45
+against the scale um of our variables in the input and to initialization we can
+1:52
+actually include normalization layers there that are differentiable um and in
+1:58
+this way actually we can uh we can worry less about data normalization and weight
+2:07
+the norms of the weights uh there's one discrepancy
+2:12
+between batch normalization and dropout we discussed this as well so when you
+2:18
+are using dropout B normalization you need to be careful so dropout should
+2:23
+follow the last B normalization today we will start
+2:30
+looking at um maybe more interesting architecture convolutional uh neuronet networks uh
+2:38
+first we will start uh with a motivation for why we need u a
+2:44
+different architecture why we need um a convolutional architecture for that we
+2:50
+will discuss um some issues that we need to deal with that
+2:57
+arises that arise when we are working with multipers loans then um we will
+3:04
+introduce some basic operations we use in CNN's i think the last thing
+3:11
+different types of convolution in CNN we are not going to be able to start that today in the next lecture we will we
+3:17
+will do that any questions before we start
+3:25
+in previous on you said we talked about
+3:31
+normalization and initiation and such did we have those lectures in physical
+3:37
+or you just referring to the lecture recording that you share i I don't
+3:42
+remember okay but I hope you watched the
+3:49
+recordings i was also hoping that if we have an opening in the future we can go back to
+3:56
+these and learn about these in a face to face manner okay if if some if you have question for example now I can go over
+4:02
+that so we can use this slot to go over that
+4:12
+okay um so was was weight initi initialization
+4:18
+in the recording as well or did we cover that in the lecture in the recording okay so let then let me
+4:26
+go over weight in initialization
+4:31
+um so if you we have a multi-erceptron
+4:36
+or or a different architecture if you remember our gradient sent algorithm we need to start with some weights right
+4:45
+because we will make a prediction that prediction will probably get errors but
+4:50
+we will calculate the loss take the gradient and update the weights so we need to start
+4:55
+somewhere how do we start where do we start zero weights is not a good idea
+5:01
+initializing the weights with zero values is not a good idea because everything is going to be zero in forward pass and in backward pass we are
+5:08
+not going to get any useful gradients so what we generally do is we
+5:16
+we try to initialize weights with some small values we want to keep the weights
+5:22
+small because if you remember our discussion beforehand when we talked
+5:28
+about regularizing weights analyzing large weights we mentioned that large
+5:34
+weights make our predictions sensitive to noise in the data so we want to keep the weights small so we should start
+5:41
+with small values how small generally around um um the variance of the weights
+5:50
+is kept to let's say 0.01 01 right but if you initialize the
+5:56
+weights too small then we are going to have something similar to initializing the weights with zero right if if the
+6:03
+weights are very small too small then the predictions are going to be too
+6:08
+small and we won't be able to get useful gradients
+6:13
+right um the bias is not very critical
+6:19
+you can initialize that to some small number uh but in some problems in some
+6:25
+architectures when you are reading the papers uh watch out for details about
+6:31
+initializing the bias so it happened to us for example we
+6:36
+tried to reproduce a paper and somehow the paper we were trying to
+6:42
+reproduce had a very small detail so the last layers bias was initialized to a
+6:47
+certain large value only then it worked really well otherwise it didn't work really well so although the bias may
+6:55
+appear to be not very critical be aware of those details so when you're reading the a paper watch
+7:02
+out for those details okay so we initialize the weight with small small
+7:07
+values but even if we do so um if you look at the variance of the activations
+7:14
+in the next layer so we are just looking at a single fully connected layer in a
+7:21
+multi-layer perceptron so this is the u uh input of
+7:26
+the layer we have the weights and if you calculate the variance of the
+7:34
+activations of the layer then we see that a term a multiplier that depends on
+7:42
+the number of neurons appears right so
+7:47
+somehow with a fully connected layer the variance of the activations in the next layer
+7:53
+changes but we don't want that we don't want variance of the calculations to change by n because if you have many
+8:01
+layers then the variance of the activations is going to explode right so you want to have
+8:08
+different layers consecutive layers to have the same variance and more or less the same
+8:15
+distribution so that we can get good gradients in backwards
+8:21
+so to address this what we can do is when we are initializing the weights
+8:26
+remember we initialize them um in a small range right from let's say 0.01 to
+8:35
+uh uh minus0.01 to plus 0.01 01 what we
+8:40
+can do is we can divide these by the square root of n
+8:46
+then when we are calculating the variance then from here we will have n
+8:51
+emerging and this will cancel this variance
+8:58
+however if you use uniform
+9:03
+distributions then we have um actually we can we get rid of n but the variance
+9:10
+of un uniform distribution introduces scaling factor 1 /
+9:17
+three so getting rid of n is not sufficient we need to get rid of the scaling factor as well because I mean in
+9:24
+consecutive layers want to have the same variance we want the distribution of
+9:29
+activations more or less the same so that we can get useful gradients through
+9:34
+all of the layers um so then the proper way to
+9:43
+initialize the weights is initialization if you use uniform
+9:48
+distribution um instead of I mean in some layers in
+9:53
+many layers u the number of neurons in consecutive
+10:00
+layers either might be the same then in that case we call them n if that's not the
+10:06
+case the number of neurons in the input layer and the output layer they are the same then we actually should
+10:14
+uh um take average and instead of n in
+10:20
+these calculations we should use this actually that is what we see here so
+10:28
+here n in plus n out divided by two and here actually this is square roo of
+10:35
+3 when you put this above it becomes square root of six so either we can use
+10:41
+inform distribution with these
+10:47
+bounds or we can use normal distribution whose uh variance actually is not going
+10:54
+to introduce this scaling factor and this is going to uh this is going to
+11:00
+cancel out this uh this end here yeah
+11:05
+repeats
+11:17
+so this is X we have a fully connected layer let me draw that by a single arrow
+11:23
+and this is the next layer
+11:28
+so we have the weights variance of S is N times variance of W * variance of
+11:41
+X any other questions is this clear
+11:48
+yeah before the
+11:58
+Okay so weight initial initialization is important and actually this is architecture dependent so if you have a
+12:05
+multi-layer perceptron you should use Javier initial initialization but if you have a
+12:11
+CNN you should uh use the so-called hey initialization
+12:18
+uh I I didn't include the slides because you know we are having a quick review in
+12:24
+H initialization [Music] uh we divide it by two or multiply it by
+12:33
+two I I forgot so there's there's a scaling of how we initialization by two
+12:38
+or dividing by two so
+12:55
+Hey initialization for railway networks we should we use hey initialization and it also depends on the
+13:04
+architecture um so our discussions so
+13:10
+far revealed that data prep processing is important normalizing our data zero
+13:17
+centering data and scaling the varian standard deviation of the data is
+13:24
+important how we initialize the weights that is also important right
+13:30
+so in order to uh be robust to initialization and data
+13:38
+norm scale of the data we can actually include in the architecture some
+13:43
+operations normalization operations that make the network robust to such
+13:51
+factors we call these normalization layers one very uh common normalization
+13:59
+operation is batch normalization so what we do is for every
+14:07
+neuron in any layer let's say the I neuron x somewhere
+14:14
+in the network we calculate its
+14:19
+um we look at its activations over the batch so let's say we have a 32 we have
+14:26
+32 samples in the batch over 32 samples for that neuron we have 32 activations
+14:32
+right consider one neuron neuron X this if we have 32
+14:42
+samples right this neuron takes uh
+14:49
+32 different values right so we calculate the mean of
+14:59
+those and standard deviations so we have 32 samples 32
+15:07
+activations for that neuron because we have 32 samples in the batch we calculate the mean we calculate
+15:15
+the standard deviation and from each of
+15:21
+those we subtract the mean and
+15:27
+we we divide that by the standard
+15:33
+deviation subract the mean with zero center deviations and we normalize the
+15:39
+range of activations so in a sense what we are trying to do
+15:44
+with data prep processing and weight initialization trying to have the
+15:50
+activations you know normalized we can do that actually in a
+15:56
+differentiable manner by adding this after either all of the layers or some
+16:02
+of the layers in the network so this is the um so these are
+16:13
+the
+16:23
+normalized normalized
+16:33
+sorry so these are the normalized activations for that neurons so we have learnable scaling and
+16:43
+translation on top of that just to allow the network to shift the activations or
+16:52
+scale the activations if necessary but otherwise the critical bit
+16:57
+is this part is this clear
+17:06
+and this is applied on every forward pass
+17:11
+yeah so we apply that in forward pass in backward pass this is differentiable so
+17:17
+we can provide the gradients through that so it is differentiable
+17:23
+so the thing with respect to batch normalization is to be able to get
+17:28
+reliable mean and standard deviation batch size should be sufficiently
+17:34
+high if the batch size is too small then your mean is going to be actually not
+17:42
+going to give a good mean or good depiction of the distribution of the
+17:48
+activations so remember our discussions before regarding b size so small batch
+17:54
+size might lead to better minima right so here actually if you are b using
+18:01
+bosition there there's a tradeoff
+18:07
+right um second thing that you need to be careful is that during testing during
+18:14
+inference we don't have a batch so for each input we try to have a
+18:20
+prediction right but if your network is batch normalization if your network is
+18:26
+trained with batch normalization during testing you need to have batch normalization as
+18:32
+well but if you don't have a batch during testing how do you
+18:39
+normalize your input right do we take a
+18:44
+sample mean variance for all layers and applying them to the given in testing
+18:50
+phase um for some other um normalization
+18:57
+operations alternatives to batch normalization we will do that but in
+19:03
+back normalization what we are going to do is we will keep
+19:10
+these mean and standard
+19:15
+deviation and store that into the network such that during testing we will
+19:21
+use the batch statistics calculated during training for for the neurons
+19:30
+i say the same thing did did you I missed that then but you
+19:36
+explained explain something that actually exists so I also might have um
+19:42
+how can I say two wrongs might have made a right and I explain myself wrongly okay i I thought you said that we can
+19:49
+look at the activations of the layer uh then use that calculate the mean and
+19:55
+standard deviation from okay that is I understood it that way so that is actually another normalization method we
+20:01
+will discuss later okay so what we do is what we are going to do is during
+20:06
+training we will actually update keep track of the mean
+20:13
+and standard deviation at the end of training we will store them and during
+20:20
+testing we will use the calculated statistics to do inference
+20:38
+momentum they we generally use weighted moving averaging or momentum to update
+20:44
+the mean and standard deviation and we will use that during
+20:50
+testing so if you have a network let's say on your training data you have
+20:56
+really good results but you apply that on your test data you get really bad
+21:02
+results so one very common source of problem is that you are probably not
+21:08
+using your network in test mode or eval mode and it is not using batch
+21:14
+normalization statistics so during testing you just provide a
+21:20
+single sample where the batch size is one and
+21:25
+it's not able to calculate a good it's it's trying to calculate on your test
+21:31
+data mean and standard deviation from one sample and it doesn't normalize it's
+21:38
+not able to normalize your activations the activations in the network so it doesn't work so when you are testing the
+21:46
+network you should switch to a mode or test mode which actually internally uses
+21:53
+the bad statistics calculated during training so this is a very common source of error yeah when you say activation do
+22:01
+you just mean the input into it or ask the activation function has been applied activations in the neurons of the
+22:07
+neurons so the output of the parization
+22:18
+um so in the paper even in the original paper they have conflicting arguments
+22:23
+about whether it should be used before the activation function or after the
+22:28
+activation function so in different networks in different problem problems
+22:33
+people have explored different ways so you can get some slight difference in
+22:39
+terms of performance so in your case you just need to try or look at similar
+22:44
+similar architectures okay
+22:53
+so batch normalization if you use batch normalization with dropout there is a
+22:59
+severe problem remember um when we talked about
+23:05
+dropout we actually change the activations um expected value and to to
+23:13
+address that during training we divide we scale the activations by P dropout
+23:20
+probability so that the expected value of x x prime the one that we use
+23:29
+um uh drop out on it doesn't change so
+23:34
+we called that inverted dropout so this way the expected value
+23:42
+of x doesn't change however that doesn't handle the change
+23:48
+in variance of the activation so variance of activations change changes when you drop
+23:56
+out but we do we don't address that with inverted
+24:01
+dropout if you look at batch normalization batch normalization keeps track of mean and vines of of the
+24:11
+activations right and during training those are updated and those are
+24:18
+um stored work right so that during testing we can use
+24:25
+them right for even for a single input we can use the mean and standard
+24:32
+deviation calculated during training however
+24:38
+those were calculated with respect to the statistics
+24:46
+um that were modified by dropout but during testing we don't use
+24:52
+dropout we use all of the activations right all of the neurons are used during
+24:57
+testing so during testing true dropout expected
+25:05
+um value and the standard deviation of the uh neurons are different than the
+25:13
+expected value and the standard deviation of the activations um for for for the dropout layers
+25:22
+therefore these statistics that you calculated here for batch normization they are not going to make
+25:30
+sense during testing because they were based
+25:35
+on the dropout dropped neuron activations right so this will lead to
+25:43
+actually low performance during testing so when you
+25:50
+um when you design an architecture drop out on batch
+25:56
+normalization shouldn't follow uh dropout you can have batch normalization
+26:03
+layers then after those after the last batch normalization you can have as many dropout as you want but not the other
+26:11
+way around does it make sense
+26:21
+okay that was actually the main material we covered in the video i don't remember
+26:27
+whether there was anything else if there is let me know we can talk about
+26:37
+that okay so we discussed multiple perceptrons
+26:44
+they are really an interesting family of architectures because they are they are
+26:50
+very versatile so we can apply multiet transaction to different types of problems and they have the benefit of
+26:59
+u having the capacity to represent any function remember the universal
+27:05
+approximation theorem it states that with a multiressive drone we can represent any function
+27:12
+it doesn't mean that we can converge such a solution but there there is a
+27:18
+solution however it has some issue one issue is that
+27:23
+um if you want to work with real life um
+27:30
+large scale problems let's say um object recognition with high resolution let's
+27:36
+say you have 1,00 by 1,000 image right you want to recognize
+27:42
+objects in such high resolution images what we do is we vectorize if you
+27:51
+remember then we use multipetron
+27:59
+so a resolution by 1,00 by 1,000
+28:05
+might appear actually even small for
+28:11
+um considering the fact that even in our mobile phones we can take
+28:17
+images that are I don't remember maybe 4,000 by 4,000 resolution images can be
+28:25
+taken by our mobile So considering the state of the technology even 1,000 by 1,000 is not a
+28:33
+high resolution but if you consider the scale of the problems we are working
+28:39
+with 1,00 by 1,000 is actually high resolution ignoring the RGB channels
+28:48
+uh for the time being for the sake of simplicity so 1,000 by 1,000 resolution
+28:54
+means that we have 1 million entries in our
+29:01
+input 1 million and
+29:07
+generally if you remember our discussion about the size of a layer we we try not to reduce
+29:15
+dimensionality rapidly so we try to reduce dimensionality slowly right so if
+29:22
+this is 1 million let's say you want to keep
+29:28
+this 100,000 or 10,000 neurons here even this is a large
+29:37
+reduction but for the sake of argument let's keep it at 10,000
+29:42
+just this layer just one multi-layer perceptron
+29:48
+layer is going to introduce um
+29:56
+10 10 billion
+30:03
+10 10 billion so just this layer is going to introduce 10 billion parameters
+30:15
+remember the resolution 1,00 by 1,000 is not actually that large and we were a bit generous in
+30:23
+terms of the size of the first layer 10,000 neurons even in such
+30:30
+um optimistic assumptions we have from a single layer
+30:37
+we have 10 billion parameters this is definitely not
+30:44
+feasible and considering that we will have many such layers right then the
+30:51
+number of parameters in a m perceptron is going to explode very
+30:58
+quickly and actually it is quadratic with respect to size of the input
+31:06
+so why is this an issue for us why are we worried about the number of
+31:13
+parameters in an architecture so more
+31:21
+parameters it means that the model is large it might be that we may not fit
+31:27
+that model that architecture in our GPU right
+31:33
+and it means more computational complexity more multiplications
+31:39
+um might be needed are needed if you have more
+31:45
+parameters a more severe outcome of having more parameters
+31:52
+is that we would need more data and I will show one study arguing that if you
+31:59
+increase the number of parameters in a network the number of data required increase
+32:07
+quadratically right so that is actually more important for us because we may it
+32:13
+may be more difficult to acquire more data for our problem
+32:19
+and with CNN as we will see these um are not
+32:26
+issues so when we talk when we are talking about dimensionality there is the concept
+32:33
+um term called curse of dimensionality in curse of dimensionality we are
+32:39
+talking about a problem where if you increase the number of dimensions number of parameters the
+32:46
+number of data required for obtaining the same error for that problem optimization problem machine learning
+32:52
+problem increases exponentially if that is the case we
+32:57
+have curves of dimensionality it has been argued that
+33:03
+for deep networks we don't have curves of dimensionality so if you increase the number of
+33:09
+parameters number of data required doesn't increase
+33:14
+exponentially but in the case of multipers it increases quadratically so the demand for data
+33:22
+still increases but it doesn't increase exponentially
+33:28
+maybe I second ago I think you said
+33:39
+for conventional machine learning methods it increases exponentially for
+33:45
+deep networks quadratically for multi is quadratic what increases exponentially
+33:52
+is number of samples required
+34:00
+So dimensionality is one fundamental
+34:06
+problem regarding multiple perceptrons but that is not the only
+34:12
+problem another issue with multiple perceptrons is that it is very difficult to g generalize to different
+34:20
+transformations in the data in some problems we will have
+34:26
+um we will require some invariances or variances to some
+34:33
+transformations so if you for example consider um an object recognition
+34:38
+problem right so we have an image we vectorize the image right we have the ve
+34:46
+we have a vector representing the image and we have the weight matrices we multiply them we obtain the scores so
+34:52
+this is just a one layer uh model if you shift the image by one
+35:01
+pixel right just one pixel so
+35:07
+this vector here is going to be shifted down so this is going to be zero then we
+35:13
+will have 56 231 etc if you multiply the
+35:19
+shifted vector with the same weights you will get completely different set of
+35:25
+scores here right we just shifted the input by
+35:31
+one pixel all of the activations in multi perceptron they are going to
+35:38
+change so this is a very severe limitation actually so we want I we just
+35:44
+shifted the image by one pixel visually we may not even see the difference but
+35:51
+the activations the predictions they are going to
+35:57
+change so we have some problems where we
+36:04
+want the transformation on the input to be applied on the output as well
+36:11
+we call these equivalent problems an example is image
+36:17
+segmentation so what do we mean so let's say we have an input image we have a network a deep
+36:26
+network that predicts um a
+36:32
+map where each pixel is actually labeled according to the label of the object
+36:40
+right right this is we call this image segmentation problem
+36:47
+if you transform um the input let's say you translate the image the the the
+36:54
+camera let's say you translate the camera slightly right as as shown here
+37:00
+so we applied some uh transformation on x we obtain translated
+37:08
+or transformed version of the input if you provide this as input to the deep
+37:16
+network we expect the output to be translated or transformed by the same
+37:22
+transformation right if you look at the problem
+37:27
+definition segmenting the pixels belonging to the object I we expect the
+37:33
+output to be transformed by um by G as
+37:39
+well right we expect the same for every factor
+37:47
+scaling that that is the
+37:52
+wish so that means if I apply the transformation on X the output I obtain
+38:00
+through segmentation should be the same should be equivalent to transformation applied
+38:09
+on this output and so this should be
+38:15
+equal so whatever transformation I apply on the input for some problems should be
+38:21
+applied on the output if the network can so let's say you shifted the input the
+38:27
+network's output predictions should be shifted by the same amount we call this
+38:34
+equarian so it is not invarian it is equarian so the output is applied the same
+38:45
+transformation image segmentation is a very good example for that but in some
+38:51
+cases we want the output to be independent of the
+38:58
+transformation of the input right so remember the object recognition example
+39:03
+so we have the cat we provide that to a deep network
+39:09
+we obtain a prediction we shifted the object the
+39:17
+object moved in the scene etc or we rotated the camera
+39:23
+slightly um the object is still in the scene the object is still the same so we
+39:29
+should have the same prediction right so whatever the transformation was we want
+39:35
+the prediction to be independent of that to be robust to that
+39:41
+transformation we call this an invariant problem we want to be we want object
+39:49
+recognition to be invariant to transformations on the input like
+39:58
+translation and if you consider u multip
+40:06
+perceptron if you shift pixels we don't know what we are going
+40:12
+to get as the output the scores are going to change so we don't have invarian to
+40:18
+transformations on the input and with equines we cannot guarantee
+40:26
+that either right so let's say we shifted the p the pixels in the input it
+40:32
+doesn't mean that we are going to the outputs are going to be shifted by the same amount with a
+40:39
+multi-erceptron so with a multi-erceptron addressing problems
+40:44
+equant problems like image segmentation or invariant problems like object
+40:51
+recognition is challenging if you provide a lot of data
+40:57
+the network maybe can learn these invariances or
+41:03
+equariances but it would take more data and more training time
+41:11
+with a CNN i mean we will design CNN's in such
+41:16
+a way that in the architecture we will have operations that provide such
+41:22
+invariances or equarianes it will be easier to train a
+41:28
+CNN to be robust to transformations on the input or have
+41:37
+equals so the source of inspiration for designing an
+41:44
+al alternative architecture um were actually findings from um
+41:52
+neuroscience so Hupil and Visel have you heard about these names so they are well-known
+42:00
+neuroscientists they got a Nobel Nobel prize for their findings in 60s they did
+42:09
+recordings real recordings from the brains of cats and so they projected different
+42:17
+patterns on the screen and they looked at activations of the neurons in cat's brain and by looking at those
+42:25
+activations for different types of patterns they showed that first
+42:31
+connectivity in in biological neurons are not fully connected fully
+42:38
+connectivity so connectivity is restricted in biological neurons so a neuron just attends to a small
+42:49
+uh portion of its input we call that receptive field so neurons have receptive fields
+42:56
+and they only look at the stimuli in their receptive field so that is one
+43:04
+important finding which is what we uh what is relevant for our discussion but
+43:10
+another important finding was that in the layers in different parts of
+43:17
+the regions in in the visual cortex uh neurons are specialized to
+43:23
+recognizing certain patterns at different scales right so
+43:31
+let's say we have um a neuron a set of neurons u sensitive to
+43:40
+recognizing a um an edge at this orientation these neurons are sensitive
+43:47
+to recognizing edges at this orientation these neurons are specialized to this
+43:53
+pattern etc we have the neurons for the left eye and
+43:59
+neurons for the right eye right and we we have
+44:07
+these multi-layer structure where the neurons
+44:12
+here are sensitive to those patterns at different scales right
+44:21
+we call this column ner structure um and these two findings were
+44:29
+very important and they got the Nobel prize for that and these their findings
+44:35
+actually motivated architecture design in artificial neuronet networks
+44:43
+briefly go over the second so here the vertical axis is actually
+44:50
+In a sense the position yeah the position of the signal in in
+44:58
+the retina right so we have neurons
+45:03
+sensitive to this pattern at different orientations right so there is one
+45:09
+neuron here another neuron here another neuron here right in a sense
+45:18
+so we have neurons covering the whole image let's say and they are
+45:26
+specialized to recognizing one pattern the ones behind those they are
+45:33
+special specialized recognizing that pattern with larger uh receptive field
+45:39
+with larger scale right so this type of edge at that orientation
+45:48
+is actually recognized with respect to position its position in the retinal um uh image
+45:58
+let's say and at different scales so this is
+46:03
+position and this is scale right
+46:10
+it kind of feels like the human brain found solution to recognize the objects
+46:16
+just trying different neurons for every scale every position and that is actually what we have in our
+46:23
+deep network so if you look at we we will we will look at the filters learned by CNN Alex we will take Alex net and we
+46:30
+will look at the filters actually it's not too far um from from what we have in
+46:37
+our b in our brains and we have uh different neurons
+46:42
+for different types of um patterns these are for the left eye and these are for
+46:48
+the right
+46:53
+Does it make sense okay so I I had briefly talked mentioned
+47:02
+um our paper in our paper actually we look at different layers in our visual cortex and different types of processing
+47:10
+that we that are known to take place in those layers and the receptive fields
+47:17
+right so those are also discussed um we show that or or we summarize that um
+47:25
+actually the septic field size changes across different layers and
+47:30
+it is not uniform in a single layer it is not uniform so when we talk about CNN
+47:36
+we will use defect a fixed receptive field size for every neuron actually in
+47:42
+in our brain in the central parts of the phobia the image let's say we have
+47:49
+smaller receptive field when we go to the peripheries of our images we have
+47:55
+higher receptive field that's why we see the peripheries of um our input in a
+48:03
+blurred fashion the central parts are more sharp we see objects at center of
+48:10
+our um um visual stimuli
+48:15
+better okay so let's go back to um our
+48:21
+discussion so the first model that that were inspired by the findings
+48:28
+of hub and visel is the new cognit model this is
+48:35
+1979 so in this model Fukushima used two different types
+48:42
+of neurons um one neuron he called simple
+48:48
+cell actually in neuroscience they are called simple
+48:53
+cells and complex cells simple cells are responsible for accepting information we
+49:00
+will call this convolution in a CNN
+49:05
+and he used the so-called complex cells they were responsible for summarizing
+49:12
+the information in its receptive field in in CNN's we will call these uh
+49:21
+cells operations pooling this is the first model that
+49:28
+took inspiration from the findings of pupil and visel and applied them in a in
+49:33
+an artificial neural network of course for training uh this architecture he
+49:39
+didn't use uh gradient descent he used a method called severalization um it's not critical for
+49:48
+our discussions for the um uh for the for our course but what we do in
+49:57
+self-organization or self-organized learning is that we look at um the
+50:03
+activations of the neurons if for a certain stimuli the none of the neurons
+50:09
+are active actually we we believe that then this stimuli that this new input is
+50:16
+not being represented properly by the existing neurons we should add a new neuron so we in then by looking at some
+50:24
+huristics based rules we actually grow the network
+50:33
+so with pooling again we have a receptive field what we are going to do
+50:38
+is we will try to summarize the information in the receptive field the
+50:43
+the aim is not going to extract features like convolution but we are going to
+50:50
+summarize let's say we will take the mean of those we will take the maximum of those
+50:56
+etc okay the first architecture that is trainable using
+51:03
+gradient descent and using uh the ideas in neo cognitron is
+51:12
+um the model used by Leon Yan Leon in 1998
+51:19
+um they called it convolutional neur networks as I said it used gradient descent it it shared the weights i will
+51:27
+explain what this means in a few slides um and he successfully applied
+51:34
+that practical problem using gradient sand by training a CNN he obtained good
+51:43
+results um later on we will look at this architecture in more detail for the time being uh let's uh let's skip
+51:52
+that so in a
+51:59
+multi every neuron in a layer is connected to all of the neurons in in
+52:06
+the input layer so let's say this is uh the input
+52:11
+layer we have full connectivity the neuron here has connections to all of
+52:18
+the neurons in the in its input layer in a CNN we are going to one of
+52:26
+the first things we are going to do is we will restrict connectivity and each neuron will have a receptive
+52:33
+field so if you consider this neuron it will be connected to just three neurons
+52:41
+it will receive information from just three
+52:47
+neurons we will call this the receptive field
+52:55
+um of of that neuron how many neurons we have in the receptive field or the size of the
+53:02
+receptive field is going to be one of the important hyperparameters of a
+53:07
+CNN we will generally use f to denote the size of the receptive
+53:16
+field as you see the receptive field size is fixed so for this neuron is the
+53:23
+same so we have three neurons in the receptive field for the next neuron it
+53:29
+is three for the next neuron it is three right
+53:36
+so the first critical bit is that
+53:44
+connectivity is
+53:51
+restricted right the second important
+53:57
+change from a multi perceptron
+54:04
+um is that the weights are shared so this if this is w1 this is w2 this is
+54:12
+w3 actually this is w1 w2 and w3 as well
+54:18
+w1 w2 w3 so for every receptive field we
+54:24
+have the same parameters
+54:29
+right we have the same parameters shared and used by every receptive
+54:40
+field so we share parameters
+54:48
+uh among the septic
+54:57
+fields is this
+55:03
+clear okay so these are the two fundamental
+55:09
+changes that actually are going to address many of the issues of
+55:17
+multietrons and because of these changes actually
+55:22
+um the number of parameters and the number of multiplications they are going to reduce significantly
+55:30
+so here if you remember our discussion with respect to um par the size of a layer so if this is
+55:39
+1 million uh we would have a large number of parameters coming through here but if
+55:46
+you look at one layer one convolutional layer and let's say you have 1 million
+55:55
+um neurons in the input layer the number of
+56:03
+parameters here it doesn't depend on that actually number of parameters just
+56:10
+depend on filter size it doesn't depend on the size of the input
+56:15
+layer if you like you can increase this size of the input layer you can decrease that it doesn't
+56:21
+matter the size of the receptive field let's say it is three then we just have
+56:27
+three parameters to learn for that whole layer we just have
+56:33
+three parameters W1 W2 W3 whereas here we have a lot of
+56:40
+parameters to learn right
+56:50
+one issue with this might be that if you
+56:55
+consider this neuron it receives information from the whole
+57:03
+input right if you consider an object recognition problem the a neuron here actually looks
+57:11
+at all of the pixels at once and it's able to use all of the information across the
+57:18
+image if you restrict connectivity in a CNN a neuron receives information just
+57:26
+from a restricted part of the input if you consider an object recognition
+57:31
+problem let's say if the receptive field size is three you have a 1,00x 1,000
+57:38
+image if you are just looking at three pixels a neuron in a convolutional layer
+57:44
+is not going to be able to process the information across the whole
+57:51
+input it's just going to look at a small part of the problem but to solve the problem we need to
+57:58
+integrate information across the whole input to address this what we are going
+58:06
+to do is we will increase the depth when we increase the depth the
+58:12
+neurons in the following layers through intermediate layer or
+58:19
+layers will have the chance to integrate information across the whole input
+58:28
+maybe we don't achieve that with a single layer but by adding more
+58:35
+layers the neurons in the top part of the architecture will be able to
+58:41
+integrate information across the whole this is one of the reasons for having
+58:48
+deeper architectures deep more number of layers in a CNN compared to multi system
+58:55
+to be able to integrate information across the whole input we need to have actually more depth in a in a
+59:07
+CN and the benefit of restricting connectivity and weight sharing is that
+59:16
+we need significantly less data to obtain the same amount of error compared
+59:22
+to a multiple so this is just one of the studies that showed
+59:28
+that let's say um if you have a multi perceptron
+59:34
+um for a dimensional
+59:40
+input and you have a CNN for obtaining a prediction error
+59:52
+um of epsilon in a multi-repressive drone you
+59:59
+need roughly d over epsilon squared many
+1:00:04
+samples and for a CNN you need roughly m
+1:00:09
+over epsilon square many samples where m is the uh filter size
+1:00:17
+f the number of uh parameters in your filter receptive
+1:00:23
+field so if D becomes large
+1:00:28
+um actually the number of data amount of data required for obtaining the same
+1:00:34
+amount of error actually increases but I thought it was quadratic so that's I'm I'm confused
+1:00:44
+only for image right otherwise it's general but we can apply CNS on any
+1:00:52
+modality But this study is on which
+1:00:58
+uh I don't remember I have to we have to check and and what is what are these
+1:01:03
+complexities for like they're for learning mainly but like what's the actual criteria
+1:01:13
+I don't remember the problem specific problem whether it is classification or regression
+1:01:20
+um I I have to check
+1:01:25
+There are other studies trying to formulate such
+1:01:31
+estimations on the number of samples so this is just one of them um continue our discussion with
+1:01:38
+respect to dimensionality um to let's say apply to obtain some
+1:01:46
+simple operation obtain such a simple output or something more complex in a
+1:01:53
+multiperceptron actually you need a lot of operations right so for this mapping
+1:02:02
+in a multi-erceptron you need these many multiplications whereas in a CNN
+1:02:09
+and it is significantly less so here three 3x3 is actually the receptive
+1:02:15
+field size so you need significantly less
+1:02:23
+multiplications for obtaining something similar um in a
+1:02:29
+CNN and storage wise it is less as well because the number of parameters is
+1:02:34
+significantly less um and training time learning time is significantly better as
+1:02:40
+well the benefit of restricting connectivity
+1:02:46
+and sharing parameters across receptive fields provides us actually equivalence
+1:02:53
+to translation right so if you cons if you
+1:02:59
+remember receptive field um u drawings so here this is one
+1:03:07
+receptive field let's say you shifted um the input right so it will shift
+1:03:16
+actually the pattern will shift to the next receptive field right or and
+1:03:21
+accordingly the activations will shift as well and that's why we
+1:03:29
+have from the architecture we have by definition equines to
+1:03:36
+translation which we wouldn't have in a multipettor that's why if you have a if
+1:03:42
+you have an equant problem we should use CNN right a
+1:03:48
+multiple perceptron is going to be not ideal for such a
+1:03:54
+problem however we don't have the same for scale and rotation if you consider
+1:04:00
+the convolution operation it doesn't provide invarian scale so if the objects
+1:04:06
+are bigger actually you will get different activations if you rotate the image or the object the activations will
+1:04:14
+change so convolution is not going to provide any equirines to scale or
+1:04:22
+rotation so in a convolutional neur network we
+1:04:27
+use why do we call that convolution what is convolution let me provide a very quick overview
+1:04:35
+about convolution anyone who has not taken a course on signals and
+1:04:42
+systems three four five for the rest these are going to be
+1:04:48
+uh trivial um so we
+1:04:54
+can actually if we have a discrete time signal like an
+1:05:00
+image but just for the sake of simplicity assume that we have a single axis of variation like the horizontal
+1:05:08
+axis if you have a discrete time signal we can write that discrete time signal
+1:05:14
+actually in terms of um the so-called impulse
+1:05:24
+signal or its shifted versions so we can write this
+1:05:29
+signal um any discrete time signal as a uh superposition of um
+1:05:37
+actually shifted and scaled
+1:05:43
+impulses so any discrete time signal can
+1:05:48
+be written as a summation of infinitely many shifted and scaled impulses
+1:05:56
+so we can do that in 2D as well so this is just for um 1D and if you have a system uh to be
+1:06:04
+specific a linear timing vine system um when you provide an impulse as the
+1:06:10
+input we get a response we call that um impulse
+1:06:16
+response and since the system is time invariant if you shift the input by U K
+1:06:24
+the output should be shifted by K if you scale the input by some
+1:06:30
+constant output should be multiplied by the same constant because it is linear
+1:06:35
+and if you have a superposition of many different inputs the output should be the same superposition right
+1:06:43
+so the main message here is that you can write any discrete time input in terms
+1:06:51
+of impulses and if you know the impulse response or that system for that
+1:06:59
+operation then actually the output for any input can be computed using this
+1:07:06
+summation that we call convolution sum right and we denote that using this
+1:07:13
+operator convolution operator so let me repeat if you know
+1:07:18
+the impulse response for that system then you can calculate the output for
+1:07:23
+any input
+1:07:29
+um so for continuous time signals we can apply the same thing in terms of
+1:07:35
+summation we have integration that's not critical for us um to be able to
+1:07:40
+calculate this convolution operation we need to take the impulse response we
+1:07:46
+need to flip the axis time axis and we need to slide that over x and for each
+1:07:55
+slide that value we need to multiply the corresponding entries and we should put that as the output for the next time
+1:08:02
+value so this is a this is an expensive operation in 2D we can apply this as
+1:08:10
+well so I have just illustrated this for 1D um so
+1:08:17
+in our cases in a CNN we will talk about using a kernel or
+1:08:24
+a filter this is actually
+1:08:30
+um a finite impulse response doesn't span from minus infinity plus infinity
+1:08:36
+the whole spatial axis it has um has a bounded
+1:08:44
+span we call such impulse responses kernels or filters and the other thing
+1:08:50
+that we don't do is that we don't flip with respect to the special axis or the
+1:08:56
+independent variable so let's assume that it has been done already
+1:09:02
+so what we do is we given this kernel or filter we place that over the
+1:09:10
+input we multiply the corresponding entries a multiplied by X B multiplied
+1:09:16
+by sorry A multiplied by W B multiply by X E by Y and F by Z then we write that
+1:09:27
+summation as the output then we
+1:09:35
+shift we multiply B w by W C by X F by Y
+1:09:41
+and G by Z and we write that as the next value in the output etc so this way
+1:09:48
+effectively we are sliding the filter over the input and for every position of
+1:09:54
+the kernel filter we multiply the corresponding entries and sum up the result and write that at at the output
+1:10:05
+so normally these the values in the kernel in the
+1:10:12
+filter wxy z they were designed by
+1:10:18
+us right by us engineers or scientists and even simple filters can do really
+1:10:26
+interesting things right if you have a filter where all of the values are the same actually it does an averaging
+1:10:35
+operation and it blurs let's say an image if you do that with a 1D filter it
+1:10:44
+can do blurring in one dimension along one dimension if you do it vert with a
+1:10:50
+vertical filter it blurs vertically so just one simple filter can do these
+1:10:58
+things we can design a simple filter like this
+1:11:03
+where we have some negative values and at the center we have a large value this can actually enhance the
+1:11:12
+crossings um the changes in the input right so it
+1:11:18
+can sharpen the changes so the change here had a magnitude of eight so now
+1:11:26
+actually it has been sharpened it has been increased so we are implying the changes with a simple filter
+1:11:37
+go back to where we which one how we
+1:11:44
+define this this is not what you call the right we just take it's a it's a
+1:11:51
+kernel you multiply them so if so if if this is
+1:11:56
+3x3 there are nine entries and each if each value is one over nine in a sense you are averaging can
+1:12:05
+you go back to previous ultimately
+1:12:12
+the resolution of the output is smaller yeah yeah we will we will talk
+1:12:19
+about that any any other question
+1:12:25
+here's one so you find a sharpening filter but the sort of there is no loss in
+1:12:34
+dimensionality the resolution is the same so here this part I mean there are other
+1:12:41
+signals here it's not shown here
+1:12:46
+so this sharpening filter for example would enhance zero crossings but it
+1:12:52
+wouldn't change um information at other other locations
+1:12:58
+okay sorry for a second um applying a filter does not take a
+1:13:05
+convolution right I think you're convolution
+1:13:14
+so actually a filter is we can consider
+1:13:19
+the filter as a finite impulse response yes yes and when you when you are convolving a finite impulse response is
+1:13:27
+symmetric finite impulse response actually it's the same thing it's the same as convolution provolution is a
+1:13:34
+matter of applying filters basically
+1:13:41
+yes so if you apply for example sharpening filter on an image right it
+1:13:48
+can actually enhance as illustrated here on natural you can see that the
+1:13:55
+edges the changes in intensity they are enhanced so with just one simple filter
+1:14:03
+like this so we can have Gaussian filter at different scales if you convolve you
+1:14:11
+apply this filter on an image it blurs at different scales so by blurring we
+1:14:17
+might lose some information but we might be highlighting some information so if
+1:14:22
+you blur such an image for example with Gaussian filter you can actually get a
+1:14:28
+better um gist of the highlight overall
+1:14:34
+layout right so blurring or filtering can
+1:14:39
+remove noise or it can enhance
+1:14:44
+crossings so here are some other simple filters just with two entries minus one
+1:14:51
+and plus one if you apply the filter you can get zero crossings or um intensity
+1:14:59
+changes um in horizontally or vertically right
+1:15:05
+and we were designing such
+1:15:13
+pictures in this one yes yes
+1:15:19
+yeah it can have negative values so we were designing these
+1:15:24
+filters but in a CNN we design receptive fields and these
+1:15:32
+filters with learnable parameters and we learn these filters from the data
+1:15:39
+itself we design we learn the filters that are necessary for solving the
+1:15:45
+problem at hand for some architectures for some problems I will show we will
+1:15:53
+look at the activations or the parameters learned by different uh
+1:16:00
+neurons we will look at the receptive fields and we will see that actually from the data they will learn some
+1:16:07
+really interesting filters right any questions
+1:16:15
+[Music]
+1:16:24
+dimension
+1:16:38
+um I mean getting to the frequency domain introduces some complexity right
+1:16:46
+some operations are needed and it has been shown that we don't get
+1:16:52
+actually better performance when we do
+1:16:58
+so maybe
+1:17:07
+Any other question
+1:17:25
+yeah was also like in a sense it is with respect to their
+1:17:30
+receptive fields so in a sense what we learn actually we will when I show the
+1:17:37
+learn filters that is going to be the case so we will see that those some of
+1:17:43
+these neurons are going to be sensitive to recognizing certain patterns that is what we will see in the waves
+1:17:51
+hello i would guess that in practice most dimensional but threedimensional
+1:17:57
+depends on the problem they will be two
+1:18:03
+dimensional images for images yes but we can work with audio signals which is one
+1:18:10
+dimensional we can still use
+1:18:17
+CNN
+1:18:29
+represent using a two dimension i think it could also
+1:18:34
+be rotation not just
+1:18:40
+can you say it again if we are using a dimensional convolution network and we
+1:18:45
+are working with images as I think that would also
+1:18:51
+be a quarant
+1:18:58
+consider the filtering operation so if the input is rotated you are using the same filters
+1:19:04
+the activations you obtain as a result of multiplication they are going to change you can only filters which are
+1:19:12
+gradient yeah if you design your filters in a circular way which is
+1:19:21
+uh complex but possible then you can obtain some invariance or equines but
+1:19:28
+otherwise with standard convolutional filters it's not the case i have a small
+1:19:34
+question for a local we will discuss that that is
+1:19:42
+that is uh I mean with with a CNN as we will see we will introduce a lot of
+1:19:47
+hyperparameters so this is going to one of the limitations of CNN's um but we will uh live with
+1:19:56
+that okay so let me continue in a CNN we will use different types of operations
+1:20:02
+we will use convolution as I have discussed so connectivity is restricted we share
+1:20:08
+parameters across the layer we will use nonlinearity we have
+1:20:14
+discussed nonlinearity in detail so we are not going to discuss them again so
+1:20:19
+the same nonlinearities can be used here we will have so-called pooling
+1:20:26
+layer layers in a CNN we will discuss that and all of
+1:20:34
+these in some resources three of those stacked
+1:20:39
+together they are called convolutional layer in some resources they just call
+1:20:46
+the convolutional layer as convolutional layer so be aware of that uh
+1:20:54
+distinction um and now we will look at um these operations in detail
+1:21:02
+convolution and pooling in detail uh in five minutes let me explain
+1:21:10
+um how we apply convolution so let's say we have an
+1:21:23
+image i'm illustrating this over images but convolution is not or CNN's are not
+1:21:33
+limited to actual images so we can apply them on any type of data whether 1D 2D
+1:21:39
+3D doesn't matter right so let's say we have an image and we have an RGB
+1:21:49
+image so let's say this is the R channel similarly we have the uh green
+1:22:01
+channel and we have the blue channel
+1:22:07
+we have our GB right so when we are applying
+1:22:14
+convolution on an image let's say we have a 2x two
+1:22:21
+filter we will place that here we will start
+1:22:26
+here receptive field size is true and our
+1:22:32
+picture is 2x
+1:22:38
+two right it has some values here A B C
+1:22:45
+D so when we talk about 2D convolution we are talking about two axis of
+1:22:53
+variation so the image has two axis of variation X and Y that's why our filter
+1:23:00
+has two dimensions spanning the horizontal dimension and the vertical
+1:23:07
+dimension but it has a hidden implicit third
+1:23:13
+dimension so when you are applying this convolution on the input actually it
+1:23:18
+spans information over all three channels the input has three channels
+1:23:24
+right so actually this should
+1:23:29
+have three uh channels as well so when we say a two-dimensional
+1:23:37
+filter actually it is might have a third dimension an implicit third dimension
+1:23:45
+that spans the channels of its input layer
+1:23:51
+right yeah just about 2x2 right
+1:24:01
+so let me make my drawing better so so we have three
+1:24:10
+um third dimension with three channels in a sense
+1:24:16
+so we because we place our filter here we multiply the corresponding entries we
+1:24:23
+obtain a value and we write that in the
+1:24:29
+output then we slide the
+1:24:34
+filter multiply the corresponding values we get the next value we slide the filter we get the next value this
+1:24:42
+way the activations in the output in one row are calculated
+1:24:50
+then we switch to the next
+1:24:56
+row in a sense we position the parameters we multiply the corresponding entries we get the result so this way we
+1:25:05
+slide the filter over the input and we get the
+1:25:12
+activations right so this is just with one filter in
+1:25:20
+general one filter is not going to be sufficient for obtaining useful
+1:25:27
+information from our inputs from our data on the same
+1:25:35
+input with the same dimensions we will have another
+1:25:51
+filter this is filter one this is filter two right with the same dimensions we
+1:25:57
+will have another filter sliding over the input in the same fashion this will
+1:26:03
+give a second channel of activations
+1:26:10
+and it might be that you can have a lot of activation a lot of such filters for
+1:26:16
+example we will look at some architectures sample architectures we will see for example 96 filters are used
+1:26:25
+and for each filter we will have one channel
+1:26:32
+here if there are 96 filters that means we have
+1:26:37
+96 channels in the next
+1:26:43
+layer right any questions yeah also learned right then
+1:26:50
+yeah they are learned everything is differentiable we will learn the parameters of the filters
+1:26:58
+okay um the last question refers to something that we
+1:27:04
+have not discussed yet so you can skip that you can leave that empty but you can answer the other questions so we
+1:27:10
+will continue on Thursday
+1:27:16
+are you okay

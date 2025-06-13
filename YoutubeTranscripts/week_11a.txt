@@ -1,0 +1,1538 @@
+
+Transcript
+0:05
+okay Uh good morning So in the previous lecture we
+0:13
+um looked at um how we design a CNN architecture So
+0:20
+we provided um a very generic um sequence of operations that are commonly
+0:26
+used for designing CNN's but this would be just um a plain vanilla CNN So we can
+0:34
+bring together um convolution and nonlinearity a number of times We can
+0:40
+have pooling We can repeat these a number of times and at the end we generally have a a set of poly connected
+0:46
+layers Um with this blueprint we can design
+0:53
+different CNN's we can uh train them from scratch for our problems But this
+0:58
+is um very tedious process and we mentioned that in general we take an
+1:04
+existing CN architecture and we adapt those architectures to our
+1:09
+problem Today we will see some well-known um CN architectures that we
+1:16
+commonly use for this purpose Um we are very flexible in terms of our
+1:22
+architecture in terms of what we can use and what what we cannot use In general we will have convolution but we we can
+1:29
+have a CNN architecture without any pooling or without any fully connected layers So we are we have a lot of
+1:37
+flexibility in CNN architecture and we talked about different design choices
+1:42
+and their impacts on performance We mentioned that
+1:48
+in general the general understanding is that if you reduce the number of the
+1:54
+size of the filters and increase the depth or the number of layers in the network that works um uh
+2:02
+better Um memory is an important issue when we are designing a CNN architecture
+2:10
+Uh yes increasing the number of layers increasing the number of filters
+2:15
+um are promising However if you increase the number of
+2:21
+layers and the number of filters then you would actually have uh you will
+2:26
+require a lot of memory to store all of these activations So this is going to be an
+2:33
+issue um to address this early on in your architecture you can try to reduce
+2:39
+um dimensionality as we will see in Alexet they do this using a large stride value
+2:47
+in the first layer Um and as we said designing um a s architecture from
+2:56
+scratch while trying to optimize its hyperparameters its memory its um speed
+3:05
+etc It's it's really demanding Uh what we generally do
+3:11
+is we take an existing architecture and we fine-tune that adapt and fine-tune that for our problem and based on
+3:18
+whether the problem that we are trying to address is similar to the original
+3:24
+problem or not and how much data we have um we have different design choices
+3:29
+either we just if the problems are similar um but the amount of data is limited we
+3:37
+just fine-tune the last layer but if we a lot of data we can finetune the whole thing Um if the problem is different
+3:45
+then we can skip we split the network and we remove the
+3:51
+second half and we take the first half and add our output layer or several
+3:58
+fully connected layers into the middle of the network
+4:03
+But if we have sufficient amount of data in this case we can also fine-tune the
+4:11
+whole Um then finally we we started
+4:16
+talking about how we can visualize what a CNN is doing what it has learned
+4:22
+whether there is something wrong or not and whether it is paying attention to
+4:28
+the relevant content Um we can visualize activations We can visualize the weights Uh we can uh keep
+4:37
+track of samples that maximally activate a neuron Um we
+4:43
+can create a map of the inputs based on
+4:48
+their similarity in the features So we can take the features of two inputs If
+4:54
+they are similar we can place them close to each other in this map If their features are different then we try to
+5:01
+place them apart We can formulate this as an optimum optimization problem and create such a
+5:07
+map We can uplude parts of the image and see um how the output changes how the
+5:14
+prediction changes If uh for an irrelevant part of the scene when you
+5:20
+upload let's say this part if the prediction probability changes then there is something wrong the network is
+5:27
+paying attention to um some irrelevant
+5:32
+content Deep networks are differentiable functions So we use that while training
+5:39
+the parameters of the function However we can use that for other purposes So we
+5:44
+can use that to actually um create
+5:49
+visualizations that give indications about what the network is um um what the
+5:55
+network has learned So one method uh is to generate um an image that maximizes
+6:04
+the score for a certain class So we can formulate this an optimization problem
+6:09
+So we have the score for class C let's say for image I we can actually
+6:18
+uh we can try to find the image that maximizes this score So we can formulate
+6:24
+this as an optimization problem and we can use gradient ascent to maximize this
+6:30
+score Um so at the right hand side we see some juations when this was first
+6:36
+released Uh in 2014 um this was a very big hit Um people
+6:45
+were saying that okay we have deep networks can dream right So they called
+6:50
+this deep dream Um so networks can generate images artificial images that
+6:58
+give indications about what they are um calculating what they are doing Right so
+7:04
+this was a very big um um uh phenomena back then but
+7:10
+nowadays considering what's we can do with deep networks what we can generate with deep networks this
+7:17
+was this is nothing but still this was influential Um another thing we can do
+7:25
+uh using the differentiable nature of deep networks is that we can take the
+7:32
+gradient of a neuron with respect to its input let's say an image and those
+7:38
+gradients would highlight the part of the input which are critical for that neuron for that
+7:45
+output Um any questions from the previous
+7:55
+lecture okay So today we will continue with um the tools that we can use for
+8:03
+visualizing understanding CNN's um and then we will look at well known
+8:12
+u widely used maybe some of them are not widely used anymore but let's say
+8:17
+wellknown CNN architectures okay so another method we
+8:24
+can use to generate great uh for example visualizations of what the network is
+8:30
+paying attention to is called class activation maps Remember uh global average pooling right we discussed
+8:39
+global average pooling as an alternative to fully connected layers in CNN Uh what
+8:45
+we do in global average pooling is we take the channels right produced by a
+8:53
+convolutional layer We sum each channel and for each channel we obtain a single
+9:00
+number We take those numbers and we pass it through a fully connected layers to obtain um the output that we want to
+9:09
+estimate Um and remember when I explained global leverage pooling I said
+9:14
+that um each channel in when you use global leverage
+9:21
+pooling each channel actually specializes in capturing uh one part or maybe the whole part of
+9:29
+an object for an object recognition problem Right in a sense it's it
+9:34
+functions as a each channel gives is a confidence map over pixels or over over
+9:44
+the spatial um space um for for the
+9:49
+object and where it is um in that space So class activation maps uses um
+9:58
+exploits this So we have a CNN right we have the
+10:04
+feature the channels we use global average pooling we sum for example each
+10:10
+number here then we have these weights that um I have explained before so let's
+10:17
+say for this input the network has predicted this class
+10:23
+um what we can do in global average pooling is we take these channels and we
+10:28
+multiply those channels with their respective weights right so remember each channel is reduced to one number
+10:36
+and these numbers each of them is multiplied by a weight So we take these
+10:42
+weights and multiply the channels by the corresponding weight and add them up
+10:51
+Right so W1 times the first channel W2 times the second channel etc So these
+10:57
+are the learned weights right and these are the channels containing a confidence
+11:05
+map for one part of the object or whole whole object depends And if you add them
+11:12
+up you get actually very nice visualization of u what the network is
+11:18
+paying attention to Yeah In this example all different
+11:23
+channels should be like the same for us right or should they Can they be I mean
+11:31
+we hope that different channels specialize in capturing different details So these might be the
+11:39
+level of objects or object parts We don't have a control over
+11:47
+that Is this clear class activation maps are very
+11:54
+popular for visualizing uh CNN architectures activations in CNN architectures So it
+12:02
+is it's widely used Um and this um this first study has
+12:11
+actually um opened the way for such
+12:16
+approaches Maybe ex extending this in different ways One is for example
+12:23
+gratam let me explain this then I will get your question So in grat cam what we do is we take the score for the class
+12:30
+and take it derivative with respect to the channel with respect to each channel
+12:36
+right So here the weights these weights were the weights of the linear
+12:43
+layer right so in grad cam what we do is we replace those weights by um a
+12:51
+summation of the gradients with respect to the channel So to each channel we get
+12:57
+the gradient of the class and for each channel we add those
+13:02
+gradients Then we use those as actually the weights for weighting the channels
+13:09
+when we add them up So if you compare the two approaches
+13:15
+so here we are directly using the weights we have learned and these weights are not input
+13:23
+dependent Right so in a sense we are not doing anything depending on the input
+13:29
+but here with the gradients we are adjusting the contributions of the
+13:35
+channels um with with the gradient you have a question in the
+13:43
+previous examples I don't understand how can we channel how can
+13:49
+they which class of blood does that highest activation
+13:54
+channel and request No it doesn't do any selection It has weights It just
+14:00
+multiplies the channels with the weights Okay But then how does that sum end up
+14:07
+getting it mapped to a class um so let's say for this input this is
+14:16
+the prediction right
+14:21
+yes Oh I don't understand that So this is a CNN This is we have made a prediction
+14:29
+right the network has predicted that class for that
+14:35
+input
+14:46
+Right Any other question is this
+14:57
+clear so we are here we see the benefit of global leverage pooling If you do
+15:04
+this with a CNN that has fully connected layers you
+15:09
+are not going to get such activation maps
+15:16
+So grat cam uh is also popular but the literature has moved beyond these
+15:23
+actually there there has been grad cam++ polycam etc So there are actually many u
+15:30
+methods uh producing such um plus activation maps So this is one library
+15:36
+that includes actually more recent um implementations of implementations of
+15:43
+more recent methods as well So if you if you are interested in this you can check out this
+15:52
+library Okay So we often
+15:57
+um use features um of images or or I'm I'm giving images
+16:06
+as a examples but it doesn't need to be actually an image So for any input we
+16:13
+generally using a CNN we extract its features and then we work with with
+16:20
+those features for several downstream tasks Um in in some of these cases we
+16:29
+might be interested in for example finding what the input is right So we
+16:35
+have the feature um what is the input like so let me
+16:47
+use So what is the input that might have um generated this feature
+17:01
+or we might be interested in um the representational capacity or how well
+17:09
+the features encode the
+17:14
+input So we have um pi of x the feature vector
+17:21
+representing x and you want to find out how well it captures the information in
+17:29
+x So for such purposes
+17:36
+um given the feature vector for
+17:42
+X we can try to generate an
+17:48
+image whose feature vector is similar to
+17:55
+uh uh that image Right so we have this this is
+18:01
+given and we want to generate
+18:07
+uh image I or content in input I such that the features of um both the
+18:16
+generated image and the given feature vector they are the same or
+18:23
+similar So I want to I can formulate this as an optimization problem I'm
+18:29
+trying to generate
+18:36
+um an image I that minimizes this distance between the feature
+18:43
+vector of X and feature vector of the generated image I'm trying to minimize this right
+18:51
+i'm trying to find the image that minimizes this
+19:02
+distance Is this clear since we have a differentiable
+19:07
+function we can do that So we can from any layer from any neuron in the network
+19:14
+we can get gradient to the input and we can use that gradient to generate
+19:20
+content using gradient descent gradient ascent to optimize an objective In this
+19:27
+case we are trying to generate input that matches the features of
+19:34
+another uh image another input So this is given to
+19:42
+us and we are trying to
+19:47
+generate find um an artificial
+19:53
+input that would have a similar feature
+20:00
+vector So here at the right hand side you see
+20:05
+for this input X let's say we have obtained the
+20:12
+features and these are the generated images I1 I2
+20:19
+etc So with different random initial points and with different
+20:26
+um uh hyperparameters they generated these images and when you look at
+20:34
+um the images generated images the general layout is there some of the
+20:41
+details are lost u texture and especially the part um
+20:50
+around the building Right so this part it's very blurry in in in in the
+20:56
+generated images but we see some general
+21:03
+layout So to ensure that the genetic images are visually pleasing we can have
+21:10
+some regulation term here that controls the smoothness of the
+21:17
+generated images that tries to make the images perceptually more
+21:24
+um uh more meaningful So there are many
+21:29
+regulation terms we can use here One is for example we can use Ln norm L1 L2
+21:37
+norm to analyze large pixel values And
+21:43
+another um regulation term we can use ensures that neighboring pixels
+21:52
+are neighboring pixels have similar intensities Right so generally the
+21:58
+images are smooth from one pixel to the next pixel Intensity doesn't change
+22:03
+abruptly So we can enforce that as another regulization term
+22:12
+here Here is another um
+22:17
+example In this example the regularization term is perceptually more
+22:24
+strong with that they are able to generate perceptually more meaningful um
+22:33
+images So these are um the inputs and
+22:38
+these are the reconstructions from the features at different layers of a CNN
+22:48
+So for this input uh from this layer um if you try to
+22:55
+reconstruct the input you see that you can actually reconstruct the input very
+23:02
+well from layer two Yeah
+23:12
+Um so one is so let's say we have the feature we have a feature vector and we
+23:18
+want to find out what it represents So let's say we have lost the input given
+23:24
+the features we want to construct the input or maybe you made some
+23:29
+modifications on on the feature vector and you want to find out what's that it represent Uh the second is we are trying
+23:36
+to understand what the network is trying to do and what level of detail it has
+23:42
+kept and captured at different layers in a CNN
+23:49
+No this is just to understand what the CNN does
+23:59
+Yeah
+24:05
+So let me go back So from an early layer we are able to
+24:14
+reconstruct from the feature vector we are able to reconstruct the input
+24:21
+without much loss of of content If you if you compare
+24:28
+the two there are at um very high frequency textures there
+24:36
+are some differences but otherwise they are almost
+24:42
+identical When you go up in the hierarchy let's say for example this
+24:50
+layer fourth layer you see that the general layout
+24:55
+is preserved but lowlevel details are being
+25:01
+lost like the texture here um and the texture in the background etc
+25:07
+And when you go to the last layer right you see that the layout is
+25:16
+very difficult to see and um uh the low-level details are very
+25:24
+difficult to reconstruct as well
+25:29
+So let's uh think about this with respect to what we discussed before So
+25:36
+we have I have been mentioning that uh if you consider a CNN the especially
+25:45
+the earlier
+25:51
+layers extract very lowle information If if you focus on images these early
+25:58
+layers extract edges texture corner etc
+26:03
+So these are very generic and the first part of the network as we mentioned it's
+26:10
+uh problem independent so they are very generic and the second part is very problem
+26:19
+specific so and I have been mentioning that the information in early
+26:27
+layers um are redundant so If you for example skip
+26:34
+every second pixel or if you keep a stride of two or three
+26:40
+or four over an image or on the second layer actually you won't lose much You
+26:47
+will still be able to recover the input or understand and solve the
+26:55
+problem That is what we see here actually So in the earlier layers
+27:00
+information is redundant and we are able to capture the low-level
+27:05
+details So we are able to reconstruct even the low-level
+27:11
+details But when you go up in the network lowlevel
+27:17
+details are um are lost and we generally have more high level and maybe problem
+27:25
+dependent details preserved in the network
+27:33
+Um with this we conclude uh our discussion about visualizing and
+27:41
+understanding CNN's So here I provide uh two tutorials
+27:47
+which provide more advanced visualizations to better understand what
+27:52
+the CNN is doing I will skip those but if you when you get the slides I strongly recommend you to look at them
+28:01
+uh one final thing I want to talk about um with respect to getting gradients
+28:08
+with respect to the input and generating an image It's about adversarial attacks So
+28:15
+we can actually generate images in an adversarial manner to fool
+28:21
+a network So let's say you have a CNN CNN network It has been trained to recognize let's say this
+28:28
+image as a panda It can confidently recognize that um animal as panda And we
+28:38
+can generate a noise image that's called that R with a very small
+28:45
+magnitude such that when you add this noise image to the original image human
+28:53
+eye is not able to visually distinguish this from the original Right so this is
+29:01
+the original image It is clean and this is a perturbed image
+29:08
+or attacked image Uh and visually we cannot
+29:15
+understand that it has been attacked Um so since
+29:22
+um and with the on the perturbed image the network
+29:27
+mclassifies mispredicts with a really really strong confidence So it
+29:34
+confidently predicts completely um an irrelevant um
+29:41
+class Is this clear so we are able to
+29:49
+generate a perceptually uh there's a very insignificant
+29:57
+um small amount of noise and when you add that to an
+30:03
+image you you are changing the image but humans cannot see that but the network's
+30:10
+predictions are true Yeah How does one go about generating
+30:18
+this image without actually having access to parameters let me explain this and I will I will
+30:24
+counter it So here
+30:30
+um so since we have a differentiable um model differentiable function we can
+30:37
+formulate this as an optim optimization problem So let's say we have the original image we are trying to generate
+30:43
+some noise with small magnitude such that when we add this
+30:51
+uh noise to the original image the loss for a for another class so we can have a
+30:58
+target class in mind or we can have a so this is called targeted attack So we
+31:05
+have a target class in mind that we want the network to predict or we can just
+31:12
+have an unargeted attack in which case as long as the correct class is not
+31:19
+predicted it doesn't matter which class the network predicts
+31:25
+incorrectly So here we see the formulation for the targeted case So we
+31:31
+are trying to generate noise image that predicts um a target that we have in
+31:38
+mind and we can formulate it as an as a minimization problem and using gradient
+31:43
+descent we can solve this So we can start the noise image with some random
+31:51
+values then iteratively
+32:06
+we can uh solve
+32:14
+this and here we have a penization term to make sure that the norm of the noise
+32:22
+um actually is small so that it's not perceptually visible
+32:29
+So this is uh called white box
+32:37
+um approach for generating attacks So in this case we assume that we have access to the
+32:44
+network right since we have access to the network we can back propagate uh we
+32:50
+can take the gradient of the network with respect to the input with that we can generate
+32:56
+uh generate a noise image If we don't have access to the network we call that
+33:04
+blackbox approach So we don't have access to network So we cannot take this
+33:09
+gradient However we can give a lot of inputs and
+33:15
+outputs to the network We can get networks predictions
+33:21
+And one approach for generating blackbox attacks is to train a proxy network that
+33:29
+mimics the predictions of the of the blackbox model that we don't have access
+33:35
+to That proxy networks that proxy network is being
+33:41
+trained and we have access to that we can take its gradients and we can generate images that would fool the
+33:47
+proxy network and we under some conditions that can actually fool
+33:54
+the white box the the blackbox model that we don't have access to
+34:00
+So this is a very serious concern for deep learning not only deep learning
+34:06
+machine learning in general Um and people have shown that this can
+34:13
+be applied to not only images that exist in computers and that
+34:19
+are fed to deep networks in a digital environment These can these attacks can
+34:27
+be actually applied in the physical world to deep networks running on real
+34:35
+machines like autonomous cars So you can generate uh patches of
+34:41
+such uh noise You can print them and stick them
+34:47
+on different surfaces on buildings on traffic signs etc in different environments Then
+34:55
+autonomous cars would mclassify misdetect So they would for
+35:02
+example misdetect a traffic sign They would for example miss a crossing or a
+35:08
+traffic light right and you can easily for example there are very striking
+35:13
+examples So it misses actually that there is a road So you can force the
+35:18
+network to just completely change its estimation about the the environment So
+35:25
+this is this I mean um considering that s these
+35:32
+networks are very susceptible to such targeted um attacks or um I'm
+35:41
+considering that changing some pixels can lead to a completely
+35:48
+different pred prediction by a deep network If you know in considering the
+35:55
+autonomous driving setting again so by
+36:00
+some chance by a you know if the light is coming from a
+36:08
+different angle so there's some noise in the environment etc with slight amount amount of noise your network can
+36:15
+mispredict actually So it's very difficult to trust
+36:21
+um these autonomous
+36:27
+systems Um so this is an open issue in uh deep
+36:34
+learning So how can we make networks how we can design and
+36:39
+train deep networks that are robust to such adversarial
+36:46
+attacks So one naive option is to generate attacks during training So
+36:55
+as an as an engineer when I'm designing the system I can generate as many attacks as
+37:02
+possible right and while trained in the network I can use attacked images to
+37:10
+improve robustness of my network right then when I deploy it in the environment
+37:17
+my network will be robust to such effects however we can always find
+37:24
+another attack that would pull the network
+37:30
+So what happens is that if you if you consider the decision
+37:36
+boundary so let's say we have two classes
+37:43
+class one and class two right so let's say we have a sample
+37:51
+here that is correctly uh predicted to be to belong to class one then attack
+37:59
+Actually what we are trying to do is we are trying to find this
+38:05
+um transformation that would
+38:10
+move this point to the other side of the decision boundary So the smallest
+38:17
+transformation that would move that point to the other side of the decision boundary for the network
+38:25
+You can make your network robust against such some
+38:33
+adversary attacks But in any case there will be a decision boundary And as long
+38:38
+as there's a decision boundary you can always find some perturbation that would make
+38:46
+that network mclassify that input
+38:54
+So if and by training your network on agrical
+38:59
+examples you can make it more robust Yes But you cannot guarantee that it will be robust to any attack
+39:07
+Second while training your network to more robust you lose in terms of
+39:12
+accuracy So there's a trade-off between robustness and accuracy
+39:20
+noise even of very small is very high So just applying
+39:30
+that is another approach So one one approach uh to addressing
+39:39
+adversary attacks is to during training make your network robust to such such
+39:46
+attacks The second approach is to detect whether there is an attack So we have an
+39:54
+input right before feeding that input to the network using either handcrafted
+39:59
+methods or other methods we can try to see whether there's something different
+40:07
+uh in that input right whether that input has been changed or uh uh played
+40:14
+with So that is another approach So this is still as I said an
+40:23
+um open research uh problem Um
+40:29
+um I mean if you take the course on trustworthy and responsible AI there we
+40:36
+will spend some time on this but for the time we can skip that So here is a paper
+40:41
+showing that there's a trade-off between robustness and
+40:46
+accuracy Okay So let me continue with um well known CNN architectures U maybe you
+40:55
+won't use many of these architectures but it's important to look at them to
+41:02
+see different design choices people have explored over the years
+41:08
+Um and I mean the these architectures have
+41:14
+actually paved the way for the state-of-the-art architecture So it's
+41:20
+good to actually be aware about that So Lenet as we discussed before is one
+41:27
+of the first examples um um of an artificial neur network that
+41:34
+uses um restricted connectivity and weight
+41:41
+sharing So that means convolution and pooling are used in um lenet and it is
+41:48
+trained using gradient set Um so let's go over the architecture
+41:56
+So with this I'm hoping that when you see such an architecture you will be
+42:02
+able to read the details and understand the architecture
+42:09
+So our input is 32x 32 It it doesn't have RGB channel So it is it is a
+42:15
+grayscale um image So here uh in the first layer we have
+42:24
+convolution Um the convolution filter is 5x5 right stride is one and padding is
+42:33
+zero uh we can easily place these numbers
+42:38
+into our equation So the input size is 32 size is five padding is uh zero
+42:47
+stride is one With this we can calculate that there are 28 um neurons in along
+42:57
+one dimension in the next layer
+43:02
+Um so there are six channels
+43:10
+here that means there are six filters So in this convolution there are six
+43:16
+filters
+43:22
+used and dimensionalities are 25 by 20 28 by 28 Then we have
+43:30
+subsampling Later on people called this pooling Um in pooling in lenet they use
+43:38
+receptive field size of 2x two and a stride of two So they wanted to reduce
+43:45
+dimensionality by half around half Um and the pooling they use is
+43:54
+average pooling So they take the average of the values in the receptive field and they multiply
+44:02
+the average by two by a parameter um and they add
+44:10
+bias So they have two learnable parameters in pooling and they use sigmoid here as
+44:18
+part of pooling
+44:25
+Um so now nowadays as we have discussed before we just use max
+44:32
+pooling Um so with this remember note that the number of
+44:37
+channels didn't change dimensionality is reduced from 28 to 14 Then this is
+44:43
+followed by convolution Receptive field size 5x5 is one Heading is zero and there are
+44:51
+16 channels That means there are 16 filters
+44:56
+here And dimensionality is reduced to 10 by 10 Um then this is followed by again
+45:05
+pooling again with a receptive field size of 2x two stride of two and we use
+45:13
+average pooling with learnable scaling and shift uh parameters
+45:23
+Then the output of the um pooling is reshaped and they add a few good
+45:31
+connected layers Um and at the end uh in the last layer
+45:37
+they used radial basis
+45:45
+function Remember we talked about uh when we talk about a linear layer
+45:52
+uh we said that this um dot product was calculating the similarity of x with
+45:59
+respect to the weights right so if x um was similar to the weight the learn
+46:07
+weights then we had the highest score otherwise the score was low So
+46:12
+considering that and we are we can calculate this similarity in different ways We can use
+46:19
+distance functions to calculate that similarity and implement that as a as a layer as well So radial basis functions
+46:28
+uh was a common choice uh back then
+46:34
+Yeah Do you know any um I don't I don't remember
+46:41
+Please let us why we choose max
+46:48
+Uh it works better and it doesn't have any learnable parameters So it's very
+46:54
+easy to implement Gradient is also very easy and yeah it works better or
+47:03
+comparably Then the next interesting model is Alex net We talked about Alex
+47:09
+net already at several points so far It is um the 2012 imageet winner The
+47:17
+authors Hinton you know um Ilas they are
+47:23
+famous and here Yan Leuna Benjio they are well
+47:29
+known names as well The others are well known as well but at least you should know and
+47:38
+um so Alexet um is actually deep CNN architecture one
+47:46
+of the deep deepest architectures back then um and it has been applied to a very
+47:53
+challenging problem imageet object recognition providing the state-of-the-art results So they
+48:00
+designed um a CNN architecture with a lot of parameters requiring a lot of memory but
+48:07
+back then they were not able to fit the whole network into a single GPU For that
+48:13
+reason they split the architecture into two into two
+48:20
+branches Each branch is stored in one GPU So this is one GPU the first GPU and
+48:28
+this is the second GPU
+48:33
+Uh right so in a sense for for the same
+48:40
+input we have two branches processing the input through
+48:47
+convolutional layers and these GPUs are processing the
+48:53
+input in parallel
+48:58
+Any questions so far so it's not it is truncated here but
+49:08
+we have the duplicate of the lower branch in the upper branch So let's look at the architecture So this is the input
+49:15
+Our input has size 224 by 224 and we have RGB channels So we have three
+49:23
+channels in the first convolutional layer the receptive field size is 11 by
+49:30
+11 So 11 by 11 and they use a stride of four So there's a huge reduction in the
+49:37
+first layer there's a huge reduction in dimensionality but since information is
+49:44
+redundant in the earlier layers it it worked right If you try to do
+49:51
+convolution with a stride of core in the top of the network you will lose in
+49:57
+terms of performance But in the earlier layers it will it will be
+50:02
+fine So in one GPU we have 48
+50:07
+filters In the second GPU we have 48 filters processing the same input with
+50:14
+the same filter size with the same stride etc But 48 filters in one GPU 48
+50:21
+filters in the other GPU So this is group convolution right so we have two
+50:28
+groups of filters processing the same input but they are on different
+50:36
+GPUs and they use max pooling Um here it
+50:41
+is not drone but they use rectified linear units as far as I remember
+50:47
+I I I we can check now Um and in the next layer they used a small receptive
+50:53
+field size 5x5 and in one
+50:59
+GPU they had 128 filters In the other we
+51:04
+have 128 So in total 256 filters in the second layer
+51:15
+Then we get 192 192 You see that the filter number
+51:22
+of filters is increasing Right dimensionality is
+51:28
+decreasing Width and height are both decreasing but the depth of the
+51:35
+layers uh is increasing
+51:43
+So there are cross connections between
+51:49
+um between the two branches So in order to ensure that the different branches don't
+51:56
+completely represent completely relevant things and they share information so
+52:02
+that both branches can use um uh information jointly
+52:09
+So here convolution applied here is transferred to the the output of
+52:16
+convolution here is transferred to the other uh branch and convolution here is
+52:21
+transferred to here as well Right so they do in a sense cross convolution
+52:28
+between two branches They repeat this for a number
+52:33
+of layers So we have cross connections here Then straightforward convolution
+52:39
+Straightforward convolution and pooling And here we have put connected
+52:47
+layers So these parts are still on different
+52:54
+branches but they we share information between two branches right we have fully
+52:59
+connected layers that at the end we have one fully connected layer So we estimate
+53:05
+1,00 outputs by combining information from uh two
+53:11
+branches So the architecture itself is simple if you are able to place it into
+53:17
+a single GPU But because of the complexity of two GPUs two branches
+53:24
+things are a bit u
+53:30
+different Um okay So this is 60 million
+53:37
+parameters right 60 million So I didn't
+53:42
+write it here but Alex Lennet was less than 1 million as far as I
+53:49
+remember I I have to check So in terms of size this was actually very big back
+53:54
+then A network with 60 million parameters it was large
+54:01
+And they trained this on two GPUs for one week Right so assuming that you have
+54:09
+found the hyperparameters with those hyperparameters you train the network on
+54:15
+two GPUs for one week Uh they used nonlinearity in the
+54:24
+whole network Uh they use normalization The normalization they use is not batch
+54:29
+normalization They used something across channels I explained that in in the
+54:36
+previous lectures Um but it didn't have I mean um it the other normalization
+54:43
+operations performed better So nowadays we are using something else Um and they
+54:49
+use max pooling Um okay they used data augmentation and
+54:57
+they use dropout uh to avoid overfeitting Uh they use stoastic
+55:03
+gradient descent with a large page size relatively large page size um of 128
+55:08
+They use momentum They use weighted case So they used every tool they had available back then to mitigate um um
+55:17
+overfitting um they used uh they initialized the weight with small numbers Uh they used
+55:25
+they also uh decayed the learning rate but they they didn't do it
+55:31
+automatically So they uh did it manually They watched out for the loss values
+55:38
+When the loss was not improving they pressed the button to lower the um to
+55:44
+learning rate
+55:51
+Okay So with um we have already looked at the filters of Alex
+55:58
+Med Um and I have mentioned already that these filters resemble the filters used
+56:05
+in our brain and the filters that we design um and use in signal processing
+56:13
+But one thing that is peculiar is that so these are the filters on one GPU
+56:20
+let's say the first GPU and these are the filters in the second
+56:28
+GPU If you look at the filters learned by different GPUs there is
+56:35
+a qualitatively
+56:41
+um there's some qualitative difference between them Right so in the first what what do you
+56:48
+see the shapes colors right so in the first one
+56:55
+we have filters that are actually more or less color insensitive So they try to
+57:02
+uh detect intensity changes without paying attention to color Whereas in the second
+57:09
+one we have more color selective um filters being learned
+57:16
+So the authors say that they found this peculiar and they to see whether this
+57:22
+was just um for one experiment they repeated this um with a different
+57:28
+initial condition So by initializing the weight again the different numbers and they repeated the experiment um the
+57:36
+order of the filters changed Maybe color sensitivity emerged in the first GPU
+57:42
+instead of the second GPU but otherwise they still they consistently observed
+57:48
+this specialization between um among the filters
+57:55
+So somehow um in the
+58:04
+network through the uh gradients provided here through the initial
+58:10
+conditions and through the gradients provided here the gradients that are received here lead
+58:18
+these groups of filters to focus on different aspects of the problem
+58:26
+So this is um this is very
+58:32
+striking Any questions
+58:46
+yeah Obain all filters we will end up with other sets
+58:53
+from other If you um use group convolution and
+58:59
+maybe use cross connections that are implemented in this fashion you can still
+59:05
+observe this differentiation It's not about but it's not about the GPUs But if
+59:11
+you don't have group convolution and if you just use plain convolution without
+59:17
+any grouping etc then there won't be this separation
+59:25
+Yeah Um okay next we have uh Google
+59:31
+net Um Google net is the 2014 ImageNet um challenge winner um it is from as the
+59:41
+name implies it's from Google It has some interesting novel contributions So
+59:48
+I I want to talk about these uh contributions So by through these
+59:55
+contributions they were able to reduce the um number of parameters from 60
+1:00:01
+million in Alex net to 4 million Right so there's a huge reduction in terms of
+1:00:08
+the number of parameters This would allow us to fit the whole network into
+1:00:13
+one GPU Right that is that is a very strong uh
+1:00:18
+contribution and while doing that they were able to increase uh performance
+1:00:27
+right Um so it is a deep architecture The architectures looks like the architecture look like looks like this
+1:00:34
+So let's talk about these um contributions So there are two main
+1:00:39
+contributions The first one is the uh inception module or the so-called
+1:00:47
+networking network So what does it mean so normally
+1:00:52
+in u a convolutional layer So we have u
+1:00:58
+the input layer and we have the output
+1:01:04
+layer and we have a receptive field by f by f and
+1:01:12
+we do convolution right in vanilla convolution
+1:01:19
+But here in vanilla convolution we are using convolution with a
+1:01:25
+fixed with a single receptive field size f receptive field size is f by f but in
+1:01:33
+many cases in many problems actually information exists at multiple can exist
+1:01:39
+at multiple scales So consider object recognition objects can be small or they
+1:01:44
+can be big in images right if you use a fixed receptive field size at a layer
+1:01:52
+actually you are restricting the type of information you can extract to only a fixed
+1:01:58
+scale So scale processing information at multiple scales is a is a challenge in
+1:02:05
+computer vision and in different domains
+1:02:11
+Um so one solution to this proposed in 2013
+1:02:16
+uh by Linal is to actually use multiple convolutions with different filter
+1:02:25
+sizes in parallel on the same input
+1:02:30
+layer Instead of using a single fixed filter size why don't we use multiple
+1:02:39
+filter sizes filters with different sizes right so in a sense we have
+1:02:45
+multiscale processing in a single convolutional So this is this sounds
+1:02:51
+very elegant right so we have one by one convolution which doesn't do any special
+1:02:58
+processing but it performs processing along the channels We have 3x3 convolution 5x5 convolution and max
+1:03:06
+pooling So through these information is processed at different scales and in
+1:03:12
+different ways and the results are concatenated along the channel
+1:03:19
+dimension to ensure that the channels outputs can be concatenated We can use
+1:03:25
+zero paddings etc to ensure that the channel dimensions are the same That is
+1:03:32
+possible and we concatordinate them Right is this
+1:03:40
+clear okay So this is interesting and it is
+1:03:46
+promising But if you look at the dimensionality so if there are C many channels in the previous layer in the
+1:03:54
+input layer remember true pooling we don't change dimensionality So through pooling
+1:04:00
+we should have C many channels coming in
+1:04:05
+right pooling doesn't change dimensionality the number of
+1:04:12
+channels and through these we would have C1 many channels C2
+1:04:17
+many channels C3 many channels when you concatenate them here you would have C
+1:04:23
+plus C1 plus C2 plus C3 many channels
+1:04:35
+That means if you use such an inception module the number of
+1:04:40
+channels in the network
+1:04:45
+increases And since the number of filters we will have here it's not going
+1:04:51
+to be less compared to C Actually it will be comparable in terms of number of
+1:04:58
+channels Then quickly in the network when you go up in the network the number of channels
+1:05:05
+explodes So this is a promising approach This is a promising uh uh methods but we
+1:05:13
+have a scalability problem The solution proposed in Google Net is
+1:05:23
+to use one by one convolution before these
+1:05:30
+um convolutions to reduce number of channels So remember with one by one
+1:05:36
+convolution we are not doing any special processing We are just working along the
+1:05:42
+channel dimension With one by one convolution we can reduce the number of
+1:05:49
+channels as as as much as we like And here we are adding one by one
+1:05:57
+convolution after pooling Right and through these we can actually reduce and
+1:06:04
+control the number of channels through each block And with this we can ensure that if the
+1:06:12
+input layer has C channels the output layer after concatenation has C many
+1:06:20
+channels as well Is this
+1:06:30
+clear any questions okay So this is the first
+1:06:37
+contribution of Google next So the inception module the extended inception
+1:06:43
+module which is scalable you know the number of channels when you go up in the
+1:06:50
+layer is controllable So the number of channels can stay the same in the
+1:06:55
+inception module Okay So the
+1:07:03
+second contribution is that
+1:07:10
+normally we would um have fully connected layers and we would have
+1:07:15
+predictions in at the top of the network So this is the input coming in So we
+1:07:21
+have the layers You see we have many inception modules here These are all
+1:07:28
+inception modules stacked on top of each other
+1:07:33
+Right then at the end we have fully connected layers to estimate the
+1:07:40
+outputs and we provide our loss and we provide the gradient uh and we back
+1:07:46
+propagate through the whole network In Google net they tried
+1:07:52
+something very different So they tried adding fully connected
+1:08:00
+layers into the intermediate layers of the network Not only from the
+1:08:07
+top of the network in while predicting the output and providing loss here at the
+1:08:16
+same time they make predictions from the intermediate stages They get outputs
+1:08:25
+They are they are trying to predict the same classes the same output We calculate the loss and we back
+1:08:33
+propagate Output we calculate the loss we back propagate
+1:08:41
+So for the same input we are trying to predict the same outputs from different
+1:08:46
+parts of the network and we are calculating three three different copies
+1:08:52
+of the loss protropy loss calculated let's say
+1:08:59
+at this part at this part and at this part we can back
+1:09:04
+propagate through the whole network and we update the
+1:09:11
+Is this clear
+1:09:21
+the first layers receive gradients from three different loss functions right
+1:09:27
+whereas the top layers receive only the gradient from the top loss top predictions
+1:09:36
+So why do you think uh do you think that they wanted to have such an approach
+1:10:06
+diminishing gradients
+1:10:12
+Okay But they use
+1:10:29
+Okay Any any other comment here
+1:10:42
+lower level and
+1:10:57
+later some of them are large Mhm
+1:11:13
+I'm not sure Yeah So let me rephrase what the trend
+1:11:20
+suggested So if you remember our discussion regarding the difference between
+1:11:26
+uh the different layers in a deep network the earlier layers being more uh
+1:11:33
+specialized in exacting low-level details and later
+1:11:39
+layers um later layers being more specialized on exacting more high level
+1:11:46
+information then it might be Adding
+1:11:52
+these additional um predictions to the intermediate stage
+1:11:57
+of the network can be helpful in capturing both low-level details and
+1:12:03
+maybe uh better for recognizing small objects as
+1:12:10
+well as large objects There was another
+1:12:16
+Yeah the same thing
+1:12:24
+Any other questions
+1:12:42
+um we don't see that here but there are other architectures maybe taking
+1:12:49
+inspiration from this that um try to predict um the
+1:12:56
+output from every layer um we call them early exit networks If
+1:13:05
+the prediction at an intermediate stage is confident enough we don't proceed
+1:13:10
+with the following names So that that is that is
+1:13:16
+possible Um so here both answers um
+1:13:23
+are I think relevant and sensible So one benefit of adding
+1:13:32
+um such prediction branches in the into the intermediate stage of the network
+1:13:39
+would allow the gradient to be uh better for the earlier layers So this
+1:13:47
+is a this is significantly deeper than Alex net right So even if you use
+1:13:55
+rectified linear units we don't have I mean it it is not
+1:14:00
+a squashing activation function but still if you consider the chain rule and propagating
+1:14:09
+the gradient through the whole network to the earlier layers we have a lot of matrix multiplications
+1:14:16
+uh for the gradient to reach the earlier layers right so If the gradient is
+1:14:25
+um if the prediction error is small but there is an error you
+1:14:31
+calculate the loss the gradient is small if you try to propagate that to the earlier layers actually you won't have
+1:14:39
+any useful gradients for the earlier layers So adding these intermediate predictions
+1:14:47
+can address that through these branches we can get actually strong
+1:14:53
+gradients to the earlier parts And another benefit of these
+1:14:59
+predictions might be that through these for example we can
+1:15:06
+uh recognize objects with low-level details and maybe small scale objects
+1:15:13
+etc And with with these we can maybe recognize large scale objects where
+1:15:19
+maybe uh details are not very important
+1:15:25
+So these are the three important contributions of Google net Um inception
+1:15:30
+module which has been improved improved by one by one
+1:15:36
+convolution The second one is actually these intermediate
+1:15:44
+predictions Um they use linear unit max pooling Um at the end of the network
+1:15:51
+they use average pooling Maybe this is one of the um important factors for reduced number
+1:15:57
+of parameters The gap in performance was very negligible They used dropout they
+1:16:04
+augmentation They they trained on CPUs not GPUs I think they have they had a
+1:16:11
+very big cluster of CPUs in Google Maybe they didn't have access to
+1:16:18
+GPUs I don't know Um they use SGD with momentum They used
+1:16:24
+um they decayed learning rate Um and while training developing
+1:16:31
+the model they used a method a very ad hoc method
+1:16:38
+that could not be reproduced So they trained the model then they took that and combined this
+1:16:45
+with continued training that some other parameters etc etc Um and it was so
+1:16:54
+complex complicated and not not well documented that no one could reproduce
+1:16:59
+their results Right this is one of the reasons for Google Net being not widely used
+1:17:09
+Although it was the winner in 2014 for the challenge it was not um widely used
+1:17:17
+because it could not be reproduced And the second
+1:17:22
+challenge the second problem with Google Net is that the representations learned by
+1:17:30
+um Google Net were not generic So they were very problem dependent Remember our
+1:17:38
+discussions the the first half of the network was learning generic problem
+1:17:44
+independent representations and the second half were more uh problem
+1:17:50
+specific right but by providing gradients through these
+1:17:57
+parts actually Google net was very problem specific It was very well tuned
+1:18:04
+to recognizing objects in image net and the features even the low-level features
+1:18:11
+in the earlier layers they were very much image net
+1:18:17
+dependent and if you take Google net and try to apply that use that fine-tune
+1:18:24
+that for a different um visual classification problem visual
+1:18:29
+recognition problem it didn't work um as well as other
+1:18:35
+architectures Yes it sounds promising to add these intermediate predictions but
+1:18:40
+you lose in terms of generalization Because of these two
+1:18:46
+reasons Google Net was not widely used and instead the
+1:18:53
+second uh place um holder in that year in that
+1:18:59
+ch in that um challenge um is more commonly used because it
+1:19:06
+could be reproduced and the features it learned were very generate and
+1:19:12
+generalizable to different problems Uh it's called VGET It is um from Oxford
+1:19:21
+the VG group in Oxford It doesn't have any interesting
+1:19:28
+uh contributions So it is just vanilla CNN without any anything
+1:19:36
+fancy Um and there are different versions with different number of
+1:19:42
+layers right we just have one convolution uh rel pooling etc stacked
+1:19:49
+on top of each other and at the end we just have plain to the connected
+1:19:54
+layers compared to Google net there's there's nothing interesting
+1:20:00
+um but I mean this visionet could be
+1:20:07
+reproduced the weights were publicly open and the features learned by BGNet
+1:20:15
+were penalizable because of that BGNet was widely used It was very
+1:20:23
+popular Um and Google net although it had really interesting properties it it
+1:20:29
+was not um widely used Let me talk about RestNet
+1:20:37
+Um RestNet is a very well-known u CNN architecture It is still widely
+1:20:45
+used It was the imageet um object recognition challenge winner in 2015
+1:20:53
+um in restnet
+1:20:59
+they they realized that if you if you increase the depth of the network the
+1:21:04
+depth of a CNN architecture after a while performance doesn't
+1:21:09
+improve it doesn't only improve or it doesn't uh get better it actually
+1:21:16
+becomes even worse right after a certain number of layers so remember remember up
+1:21:21
+to now We have been suggesting that we can reduce the the filter size and
+1:21:27
+increase the number of layers in a CNN to get better performance But after a
+1:21:32
+while that we don't see improvement in
+1:21:37
+performance So here we see the training error for a 56 layer CNN and a 20 layer
+1:21:46
+CNN Right so this is um on the left we have training performance You see
+1:21:52
+that a 56 layer CNN is supposed to be better
+1:21:59
+right but that is not the case So it's has actually more
+1:22:05
+error That is also observed in the in the test set as well So a 56 layer uh
+1:22:12
+CNN performs worse than a 20 layer CNN Yeah
+1:22:19
+but the six layer CNN has more effect
+1:22:28
+I was going to say the same thing Why don't we just keep adding more data and more time
+1:22:34
+um but if you'll compare the performance um training performance and uh test
+1:22:41
+performance for 56 CNN there's no significant gap So there's no sign of
+1:22:54
+memorization So the paper argues that this is not this doesn't seem to be
+1:23:03
+uh owing to all fittings and we don't use squashing activation function So
+1:23:10
+this may not be a property of the nonlinearity either
+1:23:16
+Um but still we see this problem and the main reason appears to be that when you
+1:23:23
+go deeper even if you use rectified linear units when you multiply all those
+1:23:30
+gradients through all of these layers you don't get useful gradients to the earlier parts of the network
+1:23:39
+Um so the the solution in restn net is to add these skip
+1:23:48
+connections So after one or two convolutional layers you can have
+1:23:56
+the skip connection and through the skip connection you in a sense have the
+1:24:04
+identity functioning So considering that here through these convolutional layers
+1:24:11
+we are actually representing a function of X
+1:24:16
+right right and here through the skip skip connection we have the identity
+1:24:21
+function and when you concatenate them or so when you add
+1:24:27
+them you have a function of f and the function of x and the x itself
+1:24:36
+being represented by this residual um
+1:24:42
+block So in a sense in forward pass we have a function of the input as
+1:24:49
+well as the identity being propagated um
+1:24:54
+and for for the prediction problem and it might be that for many
+1:24:59
+problems the input itself might be important for making predictions some
+1:25:05
+some details in the input might be useful for making the prediction The identity function makes sure that those
+1:25:15
+the input is propagated to the output so that we can make prediction um from from
+1:25:22
+by using the input as well So here we see VG19 you see that it is a
+1:25:29
+plain CNN architecture and if you increase the
+1:25:35
+depth of such a plane architecture to 34 it is it is it would look like this and
+1:25:41
+with residual connections we would have um such um connections and through these
+1:25:48
+connections we are representing the identity function in the network as well but we are adding bias to the network to
+1:25:57
+represent such that by definition it represents the identity
+1:26:02
+mapping as part of the solution The benefit of this in backward pass is
+1:26:12
+that through this backward pass the gradient will
+1:26:21
+flow without any vanishing problem So gradient will flow through two paths
+1:26:28
+through the function as well as through the identity branch or the residual branch and therefore in backward pass
+1:26:36
+gradient we will have useful gradient to the earlier layers as
+1:26:43
+well Uh let me quickly uh finish this part then we can stop So with this we
+1:26:50
+are able to now train deeper networks Um
+1:26:55
+so here you see for example a 110 layer CNN
+1:27:02
+providing better performance than um a 20 layer CNN So as now with residue
+1:27:08
+connections as expected if you go deeper you get better performance
+1:27:15
+There are many studies explaining why residual connections help So this is for
+1:27:22
+example um one paper showing that if you add real connections if you add if you
+1:27:30
+integrate identity transformation mapping in as part of the network such a
+1:27:37
+complex loss function actually transforms into a smoother uh loss
+1:27:43
+function which becomes actually easier to optimize Why that is the case we don't have a
+1:27:50
+good understanding There are several hypothesis but there is no theorem
+1:27:56
+showing this We can another study showed that we can view actually
+1:28:03
+um residual network as an ensemble of multiple sub networks Right if you just
+1:28:10
+consider this part right so we have f_sub_1 with residue connection f_sub_2
+1:28:16
+with residue connection f_sub_3 with residue connection If you consider the
+1:28:21
+different parts information would flow from um the starting point to the end
+1:28:29
+point So information can actually just follow the skip connections So in a
+1:28:34
+sense we have a direct path or information can go through F_sub_1 then
+1:28:40
+follow the skip connections right F1 and skip connections right so there are
+1:28:46
+different paths that we can think of
+1:28:51
+um about how the information is propagated through these skip connections so in a sense the same
+1:28:58
+information is simultaneously processed by these
+1:29:03
+different pads Right in a sense we have an ensemble of
+1:29:08
+different modules processing the same information at the same
+1:29:13
+time This is a really strong
+1:29:20
+benefit Okay any questions [Music]
+1:29:28
+okay we can continue next lecture

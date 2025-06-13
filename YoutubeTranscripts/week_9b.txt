@@ -1,0 +1,1514 @@
+
+Transcript
+0:02
+okay Uh good morning again So let's start um with a quick overview of the
+0:10
+previous lecture So we in the previous lecture we uh discussed the limitations
+0:17
+of multiple perceptrons and with those discussions
+0:22
+we motivated by the need um a different type architecture You mentioned that
+0:28
+dimensionality is an issue for alter perceptrons If you want to work with um
+0:34
+realistic problems where the input size is really large then actually you would
+0:39
+end up with a lot of parameters a large multipetron and this means more memory
+0:48
+more computation complexity and more data to train um such a network
+0:55
+Um then we talked about two types of variances or invariances we will be
+1:01
+interested in obtaining uh for certain problems So we talked about equarian for
+1:09
+example image segmentation is a good example for that So if the input is translated let's say um then we want the
+1:17
+output to be translated by the same amount Um and we mentioned that multiple
+1:23
+perceptrons don't provide this um invariance and we will we uh talked
+1:30
+about invariance So if you translate let's say um an image you want still the
+1:37
+output to be the same and um a multipetron unfortunately doesn't
+1:44
+provide that We talked about some findings from neuroscience uh which um highlighted
+1:52
+that which indicated that neurons in our brain actually in biological neurons
+1:59
+they have basic connectivity They look at only a small portion of the input
+2:06
+space And this gave inspiration to um artificial neural network models
+2:12
+where artificial neurons have um restricted connectivity They look at
+2:18
+only a certain number of neurons in their input layers We call that
+2:23
+receptive field um then one of the first um artificial
+2:30
+neural networks which uses graded descent to train a network with
+2:35
+restricted connectivity is convolutional neural networks With that motivation we
+2:44
+uh con contrasted um CNN's and multi-reetrons in terms of
+2:49
+the issues we discussed with regards to multi-reetrons we set that dimensional
+2:55
+problem is resolved because we are sharing parameters and we are receiving
+3:01
+connectivity Um so here in such a layer we need 25
+3:07
+parameters but here we just need three parameters So there's a huge reduction
+3:13
+in the number of parameters and if you increase the dimensionality of the input layer in a
+3:19
+multi perception the number of parameters is going to increase whereas in a CNN the parameters are going to be
+3:25
+same because we are sharing the parameters
+3:31
+Um this means less memory less parameters less uh data required for
+3:37
+training such an architecture Um and less multiplications and sharing parameters
+3:44
+across receptive fields provides us certain equances to translation For
+3:51
+example if the input is translated since the receptive fields have the same parameters actually the activations are
+3:58
+going to shift as well Um we can view this um operation as
+4:07
+actually um or
+4:15
+convolution Um in convolution we have a filter we
+4:20
+have a kernel we slide that over the input layer right so essentially by
+4:26
+using a convolutional layer with restricted connectivity and shared parameters we are effective
+4:33
+effectively doing the same in a CNN um architecture we have
+4:41
+convolution we have nonity we have pooling we will we will talk about pooling later on we combine them in
+4:47
+different ways and generally at the top we have fully connected layers We will
+4:52
+discuss the architecture in more detail So we have more
+5:00
+flexibility the operations and their ordering in a CNN So in a multiplayer
+5:06
+perceptron we just have fully connected layer and nar and maybe normalization
+5:12
+In SNN we have convolution pooling uh in addition to you know nonlinearity
+5:18
+and normalization fully connected layers etc So the last thing we talked about in
+5:25
+the previous lecture was the placement of filters
+5:30
+um and how convolution is performed in a in a CNN So we said that if we have a
+5:39
+filter uh 2D filter with size f by
+5:45
+f that means we are positioning we start uh our operation like this
+5:53
+effectively So we have an f by f filter There's a third dimension which is not
+6:00
+specified um when we are talking about size of the filter So there's a there's an implicit
+6:06
+channel dimension So if the input has c many channels
+6:12
+uh then actually our filter needs to span all of the channels Um so we multiply the
+6:19
+corresponding entries then we have a result then we write that here then we
+6:25
+slide uh the filter effectively we switch to the next receptive field with
+6:31
+the same parameters and we multiply the corresponding entries then we get the next value etc So with just one uh
+6:39
+filter we get one activation map like
+6:44
+this Um it is a 2D activation map for a 2D signal for a 2D input Um in general
+6:53
+we said that one filter is not sufficient So we will need many such filters with the same shape with the
+7:00
+same size but with different parameters So on the same input we will have different
+7:06
+filters applied um and learned to extract different
+7:11
+types of information So we will when we draw a
+7:18
+layer um in a in a CNN we will generally use such 3D volumes So they will have
+7:25
+height uh width and a channel dimension
+7:32
+So on this input um we have filters by F
+7:38
+by F and C1 as the channel dimension So in the next volume if there are C2 many
+7:45
+channels that means we need to apply C2 many
+7:51
+filters So each filter produces one channel in the output
+7:57
+layer Um and often we talk about uh we use the term depth of a layer
+8:06
+to to specify the number of channels So width height and
+8:13
+depth Is this clear any
+8:20
+questions okay So today we will continue convolution Um we have a few more things to discuss
+8:28
+about the placement of the receptive fields Um then we will talk about
+8:35
+different types of convolution we can use in CNN So we have seen only the
+8:41
+basic form of convolution a convolutional layer We have different ways to actually restrict connectivity
+8:48
+and share parameters in a layer Yeah So in um fully
+8:57
+connected you could arbitally set the size of the intermediate layers here Is
+9:02
+that really so or does that depend on the size of the first layer and like the
+9:09
+size of the filter the size of the filter and we will introduce one parameter to control the bit and height
+9:14
+as well Yeah
+9:20
+Okay So that critical parameter is called the stride So let's consider that our input is here
+9:30
+right and we have two options when we are placing the receptive fields One
+9:35
+option is so this is the first receptive field Uh the parameters are shown here 1
+9:43
+0 minus one So one 0 minus one We multiply the effective field with this
+9:50
+weight We obtain minus2 Then the second receptive field So we are in a sense we
+9:56
+are sliding the filter The second receptive field is place just next to the first one So we
+10:04
+slide receptive field by one neuron Right then we multiply
+10:12
+uh this with one this with zero this with minus one
+10:17
+So we call this stride how much we slide the next
+10:22
+receptive field So here stride is one but we can actually slide and skip more
+10:32
+neurons So as shown here we can skip two neurons between receptive field So this
+10:38
+is the first receptive field So 1 0 minus one we multiply the corresponding
+10:43
+entries and this is the second deceptive field right 1 0 minus one we multiply
+10:50
+corresponding entries etc and this is the third one so here we slide two
+10:57
+neurons we skip two neurons and we we say that stride in
+11:03
+this case is true does it make
+11:08
+sense okay so stride is an important um
+11:17
+hyperparameter because as we will see it actually controls how much we reduce
+11:24
+dimensionality in a convolutional layer and but we need to be careful with
+11:31
+stride we shouldn't skip too much because otherwise we might be skipping
+11:37
+useful important information right So here stride is one We are actually
+11:46
+making use of every possible receptive field with size three But here we are
+11:52
+skipping some potential receptive field So we are skipping for example this one here Maybe looking at these uh
+12:00
+values in one receptive receptive field might have been useful for learning some
+12:06
+pattern but we are skipping that chance we are skipping that
+12:12
+opportunity in some layers This might be fine We will discuss later on that in
+12:19
+the input layer when you are working with images The input layer or layers
+12:25
+are actually possible for um using a large strike because information is
+12:31
+redundant at the level of pixels at the earlier layers If you skip every second
+12:37
+pixel it is still going to be fine to be able to recognize let's say an object So
+12:43
+we can skip actually a lot of information in the first layers But at the top of the network every information
+12:49
+is going to be very precise and we will want to keep the stride value to very
+12:55
+small values At the at the in the first layers we can have a large stride reduce
+13:02
+dimensionality and at the top of the network we try to keep the stride value
+13:08
+small We will discuss these design choices later on Again another important
+13:14
+hyper parameter is the number of channels So how many filters we apply on
+13:21
+uh on the on on on that layer So we discussed that already And another
+13:26
+design choice important hyperparameter is handling
+13:31
+boundaries Right if we don't do anything and we just place the receptive fields
+13:40
+naively across layers dimensionality will
+13:45
+decrease If we want the dimensionality to stay the
+13:50
+same through consecutive layers we need to do something
+13:55
+What we do is we add zeros to both sides generally in a
+14:02
+symmetrical fashion So if you add two zeros to the left you add two zeros to the other end of the input layer So we
+14:10
+call that padding So we generally use zero padding to ensure that
+14:16
+dimensionality doesn't decrease
+14:21
+Um and in in some cases I I will I will talk about that now Okay Is this
+14:30
+clear in my previous question boundaries yeah
+14:38
+always use zero padding or just try to learn the padding No actually you can
+14:45
+keep it learnable but in general that is not I I have not seen that in practice
+14:53
+Yeah
+15:01
+Yeah Okay So we have introduced some parameters
+15:06
+So this is the size of the input Just consider one dimensional
+15:11
+input But if you have two dimensional input I mean the same calculation is applied to each
+15:19
+dimension This is the side of the input layer This is the receptive field
+15:24
+size Again we are not concerned with the number of channels Here we have stride
+15:30
+and we have padding the size of the next layer So if you apply this convolution
+15:38
+what will be the dimensionality of the next layer so we can calculate that actually So this is W - F + 2 * padding
+15:47
+Padding is symmetrically applied That's why we are multiplying by two and we
+15:53
+divide this by the stride So stride can actually significantly
+16:00
+reduce dimensionality in a divisive manner and we add one to
+16:06
+that So here let's look at this one So size of the
+16:12
+input 1 2 3 4 5 size is
+16:18
+three We have zero padding Padding dimensionality is one
+16:26
+stride is one in this case and plus one So this is 2 4ide by
+16:36
+one and this is five So we can calculate how many neurons there will be in the
+16:42
+next layer In a fully connected layer that is very easy but in a convolutional
+16:48
+layer you need to calculate that And uh for the right hand
+16:57
+side again input layer has dimensional to five Uh filter size is three Heading
+17:05
+is one and str is two and we add one to
+17:12
+that So two + 2 4 / two it's two and
+17:18
+this is three So there will be three neurons in the output layer of that
+17:23
+convolution operation
+17:29
+So we need to be careful when we are placing the u receptive fields and we
+17:37
+are choosing when we are choosing filter size padding and stride because this
+17:42
+needs to be an integer right because this is going to
+17:49
+be the number of neurons in the next layer If this is not an integer that means your placement of the receptive
+17:56
+field over the input layer does not overlap with the input layer So somehow
+18:03
+one receptive field let's say uh does not is not able to cover some of
+18:09
+the neurons So we should adjust filter size
+18:14
+padding and stride such that this is an integer and that means we can properly
+18:22
+place the receptive fields over the input
+18:28
+layer So if um this is not an integer you can play
+18:34
+with um padding You can add padding you can reduce padding right you can can
+18:40
+change stride and this way actually you can control placement of the
+18:49
+filters Okay So here is a real example from
+18:55
+alexnet We will talk about Alex net several times um during these weeks It
+19:03
+is a well-known CNN architecture actually it is one of the
+19:09
+um models that led to the burst of deep
+19:16
+learning Let's look at the first convolutional layer So input size is 227
+19:24
+227 by 227 by3 RGB channels So in the
+19:29
+first layer receptive field size is 11 This is large We will look at alternative
+19:36
+architectures uh comparatively compared to those 11 by
+19:42
+11 it is actually large Um so we are just looking at at
+19:48
+the parameters along one axis in the other direction in the other axis we use the same stride is four it
+19:58
+is it is a large stride remember we are dividing this quantity by s we are reducing
+20:06
+dimensionality by a factor of four that is a huge
+20:11
+reduction and padding is zero right So if you put in the values dimensionality
+20:18
+filter size padding is zero and s is four you end up with a value of 55 So it
+20:26
+means in Alex net input dimensions are like this we have RGB
+20:37
+channels and in the next layer
+20:43
+Okay So we have 55 and 55 So the dimensions of the of
+20:50
+one of the channels is 55 by 55 What is the third dimension the number of channels It
+20:57
+depends on the number of uh filters and later on we will see that there are 96
+21:03
+filters So this is 96 So there are 96 such filters used by
+21:12
+Alexet So if you are designing a CNN
+21:17
+architecture from scratch for a similar problem you should look at existing
+21:22
+architectures like AlexNet and their design choices can give you inspiration
+21:29
+So instead of starting from something scratch which is very time consuming
+21:34
+because you need to try different filter sizes different padding different stride different number of channels etc We have
+21:41
+a lot of hyperparameters to tune in a CNN Tuning all of them from
+21:48
+scratch together with other hyperparameters It is very time
+21:54
+consuming So what we are going to do in general is either we will take these
+21:59
+architectures and use them adapt them to our problem or if you really need to
+22:05
+train start something from scratch you can use similar
+22:16
+hyperparameters Okay
+22:21
+Um and these are the filters learned by Alex net in the first
+22:28
+layer Right so the filter size is 11 uh by
+22:36
+11 right and it is um the channel
+22:43
+dimension So we have 96 of those So we have 96 filters with
+22:51
+shape 11 by 11 by3 where we can draw them right So we can draw them as images
+22:58
+and this is how those uh filters look like If you visualize
+23:04
+them you see that um I mean filters look really um really
+23:15
+uh how to say noisefree U generally when you train something like this the
+23:21
+filters have a lot of white noise etc So this is these are really looking well
+23:27
+and we see that many of the filters are selective
+23:34
+to contrast change at certain orientations So this is sensitive to
+23:41
+contrast change along this direction This is sensitive contrast change along this direction This is along this
+23:48
+direction This is along this direction etc What's more their
+23:56
+scale is different So this is sensitive to edges or intensity changes that are
+24:07
+um observed at a higher um spatial resolution Whereas we have for example
+24:15
+uh these ones or maybe these ones that are sensitive to contrast changes that
+24:23
+occur in a in a small number of pixels in a small
+24:28
+neighborhood Moreover we have neurons that are or filters that are selective
+24:34
+to uh color changes Right so these are sensitive to
+24:40
+brightness changes So these are and these are sensitive to certain color changes So we have color selective
+24:47
+filters and intensity selective brightness selective
+24:55
+filters and we learn all of that from from the data So we used to design these
+25:00
+filters actually ourselves from scratch and actually they looked like
+25:06
+this So we call later on I will talk about that and these are actually
+25:11
+similar to so-called coore
+25:16
+filters So the filters that we normally design for processing images for
+25:23
+extracting edges texture etc from images
+25:28
+Actually we can learn what we learn from data they they resemble those
+25:38
+I don't see why
+25:48
+we thought 55 ohm was meant to be the size of the entire but it's not I see
+25:55
+The second layer um like contains RGB
+26:03
+um three layers for width as well right so so three three dimensional secondary
+26:10
+layer is so for each filter we have three more
+26:15
+So this is the input layer uh it is
+26:21
+227 227 by3 So when you apply a filter on this 11 by 11 there is the channel
+26:31
+dimension hidden channel dimension then for one filter you obtain such a channel
+26:40
+uh activation map with dimension of 55 by 55 or just one filter Um the width of
+26:47
+this is one for one filter Yes Since there are 96 filters we have 96 of
+26:55
+those
+27:02
+Make sure the 11 by
+27:07
+11 and just combine them into one
+27:12
+Yeah So if you just look at this part let me change
+27:18
+color So this is the place placement of one filter one receptive fields So in
+27:26
+the filter we have uh 11 11 * 3
+27:35
+uh parameters So 11 * 11 * 3 parameters
+27:40
+So we multiply the corresponding entries we input there We write that here Then we slide it Then we multiply
+27:48
+the corresponding entries and we write it here So we slide the picture and the
+27:55
+values are written here in one channel
+28:00
+Different values obtain from the different color channels are combined
+28:06
+to I question Can you go next slide
+28:12
+are all those filters just 11 by 11 yeah more
+28:17
+I think they are a bit stretch more but they are 11 They have more resolution
+28:24
+Maybe they use interpolation to make it visually more pleasing but otherwise
+28:29
+it's 11 by 11 So here it says that So
+28:38
+each shown here is size 11 by 11 by
+28:45
+3 Any other um
+28:53
+question okay So um when we are designing um a convolutional layer and
+28:59
+CNN we will have different as I said we will have different design choices and later on I will discuss this again
+29:07
+So we have I have already mentioned that if you use large receptive field size we
+29:14
+are reducing dimensionality Um so we are generally
+29:20
+going to try to reduce dimensionality slowly such that at the end of the network dimensionality is going to be
+29:26
+small and from that representation from that uh layer we can make
+29:31
+predictions Um so one option is that we can keep um
+29:38
+the receptive field size small like for example 3x3
+29:44
+um or we can have a large receptive field size relatively larger
+29:50
+u so if you contrast one convolutional layer with large receptive field size to
+29:58
+smaller receptive field with more convolutional layers
+30:06
+Um in the first case actually number of parameters um is going to be less compared to the
+30:13
+number of parameters that you would have from a single commotion layer with larger receptive field size So from here
+30:22
+from a large receptive field with a single commotion layer you would have 49
+30:28
+C square parameters whereas here small receptive field size but more
+30:34
+layers you would have less parameters and the bonus is that since
+30:40
+you have more layers you have more nonlinearity in your network
+30:45
+So you are adding the capacity to network for more
+30:51
+nonlinearity in the in the smaller septic field this case and if you have
+30:58
+larger receptive field size but less uh layers you have less nonlinearity and
+31:04
+more parameters So in general we are going to prefer keeping the set field size small
+31:12
+but increasing the depth So later on after talking about all of the
+31:17
+operations in a CNN I will talk about a study which in a controlled manner
+31:24
+compares different design choices That paper that study will also highlight
+31:29
+keeping the uh receptive field size small and increasing the depth of a
+31:38
+CNN Okay So if we were to implement convolution ourselves from
+31:46
+scratch in numpy this is how it would look like Let's say our input X has a
+31:53
+shape 11 by 11 by 4 It's a two-dimensional input So four is the
+31:58
+channel dimension The first two are the independent variables X and Y let's say
+32:07
+And in numpy we can use this notation to access the uh the information in a
+32:16
+certain channel So let's say channel D Um and if you want
+32:24
+to access all of the information in all of the channels at a certain position we
+32:30
+can use this notation uh in numpy uh and let's say our filter
+32:36
+size is five padding is zero stride is two With that we can easily calculate
+32:41
+number of values in the next uh layer It's going to be four With this we can calculate uh and allocate space for an
+32:50
+output data structure It's going to be 4x4 and how many channels there will be
+32:56
+it's up to us If we look at the type of computation
+33:03
+we need to do for one of the channels for one of the
+33:08
+filters So our filter size is 5 by five
+33:14
+right and there is the hidden channel dimension So it is
+33:20
+four 5x 5 by
+33:27
+4 Right so there are 25 times for 100
+33:32
+parameters in the filter and there is also the
+33:38
+bias So calculation for one receptive field
+33:44
+So we place the kernel at the top left Uh so if this is the input
+33:51
+layer our input is dimensionality 11 by 11 by
+34:01
+4 So we are just looking at the calculation for this position So this is
+34:06
+5x5 We place the kernel here Right so for this position of the kernel this is
+34:15
+what we do So we get the entries from 0 to 5 0 to 5
+34:21
+So it is this part XY and we get all of the channels of the input We multiply
+34:29
+that with the filter Our filter is a matrix Right so we do element wise
+34:37
+multiplication and we add the bias
+34:43
+Then we slide the filter Our stride is
+34:48
+two So we skip two neurons So this time we start from two
+34:55
+We spend from two to seven Yaxis is still from 0 to 5 We get all of the
+35:01
+channels We do element by multiplication We add the binds
+35:07
+Yeah So here the bias is always the same Yeah The same So we are sharing the bias
+35:13
+as well for one picture So bias belongs to Yeah
+35:25
+Yeah Is this clear okay So as you
+35:33
+see I'm compared to a multi perceptron
+35:38
+maybe the number of multiplications is less but the operation itself might be
+35:47
+more computationally expensive because we need to do these
+35:54
+individual matrix multiplication separately There are more effic
+36:00
+efficient ways of doing that You can prepare the input You can prepare all of
+36:06
+these this um the receptive fields You can vectorize them You can vectorize
+36:11
+your P parameters etc But still that processing of the
+36:18
+input layer it takes time and therefore compared to multi-press drone a convolutional layer
+36:27
+is slower Although the number of multiplications is
+36:35
+less and this is how it would look like for the second filter or the second channel in the
+36:41
+output So so we have another filter
+36:49
+here Uh we talked about these unks Any questions
+37:01
+so we talked about convolution basic form of convolution
+37:07
+different hyperparameters um that are going to be
+37:12
+critical for the placement of the receptive fields in an in on the input
+37:18
+layer receptive field size stride padding etc
+37:24
+So now we will look at alternatives to uh alternative forms of
+37:31
+convolution So I think I will talk about 10 around 10 um
+37:37
+alternatives The first one is unshared convolution So in the convolution
+37:43
+vanilla convolution I have talked about parameters are shared between receptive
+37:50
+fields So if you consider the input layer like
+37:59
+this So these
+38:04
+parameters they are shared in vanilla
+38:13
+convolution and this actually provided us equal
+38:18
+layer is translated dark operations are going to be translated as
+38:25
+well actually we can still use receptive fields without sharing parameters So we
+38:32
+call that unshared convolution So if you have a problem
+38:37
+where you don't need equines then you can use unshared
+38:44
+convolution but that would mean increasing the number of parameters and therefore increasing the
+38:52
+data uh required for training that network In practice I have not seen any network
+39:00
+using unshared convolution Just keep that in mind You know this can be
+39:09
+uh this can be possible [Music] Um I I'm not sure about a problem where
+39:17
+this might be useful So if you have a really uh control setup where you are
+39:24
+trying to recognize let's say objects or patterns and the somehow
+39:31
+the objects or visual entities occur at special specific positions So they don't
+39:38
+it's not possible that they they might appear at different positions If that is the case then maybe unshared convolution
+39:45
+can be helpful you had a question Yeah I can't properly picture what it means to
+39:53
+not share the weights So we have a filter again Yeah
+39:59
+And what does it mean to share weights we still
+40:05
+Yeah it's difficult to call that a filter anymore So we have a filter We apply that filter on a at a specific
+40:12
+position only Sorry
+40:20
+Maybe Yeah Oh the weights of the
+40:25
+filter parameters Yeah
+40:32
+Another um maybe more commonly used um formal convolution is dilated or at um
+40:43
+convolution Me change color I cannot see my pen Um normally we place a filter like
+40:51
+this So this is the input layer on which we apply our convolution So and we place
+40:57
+the 50 parameters next to each other Right so we have a 3x3 filter and they
+41:05
+are parameters are placed next to each other Actually we can leave space
+41:11
+between those So I can place the first parameter here the second here third
+41:18
+here Uh and this way without
+41:23
+um increasing the number of parameters I can increase the effective coverage of
+41:29
+the of the receptive field So normally to to be able to cover such
+41:35
+a large receptive field I would require one two three four
+41:41
+five 25 parameters But by using
+41:48
+dilation we dilute the receptive field We add space between the parameters when
+41:54
+we place them in a receptive field we are increasing the effective size of the
+42:01
+receptive field without increasing number of elements So this can be
+42:07
+uh useful when you do this in in
+42:12
+consecutive layers with small number of parameters actually you can cover a
+42:18
+large large
+42:24
+space Yeah
+42:35
+Yeah So we need to be careful about the dilation
+42:46
+amount So another um commonly used convolution type is transposed um
+42:54
+convolution In some architectures in some problems um through convolutional layers we will
+43:01
+want to reduce dimensionality and we will force an information bottleneck So
+43:07
+let me try to draw that So let's say we have an image Let's say
+43:14
+uh slowly we will reduce dimensionality
+43:25
+We will reduce dimensionality Then we will slowly try to increase
+43:32
+dimensionality
+43:42
+again So we will reduce dimensionality and we will increase dimensionality again So image segmentation for example
+43:49
+is one such problem where this is really helpful So we are forming an information
+43:56
+bottleneck
+44:03
+here where we are forcing the network to learn a really compact high
+44:08
+level representation space where semantic
+44:15
+information that are necessary for solving that problem are learned and from that we are decoding back to the
+44:22
+original space where we can make for example excel level
+44:28
+predictions So this upsampling of dimensions increasing
+44:34
+um increase in dimensions can be obtained using transpose
+44:41
+convolution So how does it work so if this is the input layer let's say this is our filter it is 2x two What we do is
+44:50
+for each receptive field that we can place in the output
+44:55
+layer we multiply the corresponding entry here we multiply the values zero
+45:03
+is multiplied by all of them and we write them here Then the next positioning of the
+45:10
+kernel stride is one is here So we multiply this with the parameters of the
+45:17
+filter We write them that here Then we continue to the next position which is
+45:24
+here We multiply this with kernel parameters We have these entries
+45:30
+etc So we are doing something that is the inverse of convolution So still we
+45:36
+have stride we have filter size we have placement of the receptive
+45:43
+fields but receptive fields are in a sense placed in the output
+45:50
+layers then we add them up and we obtain the output cube So we see that
+45:57
+dimensionality is increased by changing filter size and stride We can control
+46:04
+the size of the output layer So we are doing something that is the inverse of
+46:10
+uh convolution Normally if the layer was
+46:17
+w - f + 2 * p /
+46:23
+s was used to calculate the size of the output
+46:28
+layer which is this one So this is o by o So since we are doing the
+46:35
+inverse so to calculate this from this so we need to do O * S + F - 2 P min -
+46:48
+one right yeah so this is this can be used
+46:54
+to calculate the size of the outlay in transpose convolution
+47:06
+When you say inverse just in terms of dimensions right right There is
+47:12
+no convolution is not an inverse cooperation You can't get back
+47:21
+Yeah to increase dimensionality we have alternative
+47:27
+operations by using excessive uh zero padding We can increase dimensionality
+47:34
+but we need to add a lot of zeros to both
+47:40
+um and end ends of the dimensionalities or we can use
+47:46
+dilation and dilation amount how many zeros we place between filters that
+47:53
+can control actually the size of the next layer So depending on I for for your
+48:01
+problem you can you can try these alternatives Any questions
+48:08
+how does the one you just showed differ
+48:15
+from that is this the same
+48:20
+it's the same Yeah
+48:26
+Then we have 3D convolution So
+48:33
+um actually it is not necessarily a special form of convolution but um it's
+48:40
+it's important to talk about that So 1D convolution is with regards to some
+48:49
+let's say data where we have one independent
+48:54
+variable let's say time time is changing here and at each
+49:00
+time point we have a set of values collected through let's say
+49:06
+different sensors etc Right so let's say we have sensor
+49:13
+uh readings sensor data and this is the time
+49:19
+axis In a sense this is going to be our channel
+49:26
+dimension In an image we have RGB So at each independent variable value we have
+49:34
+RGB values So here in this case at each independent variable value at each time
+49:40
+point we have sensor
+49:46
+data So that that is the channel
+49:51
+dimension So when we are working with such data again we will have a receptive field So since our data is
+49:59
+one-dimensional our channel is going to be one-dimensional So let's say this is the placement of
+50:05
+one filter But it will span all of the channels So receptive field size F is
+50:15
+three But there is the hidden dimension the channel dimension as well And then we will slide the
+50:23
+filter depending on the stride value We can either uh slide one time point or
+50:30
+two time points So this is the next placement Oops
+50:35
+sorry What happened this is the placement of the next receptive field This is the
+50:42
+placement of the next receptive field
+50:48
+etc So this is how you would do 1D convolution and how you can work with
+50:54
+let's say time series data So convolution CNN's they are
+51:00
+not special or they are not applicable only on images So they can be used
+51:06
+actually on any type of data So this is how it would work for 1D
+51:11
+images 1D data We have talked about sorry we have already talked about 2D
+51:19
+convolution on images So if you have a problem data that changes along along X
+51:27
+Y and time right so you have three independent variables X Y and
+51:38
+time X Y and
+51:44
+time so you have three X of variation but you need 3D convolution
+51:52
+So if this is a video videos are really good examples for this So in a video we have RGB
+52:01
+images So this is RGB Let's say we have three channels They are stacked on top
+52:07
+of each other Actually if you consider the channel dimension the signal is
+52:14
+effectively four dimensional XY time and the
+52:19
+channel But if you stack them on top of each other it would look like
+52:27
+3D If you work with such data
+52:37
+um we have a receptive field size f by f
+52:43
+and we have the um third
+52:48
+dimension So that is general either the same or different
+52:54
+It's up to you up to us So what we do is we place the uh
+53:01
+filter Let's say we start here Let me change
+53:09
+color We start here We multiply the corresponding
+53:16
+entries We write it here Then we slide it along x along y and along t
+53:25
+So we are sliding the filter along three dimensions
+53:31
+now and we obtain an activation
+53:37
+volume So this is just for one one
+53:44
+filter If you have a second filter you will have such 3D volume for the second
+53:50
+filter Right so if you have 96 filters you have 96 of
+54:01
+those So things are going to be more complicated when you go to 3D
+54:10
+convolution Is this clear yeah
+54:19
+or should be it's um I'm not sure how the frameworks
+54:27
+implement that internally [Music] Um I think what they do is they stack
+54:35
+them on top of each other and form something like
+54:42
+this if I'm not mistaken
+54:51
+Okay So we have a special case of vanilla convolution if
+54:58
+the filter size is one for 2D convolution if it is one by
+55:04
+one Um so we without using any
+55:11
+uh without combining any information from a neighborhood by just acting on the
+55:18
+channels we can perform such convolution and the main goal of one by one
+55:26
+convolution is going to be to reduce or control the number of channels So if you
+55:33
+want to reduce the number of channels when you go to next layer but you don't
+55:38
+want to increase the number of parameters too much you can use one by one
+55:43
+convolution So we will look at some special architectures that are used in
+55:48
+practice that use one by one convolution there we will discuss this in more
+55:59
+detail Any questions
+56:29
+is everything clear so far
+57:20
+um I think 60% you need to complete 60%
+57:29
+Does that mean only 60% will degrade or% to take the to take the exam
+57:56
+sorry Will you drop some yeah I will do
+58:04
+And then I'll do
+58:25
+Okay So let's continue with uh separable um convolution So actually we can write
+58:35
+um a matrix as a multiplication of two vectors
+58:43
+right Um if you compare the number of
+58:49
+parameters in a
+58:55
+matrix So in a matrix we would have um nine
+59:01
+parameters But if you write that as a multiplication of two vectors you would
+59:07
+have three by three six parameters So we are we can reduce the number of
+59:14
+parameters by writing a 3x3 matrix as a
+59:20
+multiplication of two vectors and the number of par number of multiplications is reduced as well Of
+59:27
+course not every matrix um can be written um as a multiplication of two
+59:35
+vectors but for many problems this can be uh sufficient So for efficient
+59:42
+architectures that are designed to run really fast and requiring less
+59:51
+memory on edge devices people generally use separable convolution or depthwise
+59:59
+separable convolution In that bicycle convolution
+1:00:04
+what we do is remember in vanilla convolution one
+1:00:10
+filter acting on such data would be like this So if the uh filter size is three
+1:00:19
+3x3 and we will have we would have uh the uh channel dimension right We would
+1:00:27
+slide this over um over the input layer In separable depth by separable
+1:00:34
+convolution we have three peters the same size but they act on
+1:00:42
+different channels So in a sense we just have one
+1:00:48
+normal uh one normal convolution filter With
+1:00:54
+this we obtain an intermediate representation a 5x 5 byp for this
+1:01:00
+specific example And to obtain a certain number of channels in the next layer we
+1:01:08
+use one by one convolution normal one by one
+1:01:14
+convolution and we use 128 of
+1:01:19
+those So we slide uh one by one convolution over this This should for
+1:01:26
+each of these we will have one channel here and since we have 128 of those we
+1:01:33
+have the channel dimensionality is 128 So in the quiz I asked about the
+1:01:41
+number of parameters that would be required if you use dep convolution like
+1:01:48
+this or directly use vanilla convolution and you try to obtain the
+1:01:55
+same output dimensions How many parameters you require in each case so in this case
+1:02:02
+more previous case the um the result is not the same as the
+1:02:08
+same the result is not so so just applying the normal convolution and separating
+1:02:15
+the filter like this and applying them individually it's it doesn't necessarily
+1:02:21
+give us the same result like a performance drop
+1:02:28
+it's not a to represent
+1:02:34
+but many filters can be represented this way No I mean to say for a specific
+1:02:41
+filter does it um turn out to be the same if it is if it is if it can be
+1:02:47
+written as a multiplication of two vectors Yes Okay So
+1:02:53
+and I guess it's the same with the next Yeah
+1:02:59
+So here Yeah Is this clear any questions
+1:03:11
+so ju just to make sure I understand this for some filters at least Yeah Um
+1:03:16
+doing the twodimensional convolution is just a waste of computational power Yeah In a
+1:03:22
+sense Yeah An extension of um depth wise several
+1:03:31
+convolution uh is group convolution So depth wise let's say we group some of
+1:03:36
+the petters So nor you see here that Peters
+1:03:42
+are applied independently to the different channels So what if we group them
+1:03:50
+so actually this idea came from Alex Net Um later on I will talk about Alex Net
+1:03:57
+in more detail So there I will say that Alex Net was a big architecture in 2012
+1:04:04
+They couldn't fit that into a single GPU What they did was they split the
+1:04:10
+architecture into two into two branches the first branch on one
+1:04:18
+GPU The second branch which is symmetrical but with
+1:04:24
+different parameters is on a second GPU So there there was a lot of
+1:04:30
+engineering involved here but two uh branches acted on the
+1:04:38
+same data So I mentioned that there are 96 filters
+1:04:45
+in the first layer Actually 48 of them are here 48 of them are
+1:04:51
+here Right So on the same data we use
+1:04:56
+um filters but they are fed to different parts of the architecture I will talk
+1:05:04
+about this architecture in more detail later on So inspired from this people explored
+1:05:12
+this further and they um said that they realized actually group convolution can
+1:05:18
+per beneficial What we do in group convolution is we split the um channels
+1:05:25
+into two If group size is two for
+1:05:31
+example we split the channels into two the first
+1:05:38
+group second group to each
+1:05:44
+group we apply um filters
+1:05:50
+independently Then we stack the outputs together So through these
+1:05:57
+um filters we get these activations Through these filters uh we get these
+1:06:02
+activations with
+1:06:08
+sta and this is as I said this is in a sense an extension of um depth wise
+1:06:14
+several convolution in dep convolution we apply an a filter independently to each
+1:06:21
+channel each channel in group wise convolution we applied filters to the groups independently
+1:06:32
+um So the size of the group the number of groups um can affect performance So
+1:06:39
+in Alex net they showed that um if you don't use any groups um you obtain this
+1:06:47
+performance This is a validation error If you use two groups you get nice
+1:06:54
+improvement in performance But if you continue to increase the number of groups to let's
+1:06:59
+say four performance degrades again So there's a sweet spot
+1:07:06
+where certain number of groups can be helpful This uh reduces number of
+1:07:12
+parameters and the number of multiplications similar to depwise separable convolution
+1:07:20
+And do you know what this problem is model is trying to solve
+1:07:27
+what do you mean what the model is trying to solve it's a classification task Yes Object
+1:07:33
+object recognition
+1:07:38
+Um then a very very
+1:07:45
+interesting extension of convolution is deformable
+1:07:51
+convolution So this is a really fancy method
+1:07:56
+computationally it is very expensive but it promises very good
+1:08:05
+features Normally we would place a filter like
+1:08:12
+this right in a regular manner So one parameter place after the next one In
+1:08:19
+dilated convolution we we can place white space or space between them but
+1:08:26
+still it is still regular So what if we
+1:08:32
+learn directly from the data we estimate directly from the input a better
+1:08:39
+positioning of the filter So for each
+1:08:45
+position what if I estimate an offset along X and Y that would be more
+1:08:53
+meaningful for this U parameter to apply
+1:09:01
+onto So for each parameter here I want to have I want to estimate an offsets
+1:09:08
+delta x and delta y that would take us to actually better
+1:09:15
+positions more useful positions in the input plate
+1:09:22
+Instead of placing the filter parameters next to each other instead of placing the receptor fields in a regular
+1:09:29
+manner can we dynamically estimate a better positioning of this
+1:09:38
+field is the problem clear
+1:09:47
+learnable Yeah So what we're basically doing is learning just another
+1:09:56
+yeah and it depends on the input right so it that is the critical bit it is
+1:10:01
+dynamic it depends on the input based on the input the placement of the receptive
+1:10:08
+field changes right so it might be that so this attends to
+1:10:16
+here this actually multiplies the value here This multiplies the value here Or it can be something like this or
+1:10:22
+something like this Whatever the input leads
+1:10:27
+to whatever the gradient descent finds more
+1:10:33
+useful we multiply the corresponding entries with the 50 parameters And we
+1:10:39
+call this pattern I mean isn't it basically a pattern of patterns
+1:10:47
+yes maybe Yeah but maybe it's better to call it
+1:10:52
+the dynamic receptive field So we have a receptive field and how we place the
+1:10:59
+receptive field it's dynamic
+1:11:04
+Yeah
+1:11:15
+Yeah we will try to do them both at the same time
+1:11:20
+So if you consider let's say a 3x three
+1:11:27
+uh filter um so for each position
+1:11:38
+here for the placement of each filter
+1:11:45
+here we need to have an offset
+1:11:52
+Um so [Music]
+1:11:58
+if so if there are n parameters
+1:12:05
+uh in the
+1:12:11
+filter for each parameter we need to have two offsets for X and Y delta X and delta
+1:12:22
+Y So what we are going to do is for from the input layer using vanilla
+1:12:29
+convolution So we will try to
+1:12:34
+estimate an activation
+1:12:40
+map that is shape
+1:12:45
+um that allows us to position for each position of possible position count
+1:12:51
+along each direction Here we have those that many entries here and for the
+1:12:58
+vertical positioning as well And the channel dimension is equal to number of parameters times 2
+1:13:06
+So for each position of the filter here we have
+1:13:12
+an entry here if you take that it has two n two * n many
+1:13:21
+values and you can reshape that and that would give you the
+1:13:27
+offsets right offsets for the positions of the kernel at that position
+1:13:35
+So for each position we have a different offset right it is estimated from the
+1:13:42
+layer and for each position on the layer we have a different
+1:13:48
+offset are we clear so far I
+1:13:54
+touch
+1:14:00
+them Okay So what we are going to do is we
+1:14:07
+want to estimate the offsets from the data itself Right So we
+1:14:14
+will apply deformable convolution on this
+1:14:19
+layer So this is going to be the convolution But for applying convolution
+1:14:26
+we need to estimate the offsets So this branch is trying to estimate the offsets
+1:14:34
+from that layer Right clear so
+1:14:41
+far So we are going to use vanilla convolution With convolution by changing
+1:14:48
+filter size with stride we can control the size of an offset
+1:14:57
+field We want to for each possible positioning of the
+1:15:02
+kernel here We want to have an entry
+1:15:10
+here And at that entry we want to have two times n many
+1:15:16
+parameters that represent the offsets position offsets
+1:15:26
+If I were to apply regular convolution on at this at this
+1:15:36
+position right clear so far So normally I have 3x3
+1:15:44
+convolution If I were to use vanilla convolution I would use this But to each
+1:15:49
+one I want to apply these offsets for each
+1:15:56
+position of the kernel I want to estimate these offsets
+1:16:02
+from the same input layer Right so we have two convolutions
+1:16:09
+here One for estimating the offsets
+1:16:14
+two with the estimated offsets This the real convolution we want to
+1:16:22
+apply right clear so far better it's too complication yes it's very
+1:16:30
+expensive that's why we generally don't design a whole CNN using deformable
+1:16:37
+convolution it's very expensive but in the top layers where dimensionality is
+1:16:45
+smaller and information at different parts of the input space High level
+1:16:52
+information can be really valuable if you give this flexibility to the network to in a sense to dynamically attend to
+1:17:01
+different parts of the input that that is really helpful So
+1:17:07
+really state-of-the-art um
+1:17:12
+models that are computationally heavy they use um actually deformal
+1:17:19
+convolution but it's it's it's
+1:17:25
+expensive Any questions so the challenge here is that
+1:17:34
+how can we back propagate through here these offsets are added to x and y
+1:17:43
+coordinates of um the input layer right or the or the
+1:17:53
+filter those I mean these are indices right indices don't enter the
+1:18:00
+calculations so we generally take the value of the activation map value of the
+1:18:05
+filter value of the input layer here we multiply them but we don't have any
+1:18:11
+calculation that involves these offsets So through to be able to learn
+1:18:19
+these um estimate these offsets we need to be able to back
+1:18:25
+propagate right So that is the
+1:18:32
+challenge Um but if you solve that challenge compared to vanilla
+1:18:39
+convolution the placement of the filters are actually very dynamic and they are
+1:18:45
+very input specific Um colors the objects are not
+1:18:51
+very visible but actually there there is one sheep here there is a baby sheep there's a
+1:18:59
+mother sheep here Um and we use um
+1:19:05
+vanilla convolution with a filt size of 3x3 Um everything is very rigid very
+1:19:13
+regular And when you are processing information across layers
+1:19:19
+in a receptive field you have information coming from the background as well as the
+1:19:25
+object Whereas if you use the fable convolution the receptive fields are
+1:19:31
+adjusted automatically by looking at the data in a dynamic manner in such a way that
+1:19:39
+receptive field actually pays attention to the most relevant content most relevant part of the
+1:19:45
+problem And it turns out that for these specific example those parts are the
+1:19:51
+objects So the receptive field is positioned in such a way that neurons
+1:19:57
+actually attend to the objects without increasing the number of
+1:20:04
+parameters Right with the same number of parameters in the receptive
+1:20:09
+field Um in the next layer we cover
+1:20:15
+um more portion of the uh useful information without getting um without
+1:20:24
+by while while discarding information coming from the background This this is this is really really
+1:20:31
+handy But how do we solve back propagation problem so how can we back
+1:20:37
+propagate through um
+1:20:43
+offsets um I have four
+1:20:50
+minutes Can I explain it in four minutes so let's
+1:20:55
+try So I will follow the notation in the paper because it is very uh easy to
+1:21:02
+follow So if you have um a picture like
+1:21:07
+this um it has two axis of variation
+1:21:13
+uh 012 012 and each position here actually can
+1:21:20
+be listed um in a list 01
+1:21:25
+uh 0 0 for example 0 1 uh
+1:21:31
+02 one zero etc So we have a list of
+1:21:37
+indices in the receptive field right So that is what we have
+1:21:43
+here So it it starts from minus one to one
+1:21:49
+Sorry So these are the indices for the filter So it's a 3x3 filter And just to
+1:21:57
+be to simplify the notation they use X and Y with a single variable So uh
+1:22:06
+position in the uh in a 2D coordinate space is denoted by just one variable
+1:22:15
+P So normal convolution can be mathematically
+1:22:20
+described like this So for the for a position in the output
+1:22:26
+layer we get the corresponding entries Actually we uh we iterate over these
+1:22:33
+indices We get the corresponding entries from the filter and we add those indices to the
+1:22:43
+positions um in the input layer P 0 minus plus -1
+1:22:52
+-1 P 0 + - 1 0 etc So this is how we can
+1:22:58
+represent convolution for one position in the output right Yes
+1:23:12
+Yeah This is just written as a linear layer like a linear layer in
+1:23:19
+that receptive field
+1:23:29
+Yeah it depends on how you write this So here they write it as if it it is a
+1:23:35
+simple linear operation on a vector
+1:23:42
+right x is actually two dimensional but it doesn't matter for us
+1:23:51
+We can assume that it I mean we can mathematically write it as if X is like
+1:23:56
+a one-dimensional vector and we have a
+1:24:04
+filter we can write it as if it is a one-dimensional vector we multiply the corresponding
+1:24:10
+entries right is this
+1:24:18
+clear so what we want to do is we want to modify this part such that when we
+1:24:27
+are taking the corresponding entry from X from the input layer we
+1:24:32
+want to have an offset and we want to estimate this from
+1:24:39
+the um input layer and note that when you
+1:24:45
+want to take the gradient of this output layer with respect to the offset You
+1:24:50
+cannot do that because it is not part of the calculation It doesn't multiply
+1:24:55
+anything It is not added to anything So X enters calculation W enters
+1:25:03
+calculation but the offset is not part of the calculation
+1:25:10
+However the offsets that are estimated
+1:25:15
+by convolution they are real
+1:25:22
+values But this here needs to be an integer because x is an array It is a m
+1:25:31
+matrix right so its indices need to be real numbers So what difference is that
+1:25:37
+we use interpolation So this let's call this by
+1:25:44
+Q This Q is a real
+1:25:49
+number But what we can do is we can find the closest integer coordinates
+1:26:00
+The position the value of x
+1:26:06
+q can be written as a So let me write this as x
+1:26:16
+p1 x p2 x p 3 and x
+1:26:24
+p4 So these are the closest integers enclosing Q
+1:26:30
+So this areas A
+1:26:35
+uh B C D these areas can be used as weights to
+1:26:42
+weigh these uh
+1:26:47
+um values and you can write XQ as a weighted combination of
+1:26:53
+those right so this is actually C * X P1
+1:26:59
+1 + d * x p2 No it
+1:27:06
+is so it's so a * xp1 b * x p2 +
+1:27:17
+uh d * x p3 plus
+1:27:23
+uh c * x p4 Yeah For
+1:27:31
+example the weight of XP1 be inversely proportional to see
+1:27:38
+Oh Oh yes So this is actually called bilinear uh
+1:27:43
+interpolation If you look at the C D A B it uses
+1:27:51
+actually Q and it multiplies X and in A B C D actually delta comes
+1:28:02
+into play The offsets we estimate they are now part of the equation and through
+1:28:09
+those we can actually provide gradient
+1:28:15
+Everything is auto differentiable Everything is differentiable We can back propagate through convolution and
+1:28:22
+through the offsets and learn the parameters very
+1:28:29
+well Any questions okay see you next week
