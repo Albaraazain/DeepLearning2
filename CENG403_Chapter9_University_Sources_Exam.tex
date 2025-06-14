@@ -1,0 +1,303 @@
+\documentclass[12pt]{article}
+\usepackage{fancyhdr}
+\usepackage{amsmath,amsfonts,enumerate}
+\usepackage{color,graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usetikzlibrary{arrows,positioning,shapes,calc,matrix}
+\pagestyle{fancy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Course customization based on university sources
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\masunitnumber}{CENG 403}
+\newcommand{\examdate}{January 2025}
+\newcommand{\academicyear}{2024-2025}
+\newcommand{\semester}{I}
+\newcommand{\coursename}{Deep Learning - CNN Fundamentals \& Convolution Types (University Sources)}
+\newcommand{\numberofhours}{3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM SPACING COMMANDS FOR ANSWER SPACES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\answerspace}[1]{\vspace{#1}}
+\newcommand{\questionspace}{\vspace{3cm}}        
+\newcommand{\subquestionspace}{\vspace{2.5cm}}   
+\newcommand{\shortanswer}{\vspace{2cm}}          
+\newcommand{\mediumanswer}{\vspace{3cm}}         
+\newcommand{\longanswer}{\vspace{4cm}}           
+\newcommand{\journalspace}{\vspace{4.5cm}}       
+\newcommand{\codespace}{\vspace{5cm}}            
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header setup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lhead{}
+\rhead{}
+\chead{{\bf MIDDLE EAST TECHNICAL UNIVERSITY}}
+\lfoot{}
+\rfoot{}
+\cfoot{}
+\begin{document}
+\setlength{\headsep}{5truemm}
+\setlength{\headheight}{14.5truemm}
+\setlength{\voffset}{-0.45truein}
+\renewcommand{\headrulewidth}{0.0pt}
+\begin{center}
+SEMESTER \semester\ EXAMINATION \academicyear
+\end{center}
+\begin{center}
+{\bf \masunitnumber\ -- \coursename}
+\end{center}
+\vspace{20truemm}
+\noindent \examdate\hspace{45truemm} TIME ALLOWED: \numberofhours\ HOURS
+\vspace{19truemm}
+\hrule
+\vspace{19truemm}
+\noindent\underline{INSTRUCTIONS TO CANDIDATES}
+\vspace{8truemm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Instructions based on university standards
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+\item This examination paper contains {\bf SEVEN (7)} questions and comprises 
+{\bf TEN (10)} printed pages.
+\item Answer all questions. 
+The marks for each question are indicated at the beginning of each question.
+\item Answer each question beginning on a {\bf FRESH} page of the answer book.
+\item This {\bf IS NOT an OPEN BOOK} exam.
+\item Show all mathematical derivations clearly with proper notation.
+\item For architectural diagrams, draw clear and labeled components.
+\item Calculate all requested parameters and show intermediate steps.
+\item Explain computational complexity where requested.
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New page for questions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\lhead{}
+\rhead{\masunitnumber}
+\chead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+\setlength{\footskip}{45pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EXAM QUESTIONS BASED ON UNIVERSITY SOURCES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{Question 1. CNN Motivation and MLP Computational Analysis}{{\hfill (25 marks)}}\\
+Based on Stanford CS231n and UC Berkeley CS280 deep learning course materials.
+
+\begin{enumerate}[(a)]
+    \item Calculate the parameter explosion in fully connected networks. For a 200×200 RGB image classification task: \hfill (10 marks)
+    \begin{itemize}
+        \item Calculate parameters for single hidden layer with 1000 neurons
+        \item Compare with equivalent CNN layer (64 filters, 3×3 kernels, same output size)
+        \item Determine parameter reduction ratio and explain computational implications
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Analyze the three fundamental limitations of MLPs for computer vision tasks: \hfill (10 marks)
+    \begin{itemize}
+        \item Translation variance: Mathematical demonstration of sensitivity to spatial shifts
+        \item Full connectivity overfitting: Relationship between parameter count and generalization
+        \item Curse of dimensionality: Data requirements scaling with parameter count
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Compare memory requirements during training for MLP vs CNN processing 224×224×3 images: \hfill (5 marks)
+    \begin{itemize}
+        \item Forward pass activation storage
+        \item Backward pass gradient storage  
+        \item Total memory footprint analysis
+    \end{itemize}
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 2. Mathematical Foundation of Convolution Operations}{{\hfill (28 marks)}}\\
+Based on MIT 6.036 and CMU 10-301 mathematical treatments of convolution.
+
+\begin{enumerate}[(a)]
+    \item Derive the convolution output size formula and apply to practical examples: \hfill (12 marks)
+    \begin{itemize}
+        \item Prove: Output size = $\frac{W - F + 2P}{S} + 1$
+        \item Apply to AlexNet Conv1: Input 227×227, Filter 11×11, Stride 4, Padding 0
+        \item Calculate feature map sizes through first 3 layers of AlexNet
+        \item Verify mathematical consistency with integer constraints
+    \end{itemize}
+    
+    \journalspace
+    
+    \item Analyze computational complexity of convolution operations: \hfill (10 marks)
+    \begin{itemize}
+        \item Derive FLOPs formula: $H' \times W' \times C_{out} \times F \times F \times C_{in}$
+        \item Compare with equivalent fully connected layer complexity
+        \item Calculate speedup ratio for typical CNN layer dimensions
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Implement convolution using matrix multiplication (im2col): \hfill (6 marks)
+    \begin{itemize}
+        \item Explain im2col transformation for GPU optimization
+        \item Show how convolution becomes GEMM operation
+        \item Analyze memory vs computation trade-offs
+    \end{itemize}
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 3. Receptive Field Theory and Parameter Sharing Analysis}{{\hfill (22 marks)}}\\
+Based on Stanford CS231n and UC Berkeley theoretical frameworks.
+
+\begin{enumerate}[(a)]
+    \item Calculate effective receptive fields in deep CNN architectures: \hfill (10 marks)
+    \begin{itemize}
+        \item Derive recursive formula: $RF_l = RF_{l-1} + (k_l - 1) \times \prod_{i=1}^{l-1} s_i$
+        \item Apply to architecture: Conv(3×3,s=1) → Conv(3×3,s=1) → Conv(3×3,s=2) → Conv(3×3,s=1)
+        \item Calculate receptive field at each layer
+        \item Explain relationship between depth and spatial coverage
+    \end{itemize}
+    
+    \journalspace
+    
+    \item Analyze parameter sharing efficiency: \hfill (8 marks)
+    \begin{itemize}
+        \item Compare: Single 7×7 conv (49C² parameters) vs Three 3×3 convs (27C² parameters)  
+        \item Calculate parameter reduction percentage: $\frac{49C² - 27C²}{49C²} = 44.9\%$
+        \item Explain why stacked small filters outperform large filters
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Prove translation equivariance property mathematically: \hfill (4 marks)
+    \begin{itemize}
+        \item Formal proof: If $f(T_\delta(x)) = T_\delta(f(x))$ for translation $T_\delta$
+        \item Show why this property doesn't extend to rotation or scaling
+    \end{itemize}
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 4. Advanced Convolution Types and Efficiency Analysis}{{\hfill (30 marks)}}\\
+Based on comprehensive analysis from multiple university deep learning courses.
+
+\begin{enumerate}[(a)]
+    \item Analyze depthwise separable convolution efficiency: \hfill (12 marks)
+    \begin{itemize}
+        \item Standard convolution FLOPs: $M \times D_k^2 \times D_p^2 \times N$
+        \item Depthwise separable FLOPs: $M \times D_k^2 \times D_p^2 + M \times D_p^2 \times N$
+        \item Calculate reduction ratio: $\frac{1}{N} + \frac{1}{D_k^2}$ for large N
+        \item Apply to MobileNet example: 3×3 depthwise + 1×1 pointwise vs 3×3 standard
+    \end{itemize}
+    
+    \journalspace
+    
+    \item Derive mathematical formulation for dilated convolution: \hfill (10 marks)
+    \begin{itemize}
+        \item Standard convolution: $y[m,n] = \sum_{i,j} x[m+i, n+j] \cdot h[i,j]$
+        \item Dilated convolution: $y[m,n] = \sum_{i,j} x[m+d \cdot i, n+d \cdot j] \cdot h[i,j]$
+        \item Calculate effective receptive field: $(k-1) \times d + 1$ for kernel size k, dilation d
+        \item Analyze multi-scale feature extraction capabilities
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Design and analyze transposed convolution for upsampling: \hfill (8 marks)
+    \begin{itemize}
+        \item Mathematical relationship: If conv maps $\mathbb{R}^n \rightarrow \mathbb{R}^m$, transposed conv maps $\mathbb{R}^m \rightarrow \mathbb{R}^n$
+        \item Matrix formulation: $y = Cx$ vs $x = C^T y$
+        \item Calculate output size: $O = (I-1) \times S - 2P + K$ for input I, stride S, padding P, kernel K
+    \end{itemize}
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 5. Neuroscience Foundation and Architectural Evolution}{{\hfill (20 marks)}}\\
+Based on MIT 6.034 and CMU historical perspectives on neural computation.
+
+\begin{enumerate}[(a)]
+    \item Trace the evolution from biological vision to artificial CNNs: \hfill (12 marks)
+    \begin{itemize}
+        \item Hubel \& Wiesel (1959): Simple cells (orientation \& location specific) vs Complex cells (translation invariant)
+        \item Fukushima's Neocognitron (1980): S-cells (feature detection) vs C-cells (spatial pooling)
+        \item Modern CNNs: Convolution layers vs Pooling layers
+        \item Analyze preserved principles and key innovations at each stage
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Compare biological vs artificial receptive field organizations: \hfill (8 marks)
+    \begin{itemize}
+        \item Biological: Variable RF sizes (foveal vs peripheral vision)
+        \item Artificial: Fixed RF sizes across spatial locations
+        \item Attention mechanisms as bridge to biological variability
+        \item Trade-offs between biological realism and computational efficiency
+    \end{itemize}
+    
+    \mediumanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 6. Deformable Convolution Mathematical Framework}{{\hfill (25 marks)}}\\
+Based on advanced computer vision research and graduate-level analysis.
+
+\begin{enumerate}[(a)]
+    \item Derive the mathematical formulation of deformable convolution: \hfill (15 marks)
+    \begin{itemize}
+        \item Standard convolution: $y(p_0) = \sum_{p_n \in \mathcal{R}} w(p_n) \cdot x(p_0 + p_n)$
+        \item Deformable convolution: $y(p_0) = \sum_{p_n \in \mathcal{R}} w(p_n) \cdot x(p_0 + p_n + \Delta p_n)$
+        \item Explain learnable offset $\Delta p_n$ estimation network
+        \item Derive bilinear interpolation for non-integer sampling locations
+    \end{itemize}
+    
+    \journalspace
+    
+    \item Analyze computational complexity and training considerations: \hfill (10 marks)
+    \begin{itemize}
+        \item Parameter overhead: $2n$ additional offset parameters for $n$-point kernel
+        \item Forward pass complexity: Standard conv + offset prediction + bilinear interpolation
+        \item Backward pass: Gradient flow through both content and spatial transformations
+        \item Memory requirements and training stability analysis
+    \end{itemize}
+    
+    \mediumanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 7. GPU Optimization and Implementation Efficiency}{{\hfill (20 marks)}}\\
+Based on NVIDIA Deep Learning Institute and high-performance computing courses.
+
+\begin{enumerate}[(a)]
+    \item Analyze GPU-friendly convolution implementation strategies: \hfill (10 marks)
+    \begin{itemize}
+        \item Im2col transformation: Convert convolution to GEMM operations
+        \item Winograd algorithm: Reduce multiplication count for small kernels
+        \item Direct convolution: Optimized for specific kernel sizes
+        \item Memory access patterns and cache utilization
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Compare computational efficiency across convolution types: \hfill (10 marks)
+    \begin{itemize}
+        \item Standard vs Depthwise separable: FLOPs and memory bandwidth
+        \item Group convolution: Parallelization benefits and limitations
+        \item 1×1 convolution: Throughput optimization for channel mixing
+        \item Batch processing effects on computational efficiency
+    \end{itemize}
+    
+    \mediumanswer
+\end{enumerate}
+
+\vfill
+\begin{center}{\bf END OF PAPER}\end{center>
+\end{document>

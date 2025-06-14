@@ -1,0 +1,198 @@
+\documentclass[12pt]{article}
+\usepackage{fancyhdr}
+\usepackage{amsmath,amsfonts,enumerate}
+\usepackage{color,graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usetikzlibrary{arrows,positioning,shapes,calc,matrix}
+\pagestyle{fancy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Course customization based on Professor's teaching
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\masunitnumber}{CENG 403}
+\newcommand{\examdate}{January 2025}
+\newcommand{\academicyear}{2024-2025}
+\newcommand{\semester}{I}
+\newcommand{\coursename}{Deep Learning - CNN Fundamentals \& Convolution Types}
+\newcommand{\numberofhours}{3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM SPACING COMMANDS FOR ANSWER SPACES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\answerspace}[1]{\vspace{#1}}
+\newcommand{\questionspace}{\vspace{3cm}}        
+\newcommand{\subquestionspace}{\vspace{2.5cm}}   
+\newcommand{\shortanswer}{\vspace{2cm}}          
+\newcommand{\mediumanswer}{\vspace{3cm}}         
+\newcommand{\longanswer}{\vspace{4cm}}           
+\newcommand{\journalspace}{\vspace{4.5cm}}       
+\newcommand{\codespace}{\vspace{5cm}}            
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header setup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lhead{}
+\rhead{}
+\chead{{\bf MIDDLE EAST TECHNICAL UNIVERSITY}}
+\lfoot{}
+\rfoot{}
+\cfoot{}
+\begin{document}
+\setlength{\headsep}{5truemm}
+\setlength{\headheight}{14.5truemm}
+\setlength{\voffset}{-0.45truein}
+\renewcommand{\headrulewidth}{0.0pt}
+\begin{center}
+SEMESTER \semester\ EXAMINATION \academicyear
+\end{center}
+\begin{center}
+{\bf \masunitnumber\ -- \coursename}
+\end{center}
+\vspace{20truemm}
+\noindent \examdate\hspace{45truemm} TIME ALLOWED: \numberofhours\ HOURS
+\vspace{19truemm}
+\hrule
+\vspace{19truemm}
+\noindent\underline{INSTRUCTIONS TO CANDIDATES}
+\vspace{8truemm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Instructions based on professor's emphasis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+\item This examination paper contains {\bf SIX (6)} questions and comprises 
+{\bf EIGHT (8)} printed pages.
+\item Answer all questions. 
+The marks for each question are indicated at the beginning of each question.
+\item Answer each question beginning on a {\bf FRESH} page of the answer book.
+\item This {\bf IS NOT an OPEN BOOK} exam.
+\item Show clear reasoning for your answers, especially intuitive explanations.
+\item For architectural diagrams, draw clear components and explain design choices.
+\item Connect concepts to examples discussed in lectures where relevant.
+\item Explain the practical implications of design decisions.
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New page for questions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\lhead{}
+\rhead{\masunitnumber}
+\chead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+\setlength{\footskip}{45pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EXAM QUESTIONS BASED ON PROFESSOR'S TEACHING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{Question 1. CNN Motivation and Limitations of Multi-Layer Perceptrons}{\hfill (25 marks)}\\
+Based on the professor's discussion: "If you want to work with real life large scale problems let's say object recognition with high resolution...you want to recognize objects in such high resolution images what we do is we vectorize...then we use multiperceptron."
+
+\begin{enumerate}[(a)]
+    \item The professor calculated that for a 1000×1000 input image with 10,000 neurons in the first hidden layer, "just this layer is going to introduce 10 billion parameters." Explain why this parameter explosion is problematic and analyze the professor's statement that "more parameters means more data" with the quadratic relationship. \hfill (8 marks)
+    
+    \mediumanswer
+    
+    \item Analyze the professor's examples of equivariance and invariance problems. For image segmentation, explain why we need "if you transform the input...we expect the output to be transformed by the same transformation." For object recognition, explain why we need the prediction to "be independent of that transformation." \hfill (10 marks)
+    
+    \mediumanswer
+    
+    \item The professor showed how shifting an image by one pixel in a multi-layer perceptron causes "all of the activations...they are going to change." Explain why this is a "very severe limitation" and how CNNs address this through architectural design. \hfill (7 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 2. Neuroscience Inspiration and CNN Fundamentals}{\hfill (22 marks)}\\
+The professor discussed Hubel and Wiesel's Nobel Prize-winning findings: "They did recordings real recordings from the brains of cats...they showed that...connectivity in biological neurons are not fully connected...neurons have receptive fields."
+
+\begin{enumerate}[(a)]
+    \item Explain the two key findings from Hubel and Wiesel that inspired CNN design: restricted connectivity and columnar structure. Describe how these translate to "receptive fields" and specialized neurons for "recognizing certain patterns at different scales." \hfill (10 marks)
+    
+    \mediumanswer
+    
+    \item Compare the evolution from Neocognitron (1979) to CNNs. Explain how Fukushima's "simple cells" and "complex cells" correspond to "convolution" and "pooling" in modern CNNs, and why gradient descent training was crucial for practical success. \hfill (8 marks)
+    
+    \mediumanswer
+    
+    \item The professor mentioned that in CNNs we use "fixed receptive field size for every neuron" unlike the brain where "in the central parts...we have smaller receptive field...in the peripheries...we have higher receptive field." Discuss the implications of this design choice. \hfill (4 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 3. CNN Architecture and Parameter Sharing}{\hfill (20 marks)}\\
+The professor emphasized: "The first critical bit is that connectivity is restricted...the second important change...is that the weights are shared...we have the same parameters shared and used by every receptive field."
+
+\begin{enumerate}[(a)]
+    \item Explain how restricted connectivity and parameter sharing address the dimensionality problem. The professor stated: "if this is 1 million...the number of parameters here it doesn't depend on that actually...we just have three parameters W1 W2 W3." \hfill (8 marks)
+    
+    \mediumanswer
+    
+    \item Analyze the trade-off the professor discussed: "if you restrict connectivity...a neuron receives information just from a restricted part of the input" versus the solution of increasing depth so "neurons in the following layers...will have the chance to integrate information across the whole input." \hfill (8 marks)
+    
+    \mediumanswer
+    
+    \item The professor showed that parameter sharing provides "equivariance to translation...if you shifted the input...the pattern will shift to the next receptive field...accordingly the activations will shift as well." Explain this mathematical property and why it doesn't extend to scale and rotation. \hfill (4 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 4. Convolution Operation and Hyperparameters}{\hfill (25 marks)}\\
+The professor explained: "We have stride...padding...receptive field size...we need to be careful when we are choosing filter size padding and stride because this needs to be an integer."
+
+\begin{enumerate}[(a)]
+    \item Derive and apply the formula the professor used: "size of the next layer = (W - F + 2×padding)/stride + 1." For AlexNet's first layer with input 227×227, filter size 11, stride 4, padding 0, verify the output size of 55×55. \hfill (8 marks)
+    
+    \mediumanswer
+    
+    \item Analyze the professor's AlexNet example where "stride is four...we are reducing dimensionality by a factor of four that is a huge reduction." Explain why this large stride works in early layers but would be problematic in later layers, citing his explanation about information redundancy. \hfill (10 marks)
+    
+    \mediumanswer
+    
+    \item The professor discussed the channel dimension: "when we say a two-dimensional filter actually it might have a third dimension...that spans the channels of its input layer." For 96 filters of size 11×11×3, calculate the total parameters and explain how "different filters...learned to extract different types of information." \hfill (7 marks)
+    
+    \mediumanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 5. Alternative Convolution Types}{\hfill (28 marks)}\\
+The professor introduced multiple convolution variants: "We have different ways to actually restrict connectivity and share parameters in a layer."
+
+\begin{enumerate}[(a)]
+    \item Compare unshared convolution, dilated convolution, and transposed convolution. For each, explain the professor's rationale: unshared for problems without equivariance needs, dilated for increasing "effective coverage...without increasing number of parameters," and transposed for "upsampling." \hfill (12 marks)
+    
+    \journalspace
+    
+    \item Analyze separable convolution as the professor explained: "we can write a 3×3 matrix as a multiplication of two vectors...we can reduce the number of parameters...from nine parameters...to six parameters." Explain depthwise separable convolution and its efficiency benefits. \hfill (10 marks)
+    
+    \mediumanswer
+    
+    \item The professor described 1×1 convolution as controlling "the number of channels...without using any...without combining any information from a neighborhood." Explain how this operation works and its role in efficient architectures like GoogleNet that will be discussed later. \hfill (6 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 6. Deformable Convolution and Advanced Concepts}{\hfill (30 marks)}\\
+The professor introduced deformable convolution: "What if we learn directly from the data...a better positioning of the filter...for each position what if I estimate an offset along X and Y that would be more meaningful."
+
+\begin{enumerate}[(a)]
+    \item Explain the concept of deformable convolution as "dynamic receptive field." Describe how "for each parameter...we need to have two offsets for X and Y delta X and delta Y" and why this makes the operation "very expensive." \hfill (12 marks)
+    
+    \longanswer
+    
+    \item The professor showed the benefit: "receptive fields are adjusted automatically...in such a way that receptive field actually pays attention to the most relevant content." Analyze the sheep example and explain why this improves upon vanilla convolution's "rigid...regular" placement. \hfill (8 marks)
+    
+    \mediumanswer
+    
+    \item Solve the backpropagation challenge the professor discussed: "indices don't enter the calculations...we cannot do that because it is not part of the calculation." Explain how bilinear interpolation makes "everything differentiable" by incorporating offsets into the computation. \hfill (10 marks)
+    
+    \mediumanswer
+\end{enumerate}
+
+\vfill
+\begin{center}{\bf END OF PAPER}\end{center>
+\end{document}

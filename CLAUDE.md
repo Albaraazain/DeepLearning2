@@ -1,0 +1,1 @@
+- exam 1 questions are always based on the transcript - what the professor discussed in the lecture, important points etc. and exam 2 should be from university exam questions you searched from the web.
