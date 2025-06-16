@@ -1,0 +1,1 @@
+# Task 2: CNN Implementation for CIFAR-100
