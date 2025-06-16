@@ -1,0 +1,428 @@
+\documentclass[12pt]{article}
+\usepackage{fancyhdr}
+\usepackage{amsmath,amsfonts,enumerate}
+\usepackage{color,graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usetikzlibrary{arrows,positioning,shapes,calc,matrix}
+
+% Define colors for answers
+\definecolor{answercolor}{RGB}{0,100,0}
+\definecolor{explanationcolor}{RGB}{0,0,139}
+
+% Custom commands for answers
+\newcommand{\answer}[1]{{\color{answercolor}\textbf{Answer:} #1}}
+\newcommand{\explanation}[1]{{\color{explanationcolor}#1}}
+
+\pagestyle{fancy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Course customization based on university sources
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\masunitnumber}{CENG 403}
+\newcommand{\examdate}{January 2025}
+\newcommand{\academicyear}{2024-2025}
+\newcommand{\semester}{I}
+\newcommand{\coursename}{Deep Learning - Large Language Models \& Vision Transformers (University Sources) - ANSWERED}
+\newcommand{\numberofhours}{3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM SPACING COMMANDS FOR ANSWER SPACES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\answerspace}[1]{\vspace{#1}}
+\newcommand{\questionspace}{\vspace{3cm}}        
+\newcommand{\subquestionspace}{\vspace{2.5cm}}   
+\newcommand{\shortanswer}{\vspace{2cm}}          
+\newcommand{\mediumanswer}{\vspace{3cm}}         
+\newcommand{\longanswer}{\vspace{4cm}}           
+\newcommand{\journalspace}{\vspace{4.5cm}}       
+\newcommand{\codespace}{\vspace{5cm}}            
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header setup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lhead{}
+\rhead{}
+\chead{{\bf MIDDLE EAST TECHNICAL UNIVERSITY}}
+\lfoot{}
+\rfoot{}
+\cfoot{}
+\begin{document}
+\setlength{\headsep}{5truemm}
+\setlength{\headheight}{14.5truemm}
+\setlength{\voffset}{-0.45truein}
+\renewcommand{\headrulewidth}{0.0pt}
+\begin{center}
+SEMESTER \semester\ EXAMINATION \academicyear
+\end{center}
+\begin{center}
+{\bf \masunitnumber\ -- \coursename}
+\end{center>
+\vspace{20truemm}
+\noindent \examdate\hspace{45truemm} TIME ALLOWED: \numberofhours\ HOURS
+\vspace{19truemm}
+\hrule
+\vspace{19truemm}
+\noindent\underline{INSTRUCTIONS TO CANDIDATES}
+\vspace{8truemm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Instructions based on university standards
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+\item This examination paper contains {\bf SEVEN (7)} questions and comprises 
+{\bf TEN (10)} printed pages.
+\item Answer all questions. 
+The marks for each question are indicated at the beginning of each question.
+\item Answer each question beginning on a {\bf FRESH} page of the answer book.
+\item This {\bf IS NOT an OPEN BOOK} exam.
+\item Show all mathematical derivations clearly with proper notation.
+\item For implementation questions, provide clear pseudocode or algorithms.
+\item Explain computational complexity where requested.
+\item Draw clear architectural diagrams with proper labels.
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New page for questions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\lhead{}
+\rhead{\masunitnumber}
+\chead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+\setlength{\footskip}{45pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EXAM QUESTIONS BASED ON UNIVERSITY SOURCES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{Question 1. Large Language Model Pre-training Strategies}\hfill (28 marks)\\
+Based on foundational LLM research and university courses on language modeling.
+
+\begin{enumerate}[(a)]
+    \item Compare and contrast autoregressive language modeling (GPT-style) versus masked language modeling (BERT-style) pre-training objectives: \hfill (12 marks)
+    
+    \answer{Autoregressive models predict next tokens sequentially, while masked models predict hidden tokens bidirectionally, each with distinct advantages for different tasks.}
+    
+    \explanation{
+    \textbf{Autoregressive Language Modeling (GPT-style):}
+    
+    \textbf{Mathematical Formulation:}
+    $$L_{AR} = -\sum_{t=1}^T \log P(x_t | x_{<t}; \theta) = -\sum_{t=1}^T \log P(x_t | x_1, ..., x_{t-1}; \theta)$$
+    
+    \textbf{Architecture Requirements:}
+    \begin{itemize}
+        \item Causal masking prevents future token access
+        \item Decoder-only transformer architecture
+        \item Unidirectional attention patterns
+        \item Sequential generation capability built-in
+    \end{itemize}
+    
+    \textbf{Masked Language Modeling (BERT-style):}
+    
+    \textbf{Mathematical Formulation:}
+    $$L_{MLM} = -\sum_{i \in \mathcal{M}} \log P(x_i | x_{\backslash \mathcal{M}}; \theta)$$
+    where $\mathcal{M}$ is the set of masked positions.
+    
+    \textbf{Architecture Requirements:}
+    \begin{itemize}
+        \item Bidirectional attention (no causal masking)
+        \item Encoder-only transformer architecture
+        \item Random masking strategy (15\% of tokens)
+        \item [MASK] token handling during training
+    \end{itemize}
+    
+    \textbf{Comparative Analysis:}
+    
+    \textbf{Advantages of Autoregressive:}
+    \begin{itemize}
+        \item Natural generation capability
+        \item No train-test discrepancy
+        \item Excellent for text generation tasks
+        \item Scales well to very large models
+        \item Supports variable-length generation
+    \end{itemize}
+    
+    \textbf{Advantages of Masked LM:}
+    \begin{itemize}
+        \item Bidirectional context utilization
+        \item Better sentence-level understanding
+        \item Superior performance on classification tasks
+        \item More efficient training (parallel prediction)
+        \item Better representation learning for understanding tasks
+    \end{itemize}
+    
+    \textbf{Computational Complexity:}
+    \begin{itemize}
+        \item \textbf{Autoregressive:} $O(T^2)$ for generation, $O(T)$ per token during training
+        \item \textbf{Masked LM:} $O(T)$ for understanding, parallel training across all positions
+    \end{itemize}
+    
+    \textbf{Task Suitability:}
+    \begin{itemize}
+        \item \textbf{Generation tasks:} Autoregressive excels (story writing, code generation)
+        \item \textbf{Understanding tasks:} Masked LM excels (classification, NER, QA)
+        \item \textbf{Few-shot learning:} Autoregressive shows better in-context learning
+    \end{itemize}
+    }
+    
+    \item Design a hybrid pre-training strategy that combines both autoregressive and masked language modeling. Explain: \hfill (10 marks)
+    
+    \answer{Hybrid strategy uses unified architecture with task-specific attention masks, enabling both generation and understanding capabilities in a single model.}
+    
+    \explanation{
+    \textbf{Hybrid Architecture Design:}
+    
+    \textbf{Unified Transformer Architecture:}
+    \begin{itemize}
+        \item Standard transformer with flexible attention masking
+        \item Task-specific masking patterns during training
+        \item Shared parameters across both objectives
+        \item Prefix-based task identification
+    \end{itemize}
+    
+    \textbf{Training Procedure:}
+    
+    \textbf{1. Alternating Objectives:}
+    \begin{algorithmic}[1]
+    \FOR{each training batch}
+        \STATE Sample task $\sim \text{Bernoulli}(p=0.5)$
+        \IF{task == "autoregressive"}
+            \STATE Apply causal attention mask
+            \STATE Compute $L_{AR} = -\sum_{t=1}^T \log P(x_t | x_{<t})$
+        \ELSE
+            \STATE Apply bidirectional attention with masking
+            \STATE Compute $L_{MLM} = -\sum_{i \in \mathcal{M}} \log P(x_i | x_{\backslash \mathcal{M}})$
+        \ENDIF
+        \STATE Update parameters with respective loss
+    \ENDFOR
+    \end{algorithmic}
+    
+    \textbf{2. Combined Loss Function:}
+    $$L_{hybrid} = \alpha L_{AR} + (1-\alpha) L_{MLM}$$
+    where $\alpha$ balances the objectives.
+    
+    \textbf{Implementation Details:}
+    
+    \textbf{Attention Mask Management:}
+    \begin{itemize}
+        \item Dynamic masking based on task identifier
+        \item Efficient implementation using attention bias
+        \item Memory-efficient mask computation
+    \end{itemize}
+    
+    \textbf{Task Identification:}
+    \begin{itemize}
+        \item Special tokens: [AR] for autoregressive, [MLM] for masked
+        \item Position-dependent masking patterns
+        \item Gradient isolation for task-specific layers if needed
+    \end{itemize}
+    
+    \textbf{Expected Benefits:}
+    
+    \textbf{1. Unified Capabilities:}
+    \begin{itemize}
+        \item Single model for both generation and understanding
+        \item Reduced computational overhead compared to separate models
+        \item Shared representations benefit both tasks
+    \end{itemize}
+    
+    \textbf{2. Improved Transfer Learning:}
+    \begin{itemize}
+        \item Better downstream task performance
+        \item More robust representations
+        \item Versatile fine-tuning capabilities
+    \end{itemize}
+    
+    \textbf{3. Training Efficiency:}
+    \begin{itemize}
+        \item Shared computational resources
+        \item Reduced model maintenance overhead
+        \item Better parameter utilization
+    \end{itemize}
+    
+    \textbf{Challenges and Solutions:}
+    \begin{itemize}
+        \item \textbf{Training instability:} Use separate learning rates for each objective
+        \item \textbf{Task interference:} Implement gradual curriculum learning
+        \item \textbf{Memory overhead:} Use gradient checkpointing and mixed precision
+    \end{itemize}
+    }
+    
+    \item Analyze the scaling laws for language models. Given a computational budget $C$, derive the optimal allocation between model parameters $N$, dataset size $D$, and training compute, considering the relationship: \hfill (6 marks)
+    $$L(N, D) = A + \frac{B}{N^{\alpha}} + \frac{C}{D^{\beta}}$$
+    
+    \answer{Optimal scaling requires balanced growth of parameters and data, with specific allocation ratios determined by the scaling exponents $\alpha$ and $\beta$.}
+    
+    \explanation{
+    \textbf{Scaling Law Analysis:}
+    
+    \textbf{Given Relationship:}
+    $$L(N, D) = A + \frac{B}{N^{\alpha}} + \frac{C}{D^{\beta}}$$
+    
+    Where:
+    \begin{itemize}
+        \item $L$: Test loss (performance metric)
+        \item $N$: Number of model parameters
+        \item $D$: Dataset size (number of tokens)
+        \item $A, B, C, \alpha, \beta$: Empirically determined constants
+    \end{itemize}
+    
+    \textbf{Computational Budget Constraint:}
+    Training compute scales as: $\text{Compute} \propto N \cdot D$
+    
+    Given fixed budget: $N \cdot D = \text{constant} = K$
+    
+    \textbf{Optimization Problem:}
+    Minimize $L(N, D)$ subject to $N \cdot D = K$
+    
+    Using constraint: $D = K/N$
+    
+    $$L(N) = A + \frac{B}{N^{\alpha}} + \frac{C}{(K/N)^{\beta}} = A + \frac{B}{N^{\alpha}} + \frac{C \cdot N^{\beta}}{K^{\beta}}$$
+    
+    \textbf{First-Order Condition:}
+    $$\frac{dL}{dN} = -\alpha \frac{B}{N^{\alpha+1}} + \beta \frac{C}{K^{\beta}} N^{\beta-1} = 0$$
+    
+    \textbf{Solving for Optimal $N$:}
+    $$\alpha \frac{B}{N^{\alpha+1}} = \beta \frac{C}{K^{\beta}} N^{\beta-1}$$
+    
+    $$\alpha B K^{\beta} = \beta C N^{\alpha+\beta}$$
+    
+    $$N^* = \left(\frac{\alpha B K^{\beta}}{\beta C}\right)^{\frac{1}{\alpha+\beta}}$$
+    
+    \textbf{Optimal Dataset Size:}
+    $$D^* = \frac{K}{N^*} = \left(\frac{\beta C K^{\alpha}}{\alpha B}\right)^{\frac{1}{\alpha+\beta}}$$
+    
+    \textbf{Key Insights:}
+    
+    \textbf{1. Balanced Scaling:}
+    \begin{itemize}
+        \item Optimal allocation depends on ratio $\frac{\alpha}{\beta}$
+        \item If $\alpha > \beta$: Invest more in model size
+        \item If $\beta > \alpha$: Invest more in data size
+    \end{itemize}
+    
+    \textbf{2. Empirical Values:}
+    \begin{itemize}
+        \item Typical values: $\alpha \approx 0.076$, $\beta \approx 0.095$
+        \item Suggests slightly more benefit from data scaling
+        \item Optimal ratio: $N^* : D^* \approx 1 : 20$ tokens per parameter
+    \end{itemize}
+    
+    \textbf{3. Practical Implications:}
+    \begin{itemize}
+        \item Large models require proportionally large datasets
+        \item Computational budget should be balanced between model and data
+        \item Deviating from optimal allocation leads to suboptimal performance
+    \end{itemize}
+    }
+\end{enumerate}
+
+\newpage
+\paragraph{Question 2. Advanced Training Techniques for Large Language Models}\hfill (30 marks)\\
+Based on recent advances in LLM training methodologies.
+
+\begin{enumerate}[(a)]
+    \item Implement a complete Reinforcement Learning from Human Feedback (RLHF) training pipeline: \hfill (15 marks)
+    
+    \answer{Complete RLHF pipeline with supervised fine-tuning, reward model training, and PPO optimization with KL regularization.}
+    
+    \explanation{
+    \textbf{Phase 1: Supervised Fine-Tuning (SFT)}
+    
+    \begin{algorithmic}[1]
+    \STATE \textbf{function} SupervisedFineTuning(base\_model, demonstrations)
+    \STATE // Load pre-trained model
+    \STATE $\pi^{SFT} \leftarrow$ base\_model
+    \STATE 
+    \STATE // Prepare demonstration data
+    \STATE $\mathcal{D}_{demo} \leftarrow \{(x_i, y_i)\}$ where $y_i$ are human demonstrations
+    \STATE
+    \STATE // Standard supervised training
+    \FOR{epoch in training\_epochs}
+        \FOR{batch in $\mathcal{D}_{demo}$}
+            \STATE $L_{SFT} \leftarrow -\mathbb{E}_{(x,y) \sim batch}[\log \pi^{SFT}(y|x)]$
+            \STATE Update $\pi^{SFT}$ using gradient descent on $L_{SFT}$
+        \ENDFOR
+    \ENDFOR
+    \STATE \textbf{return} $\pi^{SFT}$
+    \end{algorithmic}
+    
+    \textbf{Phase 2: Reward Model Training}
+    
+    \begin{algorithmic}[1]
+    \STATE \textbf{function} TrainRewardModel($\pi^{SFT}$, preference\_data)
+    \STATE // Initialize reward model
+    \STATE $r_\phi \leftarrow$ RewardModel(base\_architecture)
+    \STATE
+    \STATE // Prepare pairwise preference data
+    \STATE $\mathcal{D}_{pref} \leftarrow \{(x, y_w, y_l)\}$ where $y_w \succ y_l$
+    \STATE
+    \FOR{epoch in reward\_training\_epochs}
+        \FOR{batch in $\mathcal{D}_{pref}$}
+            \STATE // Compute reward scores
+            \FOR{$(x, y_w, y_l)$ in batch}
+                \STATE $r_w \leftarrow r_\phi(x, y_w)$
+                \STATE $r_l \leftarrow r_\phi(x, y_l)$
+            \ENDFOR
+            \STATE // Bradley-Terry loss
+            \STATE $L_{reward} \leftarrow -\mathbb{E}[\log \sigma(r_w - r_l)]$
+            \STATE Update $r_\phi$ using gradient descent on $L_{reward}$
+        \ENDFOR
+    \ENDFOR
+    \STATE \textbf{return} $r_\phi$
+    \end{algorithmic}
+    
+    \textbf{Phase 3: PPO Training with KL Regularization}
+    
+    \begin{algorithmic}[1]
+    \STATE \textbf{function} PPOTraining($\pi^{SFT}$, $r_\phi$, prompts)
+    \STATE // Initialize policy and reference model
+    \STATE $\pi_\theta \leftarrow \pi^{SFT}$ (trainable copy)
+    \STATE $\pi_{ref} \leftarrow \pi^{SFT}$ (frozen reference)
+    \STATE
+    \FOR{iteration in ppo\_iterations}
+        \STATE // Sample rollouts
+        \STATE $\mathcal{B} \leftarrow \{\}$
+        \FOR{prompt $x$ in prompts\_batch}
+            \STATE $y \sim \pi_\theta(\cdot|x)$ // Generate response
+            \STATE $r \leftarrow r_\phi(x, y)$ // Get reward
+            \STATE $\text{kl} \leftarrow \log \pi_\theta(y|x) - \log \pi_{ref}(y|x)$
+            \STATE $\text{advantage} \leftarrow r - \beta \cdot \text{kl}$ // KL penalty
+            \STATE $\mathcal{B} \leftarrow \mathcal{B} \cup \{(x, y, r, \text{advantage})\}$
+        \ENDFOR
+        \STATE
+        \STATE // PPO update
+        \FOR{ppo\_epoch in range(K)}
+            \FOR{minibatch in $\mathcal{B}$}
+                \STATE // Compute probability ratios
+                \STATE $\text{ratio} \leftarrow \frac{\pi_\theta(y|x)}{\pi_{old}(y|x)}$
+                \STATE // Clipped objective
+                \STATE $\text{clip\_ratio} \leftarrow \text{clip}(\text{ratio}, 1-\epsilon, 1+\epsilon)$
+                \STATE $L_{clip} \leftarrow \min(\text{ratio} \cdot \text{advantage}, \text{clip\_ratio} \cdot \text{advantage})$
+                \STATE // Combined loss with KL penalty
+                \STATE $L_{total} \leftarrow -L_{clip} + \beta \cdot \text{KL}(\pi_\theta || \pi_{ref})$
+                \STATE Update $\pi_\theta$ using gradient descent
+            \ENDFOR
+        \ENDFOR
+    \ENDFOR
+    \STATE \textbf{return} $\pi_\theta$
+    \end{algorithmic}
+    
+    \textbf{Key Implementation Details:}
+    
+    \textbf{KL Divergence Regularization:}
+    $$\text{KL}(\pi_\theta || \pi_{ref}) = \mathbb{E}_{x,y}[\log \pi_\theta(y|x) - \log \pi_{ref}(y|x)]$$
+    
+    \textbf{Hyperparameter Settings:}
+    \begin{itemize}
+        \item KL penalty coefficient: $\beta = 0.02$
+        \item PPO clip ratio: $\epsilon = 0.2$
+        \item PPO epochs per iteration: $K = 4$
+        \item Advantage normalization for stability
+    \end{itemize}
+    }
+\end{enumerate}
+
+\vfill
+\begin{center}{\bf END OF PAPER}\end{center>
+\end{document>

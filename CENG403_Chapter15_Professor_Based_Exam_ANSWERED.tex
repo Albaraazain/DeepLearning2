@@ -1,0 +1,643 @@
+\documentclass[12pt]{article}
+\usepackage{fancyhdr}
+\usepackage{amsmath,amsfonts,enumerate}
+\usepackage{color,graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usetikzlibrary{arrows,positioning,shapes,calc,matrix}
+
+% Define colors for answers
+\definecolor{answercolor}{RGB}{0,100,0}
+\definecolor{explanationcolor}{RGB}{0,0,139}
+
+% Custom commands for answers
+\newcommand{\answer}[1]{{\color{answercolor}\textbf{Answer:} #1}}
+\newcommand{\explanation}[1]{{\color{explanationcolor}#1}}
+
+\pagestyle{fancy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Course customization based on professor's lectures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\masunitnumber}{CENG 403}
+\newcommand{\examdate}{January 2025}
+\newcommand{\academicyear}{2024-2025}
+\newcommand{\semester}{I}
+\newcommand{\coursename}{Deep Learning - Large Language Models \& Vision Transformers (Professor-Based) - ANSWERED}
+\newcommand{\numberofhours}{3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM SPACING COMMANDS FOR ANSWER SPACES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\answerspace}[1]{\vspace{#1}}
+\newcommand{\questionspace}{\vspace{3cm}}        
+\newcommand{\subquestionspace}{\vspace{2.5cm}}   
+\newcommand{\shortanswer}{\vspace{2cm}}          
+\newcommand{\mediumanswer}{\vspace{3cm}}         
+\newcommand{\longanswer}{\vspace{4cm}}           
+\newcommand{\journalspace}{\vspace{4.5cm}}       
+\newcommand{\codespace}{\vspace{5cm}}            
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header setup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lhead{}
+\rhead{}
+\chead{{\bf MIDDLE EAST TECHNICAL UNIVERSITY}}
+\lfoot{}
+\rfoot{}
+\cfoot{}
+\begin{document}
+\setlength{\headsep}{5truemm}
+\setlength{\headheight}{14.5truemm}
+\setlength{\voffset}{-0.45truein}
+\renewcommand{\headrulewidth}{0.0pt}
+\begin{center}
+SEMESTER \semester\ EXAMINATION \academicyear
+\end{center}
+\begin{center}
+{\bf \masunitnumber\ -- \coursename}
+\end{center}
+\vspace{20truemm}
+\noindent \examdate\hspace{45truemm} TIME ALLOWED: \numberofhours\ HOURS
+\vspace{19truemm}
+\hrule
+\vspace{19truemm}
+\noindent\underline{INSTRUCTIONS TO CANDIDATES}
+\vspace{8truemm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Instructions based on lecture format
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+\item This examination paper contains {\bf SIX (6)} questions and comprises 
+{\bf EIGHT (8)} printed pages.
+\item Answer all questions. 
+The marks for each question are indicated at the beginning of each question.
+\item Answer each question beginning on a {\bf FRESH} page of the answer book.
+\item This {\bf IS NOT an OPEN BOOK} exam.
+\item Show all mathematical derivations clearly with proper notation.
+\item Draw clear diagrams with proper labels where requested.
+\item Explain the intuition behind mechanisms where asked.
+\end{enumerate>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New page for questions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\lhead{}
+\rhead{\masunitnumber}
+\chead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+\setlength{\footskip}{45pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EXAM QUESTIONS BASED ON PROFESSOR'S LECTURES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{Question 1. Pre-training Strategies and Early Language Models}\hfill (22 marks)\\
+Based on Week 15b lecture content on GPT1 and BERT pre-training.
+
+\begin{enumerate}[(a)]
+    \item The professor explained that GPT1 used "autoregressive language modeling" for pre-training. Explain this concept and describe how it differs from the supervised fine-tuning that followed. \hfill (8 marks)
+    
+    \answer{Autoregressive language modeling predicts the next token in sequence, providing unsupervised pre-training before task-specific supervised fine-tuning.}
+    
+    \explanation{
+    \textbf{Autoregressive Language Modeling:}
+    
+    \textbf{Core Concept:}
+    \begin{itemize}
+        \item Predicts next token given previous tokens: $P(w_t | w_1, w_2, ..., w_{t-1})$
+        \item Uses causal masking to prevent seeing future tokens
+        \item Trains on large amounts of unlabeled text from the web
+        \item Learns general language understanding without task-specific labels
+    \end{itemize}
+    
+    \textbf{Mathematical Formulation:}
+    $$L_{AR} = -\sum_{t=1}^T \log P(w_t | w_1, ..., w_{t-1}; \theta)$$
+    
+    \textbf{Pre-training Process:}
+    \begin{itemize}
+        \item Uses decoder-only transformer architecture
+        \item Trained on diverse internet text
+        \item No human annotation required
+        \item Learns to generate coherent, contextual text
+    \end{itemize}
+    
+    \textbf{Supervised Fine-tuning Differences:}
+    
+    \textbf{1. Data Requirements:}
+    \begin{itemize}
+        \item Pre-training: Large unlabeled text corpora
+        \item Fine-tuning: Smaller labeled datasets for specific tasks
+    \end{itemize}
+    
+    \textbf{2. Learning Objectives:}
+    \begin{itemize}
+        \item Pre-training: General language modeling
+        \item Fine-tuning: Task-specific classification/generation
+    \end{itemize}
+    
+    \textbf{3. Training Process:}
+    \begin{itemize}
+        \item Pre-training: Single general objective across all data
+        \item Fine-tuning: Task-specific loss functions with task-specific architectures
+    \end{itemize}
+    
+    \textbf{Why This Works:}
+    The professor emphasized that autoregressive pre-training learns rich representations that transfer well to downstream tasks, providing a strong foundation for task-specific learning.
+    }
+    
+    \item According to the lecture, BERT introduced two pre-training tasks: masked language modeling and next sentence prediction. Explain both tasks and why the professor mentioned that masking creates a "discrepancy between training and testing." \hfill (8 marks)
+    
+    \answer{BERT uses masked language modeling to predict hidden tokens and next sentence prediction to understand sentence relationships, but masking creates train-test mismatch.}
+    
+    \explanation{
+    \textbf{Masked Language Modeling (MLM):}
+    
+    \textbf{Process:}
+    \begin{itemize}
+        \item Randomly mask 15\% of input tokens
+        \item Replace with [MASK] token (80\%), random token (10\%), or keep original (10\%)
+        \item Predict original token at masked positions
+        \item Enables bidirectional context understanding
+    \end{itemize}
+    
+    \textbf{Objective:}
+    $$L_{MLM} = -\sum_{i \in \text{masked}} \log P(w_i | w_{\text{not masked}})$$
+    
+    \textbf{Next Sentence Prediction (NSP):}
+    
+    \textbf{Process:}
+    \begin{itemize}
+        \item Take two sentences: 50\% are consecutive, 50\% are random pairs
+        \item Add [CLS] token at beginning, [SEP] between sentences
+        \item Predict whether second sentence follows first
+        \item Helps learn sentence-level relationships
+    \end{itemize}
+    
+    \textbf{Training vs Testing Discrepancy:}
+    
+    \textbf{The Problem:}
+    \begin{itemize}
+        \item Training: Model sees [MASK] tokens during MLM
+        \item Testing/Fine-tuning: No [MASK] tokens in real text
+        \item Artificial token never appears in downstream tasks
+        \item Creates domain shift between pre-training and application
+    \end{itemize}
+    
+    \textbf{Mitigation Strategies:}
+    \begin{itemize}
+        \item 10\% replacement with random tokens
+        \item 10\% keeping original tokens unchanged
+        \item Reduces dependency on [MASK] token
+        \item Still maintains some discrepancy
+    \end{itemize}
+    
+    \textbf{Professor's Insight:}
+    This discrepancy led to later innovations like XLNet and ELECTRA that avoid the [MASK] token entirely, showing how early design choices influenced subsequent research directions.
+    }
+    
+    \item The professor described how BERT uses a "CLS token" for classification tasks. Explain how this token works and why it's effective for downstream tasks. \hfill (6 marks)
+    
+    \answer{The CLS token aggregates sequence information through attention, providing a fixed-size representation for classification tasks.}
+    
+    \explanation{
+    \textbf{CLS Token Mechanism:}
+    
+    \textbf{Positioning and Processing:}
+    \begin{itemize}
+        \item Added as first token: [CLS] + sentence tokens
+        \item Special learnable embedding, not tied to vocabulary
+        \item Processed through all transformer layers
+        \item Attends to all other tokens in the sequence
+    \end{itemize}
+    
+    \textbf{Information Aggregation:}
+    \begin{itemize}
+        \item Through self-attention, gathers information from entire sequence
+        \item Each attention layer allows CLS to "look at" all other tokens
+        \item Builds comprehensive sequence representation
+        \item Final layer CLS embedding contains summary of entire input
+    \end{itemize}
+    
+    \textbf{Classification Usage:}
+    \begin{itemize}
+        \item Take final CLS representation: $h_{CLS} \in \mathbb{R}^d$
+        \item Add linear classifier: $\text{logits} = W_{cls} h_{CLS} + b$
+        \item Train end-to-end for specific classification task
+        \item Fixed-size output regardless of input length
+    \end{itemize}
+    
+    \textbf{Why It's Effective:}
+    
+    \textbf{1. Global Context:}
+    \begin{itemize}
+        \item Sees entire sequence through attention
+        \item Can identify important patterns anywhere in input
+        \item Not limited by sequence order or locality
+    \end{itemize}
+    
+    \textbf{2. Learned Summarization:}
+    \begin{itemize}
+        \item Learns to extract task-relevant information
+        \item Adapts summarization strategy during fine-tuning
+        \item More flexible than fixed pooling strategies
+    \end{itemize}
+    
+    \textbf{3. Pre-training Benefits:}
+    \begin{itemize}
+        \item CLS token learns general text understanding during pre-training
+        \item Provides strong initialization for downstream tasks
+        \item Transfers well across different classification problems
+    \end{itemize}
+    }
+\end{enumerate}
+
+\newpage
+\paragraph{Question 2. Evolution of GPT Models}\hfill (25 marks)\\
+Based on the professor's discussion of GPT1, GPT2, and GPT3 progression.
+
+\begin{enumerate}[(a)]
+    \item The professor noted that GPT2 showed "interesting properties emerge" when scaling up transformers. What were these emergent properties, and how did they differ from GPT1's capabilities? \hfill (8 marks)
+    
+    \answer{GPT2 demonstrated emergent capabilities like zero-shot task performance and coherent long-form generation that weren't present in smaller models.}
+    
+    \explanation{
+    \textbf{Emergent Properties in GPT2:}
+    
+    \textbf{1. Zero-Shot Task Performance:}
+    \begin{itemize}
+        \item Could perform tasks without task-specific training
+        \item Translation, summarization, question answering
+        \item Simply through text continuation
+        \item No fine-tuning required for basic performance
+    \end{itemize}
+    
+    \textbf{2. Coherent Long-Form Generation:}
+    \begin{itemize}
+        \item Generated multi-paragraph coherent text
+        \item Maintained topic consistency across long sequences
+        \item Could follow complex narrative structures
+        \item Much improved over GPT1's shorter, less coherent outputs
+    \end{itemize}
+    
+    \textbf{3. Improved Context Understanding:}
+    \begin{itemize}
+        \item Better handling of long-range dependencies
+        \item More sophisticated reasoning patterns
+        \item Improved factual consistency
+    \end{itemize}
+    
+    \textbf{Differences from GPT1:}
+    
+    \textbf{GPT1 Limitations:}
+    \begin{itemize}
+        \item Required fine-tuning for each downstream task
+        \item Generated shorter, less coherent text
+        \item Limited transfer learning capabilities
+        \item Smaller scale limited emergent behaviors
+    \end{itemize}
+    
+    \textbf{GPT2 Advances:}
+    \begin{itemize}
+        \item 10x larger model (1.5B vs 117M parameters)
+        \item Much larger and cleaner training dataset
+        \item Demonstrated scaling benefits beyond simple performance improvements
+        \item Showed that scale alone can lead to qualitatively new capabilities
+    \end{itemize}
+    
+    \textbf{Professor's Key Insight:}
+    The emergence of these capabilities suggested that further scaling might lead to even more sophisticated behaviors, setting the stage for GPT3's development.
+    }
+    
+    \item Explain the concept of "in-context learning" as described in the lecture for GPT3. How does this differ from traditional fine-tuning approaches? \hfill (8 marks)
+    
+    \answer{In-context learning enables GPT3 to perform tasks using only examples in the prompt, without parameter updates, unlike fine-tuning which modifies model weights.}
+    
+    \explanation{
+    \textbf{In-Context Learning Mechanism:}
+    
+    \textbf{How It Works:}
+    \begin{itemize}
+        \item Provide task examples in the input prompt
+        \item Model learns pattern from examples
+        \item Applies learned pattern to new instance
+        \item No gradient updates or parameter changes
+    \end{itemize}
+    
+    \textbf{Example Structure:}
+    \begin{verbatim}
+    Translate English to French:
+    English: Hello
+    French: Bonjour
+    English: Goodbye  
+    French: Au revoir
+    English: Thank you
+    French: [Model completes]
+    \end{verbatim}
+    
+    \textbf{Types of In-Context Learning:}
+    \begin{itemize}
+        \item \textbf{Zero-shot:} Task description only, no examples
+        \item \textbf{One-shot:} Single example provided
+        \item \textbf{Few-shot:} Multiple examples (typically 2-10)
+    \end{itemize}
+    
+    \textbf{Differences from Fine-tuning:}
+    
+    \textbf{Traditional Fine-tuning:}
+    \begin{itemize}
+        \item Requires labeled dataset for each task
+        \item Updates model parameters through gradient descent
+        \item Task-specific model versions
+        \item Time-consuming training process
+        \item Risk of catastrophic forgetting
+    \end{itemize}
+    
+    \textbf{In-Context Learning:}
+    \begin{itemize}
+        \item Uses same model for all tasks
+        \item No parameter updates required
+        \item Immediate task adaptation
+        \item Preserves all pre-trained knowledge
+        \item Limited by context length
+    \end{itemize}
+    
+    \textbf{Advantages of In-Context Learning:}
+    \begin{itemize}
+        \item Rapid task switching
+        \item No need for large task-specific datasets
+        \item Preserves general capabilities
+        \item Enables few-shot learning scenarios
+    \end{itemize}
+    
+    \textbf{Professor's Observation:}
+    This capability emerged only at sufficient scale (GPT3's 175B parameters), suggesting that in-context learning is an emergent property of large-scale language modeling.
+    }
+    
+    \item The professor mentioned that GPT3 came "very close to passing the Turing test." Explain what the Turing test is and analyze the significance of this achievement according to the lecture. \hfill (9 marks)
+    
+    \answer{The Turing test evaluates machine intelligence through conversational indistinguishability from humans; GPT3's near-success marked a milestone in AI development.}
+    
+    \explanation{
+    \textbf{The Turing Test Explained:}
+    
+    \textbf{Test Setup:}
+    \begin{itemize}
+        \item Human judge converses with two entities via text
+        \item One entity is human, one is AI
+        \item Judge tries to determine which is which
+        \item AI "passes" if judge cannot reliably distinguish
+    \end{itemize}
+    
+    \textbf{Historical Context:}
+    \begin{itemize}
+        \item Proposed by Alan Turing in 1950
+        \item Operational definition of machine intelligence
+        \item Focuses on behavioral rather than cognitive criteria
+        \item Influential but controversial intelligence benchmark
+    \end{itemize}
+    
+    \textbf{GPT3's Performance:}
+    
+    \textbf{Near-Random Judge Performance:}
+    \begin{itemize}
+        \item Judge accuracy approached 50\% (random chance)
+        \item Indicates high human-like conversational ability
+        \item Consistent across different conversation topics
+        \item Significant improvement over previous AI systems
+    \end{itemize}
+    
+    \textbf{Capabilities Demonstrated:}
+    \begin{itemize}
+        \item Coherent multi-turn conversations
+        \item Appropriate contextual responses
+        \item Creative and informative text generation
+        \item Apparent understanding of nuanced queries
+    \end{itemize}
+    
+    \textbf{Significance According to Professor:}
+    
+    \textbf{1. Milestone Achievement:}
+    \begin{itemize}
+        \item First AI system to approach Turing test success
+        \item Validated decades of AI research progress
+        \item Demonstrated power of scale in language modeling
+    \end{itemize}
+    
+    \textbf{2. Paradigm Shift:}
+    \begin{itemize}
+        \item Showed that large-scale pre-training could achieve general intelligence
+        \item Moved beyond narrow task-specific AI
+        \item Suggested path toward artificial general intelligence
+    \end{itemize}
+    
+    \textbf{3. Societal Impact:}
+    \begin{itemize}
+        \item Generated widespread public interest in AI
+        \item Raised questions about AI capabilities and limitations
+        \item Sparked discussions about AI safety and alignment
+    \end{itemize}
+    
+    \textbf{Limitations and Caveats:}
+    \begin{itemize}
+        \item Still made obvious errors and inconsistencies
+        \item Lacked true understanding in many cases
+        \item Performance varied significantly across domains
+        \item Turing test itself has known limitations as intelligence measure
+    \end{itemize}
+    
+    \textbf{Professor's Conclusion:}
+    While GPT3's near-success was remarkable, it highlighted both the potential and current limitations of large language models, setting the stage for further improvements in models like ChatGPT.
+    }
+\end{enumerate>
+
+\newpage
+\paragraph{Question 3. ChatGPT and Reinforcement Learning from Human Feedback}\hfill (20 marks)\\
+Based on the professor's explanation of the three-step training process.
+
+\begin{enumerate}[(a)]
+    \item The professor described a "multi-stage training strategy" for ChatGPT. Outline the three stages and explain why each stage was necessary. \hfill (10 marks)
+    
+    \answer{ChatGPT training involves supervised fine-tuning, reward model training, and reinforcement learning to align model outputs with human intentions.}
+    
+    \explanation{
+    \textbf{Three-Stage Training Strategy:}
+    
+    \textbf{Stage 1: Supervised Fine-Tuning (SFT)}
+    
+    \textbf{Process:}
+    \begin{itemize}
+        \item Start with pre-trained GPT3 as base model
+        \item Collect human-written demonstrations of desired behavior
+        \item Fine-tune model using supervised learning on these examples
+        \item Train to imitate high-quality human responses
+    \end{itemize}
+    
+    \textbf{Why Necessary:}
+    \begin{itemize}
+        \item GPT3 raw outputs often missed human intentions
+        \item Needed to teach proper response format and style
+        \item Established baseline for instruction-following behavior
+        \item Provided foundation for subsequent training stages
+    \end{itemize}
+    
+    \textbf{Stage 2: Reward Model Training}
+    
+    \textbf{Process:}
+    \begin{itemize}
+        \item Generate multiple responses for same prompt using SFT model
+        \item Human evaluators rank responses from best to worst
+        \item Train separate neural network to predict human preferences
+        \item Create automated quality scoring system
+    \end{itemize}
+    
+    \textbf{Why Necessary:}
+    \begin{itemize}
+        \item Humans cannot provide demonstrations for all possible inputs
+        \item Need scalable way to evaluate response quality
+        \item Enables automated training without constant human oversight
+        \item Captures nuanced human preferences about response quality
+    \end{itemize}
+    
+    \textbf{Stage 3: Reinforcement Learning from Human Feedback (RLHF)}
+    
+    \textbf{Process:}
+    \begin{itemize}
+        \item Use reward model as environment for RL training
+        \item Model generates responses and receives scores from reward model
+        \item Update model parameters to maximize reward scores
+        \item Use PPO (Proximal Policy Optimization) algorithm
+    \end{itemize}
+    
+    \textbf{Why Necessary:}
+    \begin{itemize}
+        \item Fine-tunes model to optimize for human preferences
+        \item Allows model to learn from feedback at scale
+        \item Addresses gap between demonstration and optimization
+        \item Enables continuous improvement beyond initial demonstrations
+    \end{itemize}
+    
+    \textbf{Integration and Benefits:}
+    \begin{itemize}
+        \item Each stage builds on previous stages
+        \item Progressive alignment with human values
+        \item Scalable training process
+        \item Dramatic improvement in response quality and helpfulness
+    \end{itemize}
+    }
+    
+    \item Explain how the "reward model" works as described in the lecture. How does it learn to rate responses, and why is this approach better than direct human rating? \hfill (6 marks)
+    
+    \answer{The reward model learns from pairwise human comparisons to predict response quality, enabling scalable automated evaluation without constant human oversight.}
+    
+    \explanation{
+    \textbf{Reward Model Mechanism:}
+    
+    \textbf{Training Data Collection:}
+    \begin{itemize}
+        \item Present human evaluators with prompt and 2-4 model responses
+        \item Humans rank responses from best to worst
+        \item Collect thousands of such preference rankings
+        \item Create dataset of pairwise preference comparisons
+    \end{itemize}
+    
+    \textbf{Model Architecture:}
+    \begin{itemize}
+        \item Use transformer architecture (similar to base model)
+        \item Input: prompt + response concatenation
+        \item Output: single scalar score representing quality
+        \item Trained to predict human preference rankings
+    \end{itemize}
+    
+    \textbf{Training Objective:}
+    $$L = -\mathbb{E}[\log \sigma(r(x, y_w) - r(x, y_l))]$$
+    Where $y_w$ is preferred response, $y_l$ is less preferred, and $r$ is reward model.
+    
+    \textbf{Advantages over Direct Human Rating:}
+    
+    \textbf{1. Scalability:}
+    \begin{itemize}
+        \item Once trained, can evaluate unlimited responses automatically
+        \item Human evaluation is expensive and time-consuming
+        \item Enables large-scale reinforcement learning
+    \end{itemize}
+    
+    \textbf{2. Consistency:}
+    \begin{itemize}
+        \item Provides consistent evaluation criteria
+        \item Humans may be inconsistent across time and evaluators
+        \item Reduces noise in training signal
+    \end{itemize}
+    
+    \textbf{3. Continuous Availability:}
+    \begin{itemize}
+        \item Available 24/7 for training
+        \item No scheduling constraints or human fatigue
+        \item Enables rapid iteration and experimentation
+    \end{itemize}
+    
+    \textbf{Professor's Insight:}
+    This approach represented a "brilliant strategy" of using one model to supervise another, enabling automated alignment training at scale.
+    }
+    
+    \item The professor mentioned that ChatGPT addressed the "gap between prompt and human intention." Provide examples of this gap and explain how the training process addressed it. \hfill (4 marks)
+    
+    \answer{ChatGPT training addressed misalignment between literal prompt interpretation and user intentions through human feedback and reinforcement learning.}
+    
+    \explanation{
+    \textbf{Examples of Prompt-Intention Gaps:}
+    
+    \textbf{1. Harmful Requests:}
+    \begin{itemize}
+        \item Prompt: "How to make a bomb?"
+        \item Literal response: Detailed bomb-making instructions
+        \item Human intention: Likely educational or fictional context
+        \item Desired response: Refuse harmful content, suggest alternatives
+    \end{itemize}
+    
+    \textbf{2. Ambiguous Queries:}
+    \begin{itemize}
+        \item Prompt: "Write about Paris"
+        \item Literal response: Generic facts about Paris
+        \item Human intention: Specific aspect (travel, history, culture)
+        \item Desired response: Ask for clarification or provide comprehensive overview
+    \end{itemize}
+    
+    \textbf{3. Incomplete Context:}
+    \begin{itemize}
+        \item Prompt: "Fix this code"
+        \item Literal response: "I don't see any code"
+        \item Human intention: Expecting helpful guidance
+        \item Desired response: Ask user to provide the code and explain common issues
+    \end{itemize}
+    
+    \textbf{How Training Process Addressed This:}
+    
+    \textbf{1. Human Demonstrations:}
+    \begin{itemize}
+        \item Showed model appropriate responses to ambiguous prompts
+        \item Demonstrated helpfulness while maintaining safety
+        \item Taught contextual interpretation skills
+    \end{itemize}
+    
+    \textbf{2. Preference Learning:}
+    \begin{itemize}
+        \item Humans ranked responses that better matched intentions higher
+        \item Reward model learned to predict intention-aligned responses
+        \item Training optimized for human satisfaction rather than literal correctness
+    \end{itemize}
+    
+    \textbf{3. Iterative Improvement:}
+    \begin{itemize}
+        \item RLHF process continuously refined intention understanding
+        \item Model learned to infer unstated user goals
+        \item Developed more helpful and contextually appropriate responses
+    \end{itemize}
+    }
+\end{enumerate>
+
+\vfill
+\begin{center}{\bf END OF PAPER}\end{center>
+\end{document>

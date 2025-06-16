@@ -1,0 +1,308 @@
+\documentclass[12pt]{article}
+\usepackage{fancyhdr}
+\usepackage{amsmath,amsfonts,enumerate}
+\usepackage{color,graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usetikzlibrary{arrows,positioning,shapes,calc,matrix}
+\pagestyle{fancy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Course customization based on university sources
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\masunitnumber}{CENG 403}
+\newcommand{\examdate}{January 2025}
+\newcommand{\academicyear}{2024-2025}
+\newcommand{\semester}{I}
+\newcommand{\coursename}{Deep Learning - Self-Attention \& Transformers (University Sources)}
+\newcommand{\numberofhours}{3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM SPACING COMMANDS FOR ANSWER SPACES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\answerspace}[1]{\vspace{#1}}
+\newcommand{\questionspace}{\vspace{3cm}}        
+\newcommand{\subquestionspace}{\vspace{2.5cm}}   
+\newcommand{\shortanswer}{\vspace{2cm}}          
+\newcommand{\mediumanswer}{\vspace{3cm}}         
+\newcommand{\longanswer}{\vspace{4cm}}           
+\newcommand{\journalspace}{\vspace{4.5cm}}       
+\newcommand{\codespace}{\vspace{5cm}}            
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header setup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lhead{}
+\rhead{}
+\chead{{\bf MIDDLE EAST TECHNICAL UNIVERSITY}}
+\lfoot{}
+\rfoot{}
+\cfoot{}
+\begin{document}
+\setlength{\headsep}{5truemm}
+\setlength{\headheight}{14.5truemm}
+\setlength{\voffset}{-0.45truein}
+\renewcommand{\headrulewidth}{0.0pt}
+\begin{center}
+SEMESTER \semester\ EXAMINATION \academicyear
+\end{center}
+\begin{center}
+{\bf \masunitnumber\ -- \coursename}
+\end{center}
+\vspace{20truemm}
+\noindent \examdate\hspace{45truemm} TIME ALLOWED: \numberofhours\ HOURS
+\vspace{19truemm}
+\hrule
+\vspace{19truemm}
+\noindent\underline{INSTRUCTIONS TO CANDIDATES}
+\vspace{8truemm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Instructions based on university standards
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+\item This examination paper contains {\bf SEVEN (7)} questions and comprises 
+{\bf TEN (10)} printed pages.
+\item Answer all questions. 
+The marks for each question are indicated at the beginning of each question.
+\item Answer each question beginning on a {\bf FRESH} page of the answer book.
+\item This {\bf IS NOT an OPEN BOOK} exam.
+\item Show all mathematical derivations clearly with proper notation.
+\item For implementation questions, provide clear pseudocode or algorithms.
+\item Explain computational complexity where requested.
+\item Draw clear architectural diagrams with proper labels.
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New page for questions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\lhead{}
+\rhead{\masunitnumber}
+\chead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+\setlength{\footskip}{45pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EXAM QUESTIONS BASED ON UNIVERSITY SOURCES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{Question 1. Mathematical Foundations of Self-Attention}\hfill (25 marks)\\
+Based on transformer research papers and university deep learning courses.
+
+\begin{enumerate}[(a)]
+    \item Define the self-attention mechanism mathematically. For a sequence of input vectors $X = [x_1, x_2, ..., x_n]$ where $x_i \in \mathbb{R}^d$, derive the complete attention formula including: \hfill (10 marks)
+    \begin{itemize}
+        \item Query, Key, Value transformations
+        \item Attention weight computation
+        \item Output aggregation
+        \item Scaling factor justification
+    \end{itemize}
+    
+    \journalspace
+    
+    \item Prove that the attention weights $\alpha_{ij}$ sum to 1 for each query position $i$. Show that $\sum_{j=1}^n \alpha_{ij} = 1$. \hfill (5 marks)
+    
+    \mediumanswer
+    
+    \item Analyze the computational and space complexity of self-attention for sequence length $n$ and embedding dimension $d$. Compare with RNN complexity. \hfill (6 marks)
+    
+    \mediumanswer
+    
+    \item Explain why self-attention is permutation invariant and how positional encoding addresses this limitation. \hfill (4 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 2. Multi-Head Attention Architecture}\hfill (30 marks)\\
+Based on "Attention Is All You Need" and related transformer literature.
+
+\begin{enumerate}[(a)]
+    \item Design a multi-head attention mechanism with $h=8$ heads for input dimension $d_{model}=512$. Calculate: \hfill (12 marks)
+    \begin{itemize}
+        \item Dimension of each head: $d_k = d_v = ?$
+        \item Total number of parameters in all projection matrices
+        \item Memory requirements for storing attention matrices
+        \item Computational complexity compared to single-head attention
+    \end{itemize}
+    
+    \journalspace
+    
+    \item Implement the multi-head attention algorithm in pseudocode. Include: \hfill (10 marks)
+    \begin{itemize}
+        \item Input preprocessing
+        \item Parallel head computation
+        \item Output concatenation and projection
+        \item Masking for causal attention
+    \end{itemize}
+    
+    \codespace
+    
+    \item Analyze why multiple attention heads capture different types of relationships. Provide examples of what different heads might learn in language modeling. \hfill (8 marks)
+    
+    \mediumanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 3. Positional Encoding Schemes}\hfill (22 marks)\\
+Based on positional encoding research and university course materials.
+
+\begin{enumerate}[(a)]
+    \item Derive the sinusoidal positional encoding formula: \hfill (8 marks)
+    $$PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{model}}}\right)$$
+    $$PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right)$$
+    
+    Explain the mathematical properties that make this encoding suitable for transformers.
+    
+    \mediumanswer
+    
+    \item Compare sinusoidal vs. learned positional encodings: \hfill (8 marks)
+    \begin{itemize}
+        \item Advantages and disadvantages of each approach
+        \item Generalization to longer sequences
+        \item Parameter efficiency
+        \item Training dynamics
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Design a relative positional encoding scheme that encodes the distance between positions rather than absolute positions. Explain how this addresses limitations of absolute positional encoding. \hfill (6 marks)
+    
+    \mediumanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 4. Transformer Encoder-Decoder Architecture}\hfill (28 marks)\\
+Based on the original transformer paper and sequence-to-sequence learning.
+
+\begin{enumerate}[(a)]
+    \item Draw the complete transformer architecture for machine translation, clearly showing: \hfill (12 marks)
+    \begin{itemize}
+        \item Encoder stack with all sub-layers
+        \item Decoder stack with all sub-layers
+        \item Information flow between encoder and decoder
+        \item Masking mechanisms
+        \item Output projection and softmax
+    \end{itemize}
+    
+    \begin{center}
+    \begin{tikzpicture}[scale=0.8]
+        % Space for complete transformer architecture
+        \draw[dotted] (0,0) rectangle (14,12);
+        \node at (7,11.5) {\textbf{Draw complete transformer encoder-decoder architecture}};
+        \node at (7,0.5) {\textbf{Include all components and connections}};
+    \end{tikzpicture}
+    \end{center}
+    
+    \item Explain the three types of attention used in the transformer: \hfill (10 marks)
+    \begin{itemize}
+        \item Encoder self-attention (bidirectional)
+        \item Decoder self-attention (masked/causal)
+        \item Encoder-decoder cross-attention
+    \end{itemize}
+    
+    For each type, specify the source of Query, Key, and Value.
+    
+    \mediumanswer
+    
+    \item Analyze the training vs. inference differences in transformer decoders. Explain teacher forcing and its implications. \hfill (6 marks)
+    
+    \mediumanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 5. Advanced Attention Mechanisms}\hfill (25 marks)\\
+Based on recent attention mechanism research and optimization techniques.
+
+\begin{enumerate}[(a)]
+    \item Compare different attention variants: \hfill (12 marks)
+    \begin{itemize}
+        \item Dot-product attention
+        \item Additive (Bahdanau) attention
+        \item Multiplicative (Luong) attention
+        \item Sparse attention patterns
+    \end{itemize}
+    
+    For each, provide the mathematical formulation and discuss computational trade-offs.
+    
+    \journalspace
+    
+    \item Design a linear attention mechanism that reduces the quadratic complexity to linear complexity. Explain: \hfill (8 marks)
+    \begin{itemize}
+        \item Mathematical approximation used
+        \item Computational savings achieved
+        \item Potential accuracy trade-offs
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Analyze attention pattern sparsity in real transformer models. Why do attention weights become sparse, and how can this be exploited for efficiency? \hfill (5 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 6. Optimization and Training Considerations}\hfill (20 marks)\\
+Based on transformer training techniques and optimization literature.
+
+\begin{enumerate}[(a)]
+    \item Explain the role of residual connections and layer normalization in transformer training: \hfill (8 marks)
+    \begin{itemize}
+        \item Gradient flow analysis
+        \item Training stability
+        \item Pre-norm vs. post-norm placement
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Design a learning rate schedule for transformer training. Include: \hfill (7 marks)
+    \begin{itemize}
+        \item Warmup phase justification
+        \item Scaling with model size and batch size
+        \item Mathematical formulation
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Analyze the gradient computation in transformers. Why might gradients vanish or explode, and how do architectural choices mitigate these problems? \hfill (5 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 7. Applications and Extensions}\hfill (25 marks)\\
+Based on transformer applications in various domains.
+
+\begin{enumerate}[(a)]
+    \item Adapt the transformer architecture for computer vision (Vision Transformer). Explain: \hfill (10 marks)
+    \begin{itemize}
+        \item Image tokenization strategy (patch embeddings)
+        \item Positional encoding for 2D images
+        \item Classification token design
+        \item Comparison with convolutional architectures
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Design a transformer-based speech recognition system. Address: \hfill (8 marks)
+    \begin{itemize}
+        \item Audio feature extraction and tokenization
+        \item Temporal modeling considerations
+        \item CTC vs. attention-based decoding
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Analyze the scalability of transformers. Discuss: \hfill (7 marks)
+    \begin{itemize}
+        \item Parameter scaling laws
+        \item Memory and computational requirements
+        \item Distributed training considerations
+    \end{itemize}
+    
+    \mediumanswer
+\end{enumerate}
+
+\vfill
+\begin{center}{\bf END OF PAPER}\end{center>
+\end{document}

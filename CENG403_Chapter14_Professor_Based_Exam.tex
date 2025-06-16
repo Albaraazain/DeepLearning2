@@ -1,0 +1,240 @@
+\documentclass[12pt]{article}
+\usepackage{fancyhdr}
+\usepackage{amsmath,amsfonts,enumerate}
+\usepackage{color,graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usetikzlibrary{arrows,positioning,shapes,calc,matrix}
+\pagestyle{fancy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Course customization based on professor's lectures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\masunitnumber}{CENG 403}
+\newcommand{\examdate}{January 2025}
+\newcommand{\academicyear}{2024-2025}
+\newcommand{\semester}{I}
+\newcommand{\coursename}{Deep Learning - Self-Attention \& Transformers (Professor-Based)}
+\newcommand{\numberofhours}{3}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CUSTOM SPACING COMMANDS FOR ANSWER SPACES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\answerspace}[1]{\vspace{#1}}
+\newcommand{\questionspace}{\vspace{3cm}}        
+\newcommand{\subquestionspace}{\vspace{2.5cm}}   
+\newcommand{\shortanswer}{\vspace{2cm}}          
+\newcommand{\mediumanswer}{\vspace{3cm}}         
+\newcommand{\longanswer}{\vspace{4cm}}           
+\newcommand{\journalspace}{\vspace{4.5cm}}       
+\newcommand{\codespace}{\vspace{5cm}}            
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header setup
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lhead{}
+\rhead{}
+\chead{{\bf MIDDLE EAST TECHNICAL UNIVERSITY}}
+\lfoot{}
+\rfoot{}
+\cfoot{}
+\begin{document}
+\setlength{\headsep}{5truemm}
+\setlength{\headheight}{14.5truemm}
+\setlength{\voffset}{-0.45truein}
+\renewcommand{\headrulewidth}{0.0pt}
+\begin{center}
+SEMESTER \semester\ EXAMINATION \academicyear
+\end{center}
+\begin{center}
+{\bf \masunitnumber\ -- \coursename}
+\end{center}
+\vspace{20truemm}
+\noindent \examdate\hspace{45truemm} TIME ALLOWED: \numberofhours\ HOURS
+\vspace{19truemm}
+\hrule
+\vspace{19truemm}
+\noindent\underline{INSTRUCTIONS TO CANDIDATES}
+\vspace{8truemm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Instructions based on lecture format
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{enumerate}
+\item This examination paper contains {\bf SIX (6)} questions and comprises 
+{\bf EIGHT (8)} printed pages.
+\item Answer all questions. 
+The marks for each question are indicated at the beginning of each question.
+\item Answer each question beginning on a {\bf FRESH} page of the answer book.
+\item This {\bf IS NOT an OPEN BOOK} exam.
+\item Show all mathematical derivations clearly with proper notation.
+\item Draw clear diagrams with proper labels where requested.
+\item Explain the intuition behind mechanisms where asked.
+\end{enumerate}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% New page for questions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\lhead{}
+\rhead{\masunitnumber}
+\chead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+\setlength{\footskip}{45pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% EXAM QUESTIONS BASED ON PROFESSOR'S LECTURES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\paragraph{Question 1. Vanilla Self-Attention Mechanism}\hfill (20 marks)\\
+Based on Week 14a lecture content on basic self-attention.
+
+\begin{enumerate}[(a)]
+    \item Explain the motivation behind self-attention. Why did the professor suggest moving away from sequential processing in RNNs to parallel processing? \hfill (5 marks)
+    
+    \mediumanswer
+    
+    \item Consider a sequence of 3 word embeddings $E_0, E_1, E_2$. Using the vanilla self-attention approach described in the lecture, show step-by-step how to compute the updated embedding $E_0'$. Include: \hfill (10 marks)
+    \begin{itemize}
+        \item Similarity computation using dot product
+        \item Softmax normalization 
+        \item Weighted combination
+    \end{itemize}
+    
+    \journalspace
+    
+    \item The professor mentioned that "different time steps can be processed in parallel." Explain what this means and why it's advantageous over RNN processing. \hfill (5 marks)
+    
+    \mediumanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 2. Query-Key-Value Self-Attention}\hfill (25 marks)\\
+Based on the professor's explanation of extending vanilla self-attention.
+
+\begin{enumerate}[(a)]
+    \item The professor introduced Query, Key, and Value functions as "parametric functions" to increase network capacity. Explain the intuition behind each of these three components: \hfill (8 marks)
+    \begin{itemize}
+        \item What does the Query represent conceptually?
+        \item What does the Key represent conceptually?
+        \item What does the Value represent conceptually?
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item Given word embeddings $E_0$ and $E_1$, and weight matrices $W_Q$, $W_K$, and $W_V$, write the mathematical equations for computing: \hfill (8 marks)
+    \begin{itemize}
+        \item Query vectors: $Q_0 = ?$, $Q_1 = ?$
+        \item Key vectors: $K_0 = ?$, $K_1 = ?$  
+        \item Value vectors: $V_0 = ?$, $V_1 = ?$
+    \end{itemize}
+    
+    \shortanswer
+    
+    \item The professor mentioned "we use the same weight for each word." Explain what this means and why it's important for the self-attention mechanism. \hfill (4 marks)
+    
+    \shortanswer
+    
+    \item Derive the complete scaled dot-product attention formula as presented in the lecture, including the scaling factor $\frac{1}{\sqrt{d}}$. Explain why this scaling is necessary. \hfill (5 marks)
+    
+    \mediumanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 3. Multi-Head Attention}\hfill (20 marks)\\
+Based on the professor's explanation of multiple attention heads.
+
+\begin{enumerate}[(a)]
+    \item The professor stated: "with one scaled dot product attention we are looking at just one potential interpretation of a word." Explain why multiple attention heads are needed and what they accomplish. \hfill (6 marks)
+    
+    \mediumanswer
+    
+    \item Describe the multi-head attention process as explained in the lecture: \hfill (10 marks)
+    \begin{itemize}
+        \item How are the $h$ different heads created?
+        \item Why are projections to "lower dimensional spaces" used?
+        \item How are the outputs combined?
+    \end{itemize}
+    
+    \longanswer
+    
+    \item The professor showed an attention visualization where the word "it" attends to relevant words. Explain how this demonstrates the disambiguation capability of attention mechanisms. \hfill (4 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 4. Transformer Architecture}\hfill (25 marks)\\
+Based on the professor's detailed explanation of transformer blocks.
+
+\begin{enumerate}[(a)]
+    \item The professor noted that self-attention "loses position information." Explain this problem and describe the positional encoding solution using trigonometric functions. \hfill (8 marks)
+    
+    \mediumanswer
+    
+    \item Draw and label a complete transformer encoder block as described in the lecture, including: \hfill (12 marks)
+    \begin{itemize}
+        \item Multi-head self-attention
+        \item Skip connections (residual connections)
+        \item Layer normalization
+        \item Feed-forward network
+        \item All input/output flows
+    \end{itemize}
+    
+    \begin{center}
+    \begin{tikzpicture}[scale=0.8]
+        % Space for transformer block drawing
+        \draw[dotted] (0,0) rectangle (12,10);
+        \node at (6,9.5) {\textbf{Draw complete transformer encoder block}};
+        \node at (6,0.5) {\textbf{Include all components mentioned in lecture}};
+    \end{tikzpicture}
+    \end{center}
+    
+    \item Explain the purpose of skip connections and layer normalization in the transformer architecture as discussed in the lecture. \hfill (5 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 5. Transformer Decoder and Cross-Attention}\hfill (20 marks)\\
+Based on the professor's explanation of the decoder architecture.
+
+\begin{enumerate}[(a)]
+    \item The professor mentioned "masked multi head self attention" in the decoder. Explain why masking is necessary during training and how it works. \hfill (6 marks)
+    
+    \mediumanswer
+    
+    \item Describe cross-attention as explained in the lecture: \hfill (8 marks)
+    \begin{itemize}
+        \item Where do the Query, Key, and Value come from?
+        \item What is the decoder "looking for" in the encoder?
+        \item How is this similar to RNN attention?
+    \end{itemize}
+    
+    \mediumanswer
+    
+    \item The professor noted that during training, the decoder can work in parallel, but during inference it must be sequential. Explain this difference and why it occurs. \hfill (6 marks)
+    
+    \mediumanswer
+\end{enumerate}
+
+\newpage
+\paragraph{Question 6. Computational Complexity and Practical Considerations}\hfill (15 marks)\\
+Based on the professor's discussion of attention complexity.
+
+\begin{enumerate}[(a)]
+    \item The professor stated that RNN complexity is $O(N)$ while self-attention is $O(N^2)$ where $N$ is sequence length. Explain why this difference occurs and what it means practically. \hfill (8 marks)
+    
+    \mediumanswer
+    
+    \item The professor mentioned issues with positional encoding for longer sequences than seen during training. Explain this limitation and why it's problematic. \hfill (4 marks)
+    
+    \shortanswer
+    
+    \item Based on the lecture content, compare the advantages and disadvantages of transformers versus RNNs for sequence processing. \hfill (3 marks)
+    
+    \shortanswer
+\end{enumerate}
+
+\vfill
+\begin{center}{\bf END OF PAPER}\end{center>
+\end{document}
